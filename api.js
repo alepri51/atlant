@@ -12,9 +12,11 @@ cache private key in REDIS (now just plain json)
 check expiration & refresh if needed
 2. token === null
 
-return new token & auth every time
+return new token & auth & error every time
 
 */
+let KEYS_CACHE = {};
+
 class APIError extends Error {
     constructor(code, message) {
         super();
@@ -28,9 +30,10 @@ class API {
         this.token = token;
         this.id = id;
         this.member = void 0;
+        this.error = void 0;
 
         this.payload = this.token && this.verifyJWT(this.token);
-        this.error = void 0;
+        this.member = this.payload && this.payload.member;
 
         let self = this;
 
@@ -42,7 +45,7 @@ class API {
                     
                     return function (...args) {
                         console.log('CALLED:', self.constructor.name, propKey);
-                        const result = method.apply(this, args);
+                        const result = method.apply(self, args);
                         return result;
                     };
                 }
@@ -56,8 +59,22 @@ class API {
         return this.payload && this.payload.auth;
     }
 
+    get class_name() {
+        return this.constructor.name;
+    }
+
     security(name, method) {
         return method;
+    }
+
+    generateError(code, message, data) {
+        let error = this.error;
+        //data = data || this.error.data;
+        this.error = new APIError(code, message);
+        this.error.class = this.class_name;
+        this.error.data = data;
+        this.error.history = this.error.history || [];
+        error && this.error.history.push(error);
     }
 
     hash(value) {
@@ -79,14 +96,17 @@ class API {
             key: member.publicKey
         };
 
-        this.signJWT(member, payload);
+        this.signJWT(member.privateKey, payload);
 
         //await db.insert('token', payload);
         return this.token;
     }
 
-    signJWT(member, payload) {
-        this.token = jwt.sign(payload, member.privateKey, {algorithm: 'RS256', expiresIn: '10s'});
+    signJWT(private_key, payload) {
+        delete payload.iat;
+        delete payload.exp;
+
+        this.token = jwt.sign(payload, private_key, {algorithm: 'RS256', expiresIn: '10s'});
     }
 
     verifyJWT(token) {
@@ -95,14 +115,23 @@ class API {
         try {
             jwt.verify(token, payload.key);
             this.member = payload.member;
+
+            let private_key = KEYS_CACHE[this.member];
+
+            !private_key && setImmediate( async () => {
+                let member = await db.findOne('member', { _id: payload.member });
+                KEYS_CACHE[this.member] = member.privateKey;
+            });
+
+            private_key && this.signJWT(private_key, payload);
+
+            return payload;
         }
         catch(err) {
             this.revokeJWT(payload.jwtid);
-            this.error = new APIError(403, err.message);
-            return;
+            this.generateError(403, err.message, err.expiredAt);
         };
 
-        return payload;
     }
 
     async revokeJWT(id) {
@@ -118,14 +147,17 @@ class API {
 class SecuredAPI extends API {
     constructor(...args) {
         super(...args);
+
     }
 
     security(name, method) {
+        let exceptions = ['generateError'];
+        let except = exceptions.includes(name); //AVOID STACK OVERFLOW DUE RECURSION
+
         let self = this;
-        if(!this.auth) {
-            return function() { 
-                this.error = new APIError(403, `${self.constructor.name} AUTHENTICATION REQUIRED`);
-                return;
+        if(!except && !this.auth) {
+            return function(...args) { 
+                self.generateError(403, `${self.constructor.name} AUTHENTICATION REQUIRED`);
             };
         }
 
@@ -152,9 +184,17 @@ class Account extends SecuredAPI {
         //use proxy to handle not auth
     }
 
-    default() {
+    async default() {
         //console.log(this.payload.member);
-        return { balance: {btc: .00001, bonus: 10} };
+        let txs = await db.find('transaction', { to: this.member });
+        let sum = txs.reduce((sum, tx) => {
+            sum[tx.currency] = sum[tx.currency] || 0;
+            sum[tx.currency] += tx.amount;
+
+            return sum;
+        }, {});
+
+        return { balance:  { ...sum } };
     }
 }
 
@@ -169,18 +209,9 @@ class Signin extends API {
         let member = await db.findOne('member', {email});
         let auth = member && await bcrypt.compare(`${email}:${password}`, member.hash);
 
-        if(auth) {
-            await this.generateJWT({ member });
+        auth && await this.generateJWT({ member });
 
-            let account = new Account(this.token);
-            let balance = account.default();
-            
-
-            //return auth ? {auth: { name: member.name, email }, balance} : { error: 'Пользователь не найден' };
-            return { balance };
-        }
-        
-        this.error = new APIError(404, 'Пользователь не найден');
+        !auth && this.generateError(404, 'Пользователь не найден');
     }
 }
 
@@ -206,6 +237,7 @@ class Signup extends API {
 
         if(!member) {
             let default_list = await db.findOne('list', { default: true });
+            
             if(!default_list) {
                 let roots = await db.find('member', { group: "root" });
                 roots = roots.map((member, inx) => { 
@@ -222,16 +254,13 @@ class Signup extends API {
 
             let member = await db.insert('member', { group: "member", referer, name, email, hash, publicKey, privateKey });
             
+            await db.insert('transaction', { from: member._id, to: referer, currency: 'btc', amount: 0.01, date: new Date() });
+            await db.insert('transaction', { from: member._id, to: referer, currency: 'bnc', amount: 1, date: new Date() });
+            await db.insert('transaction', { from: member._id, to: referer, currency: 'usd', amount: 5, date: new Date() });
 
             await this.generateJWT({ member });
-    
-            //return { auth: { name, email } };
-            return;
         }
-
-        //this.revokeJWT(this.payload.jwtid);
-        this.error = new APIError(404, 'Не корректный адрес почтового ящика или пользователь уже зарегистрирован.');
-        //return { error: 'Не корректный адрес почтового ящика или пользователь уже зарегистрирован.', auth: this.payload && this.payload.auth };
+        else this.generateError(404, 'Не корректный адрес почтового ящика или пользователь уже зарегистрирован.');
     }
 }
 

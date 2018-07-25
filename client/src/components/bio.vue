@@ -9,8 +9,11 @@
                     </v-flex>
                     <v-flex>
                         <h2><v-icon small color="primary" class="mr-2 mb-1">fas fa-dollar-sign</v-icon>баланс:</h2>
-                        <div class="mt-2"><v-icon small class="mr-1" color="green darken-2">fas fa-money-bill-alt</v-icon>{{balance.btc}} BTC</div>
-                        <div><v-icon small class="mr-1" color="green darken-2">far fa-money-bill-alt</v-icon>{{balance.bonus}} BONUS</div>
+                        <div class="mt-2" v-for="(sum, key) in balance" :key="key">
+                            <v-icon small class="mr-1" color="green darken-2">fas fa-money-bill-alt</v-icon>
+                            {{sum}} {{key}}
+                        </div>
+                        <!-- <div><v-icon small class="mr-1" color="green darken-2">far fa-money-bill-alt</v-icon>{{balance.bonus}} BONUS</div> -->
                     </v-flex>
                 </v-layout>
             </v-card-text>

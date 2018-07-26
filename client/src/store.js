@@ -62,7 +62,10 @@ export default new Vuex.Store({
     mutations: {
         INIT(state) {
             state.api = axios.create({ 
-                baseURL: 'https://localhost:8000/api'
+                baseURL: 'https://localhost:8000/api',
+                /* transformRequest: (data, headers) => {
+                    return JSON.stringify(data);
+                } */
             });
 
             state.token = sessionStorage.getItem('token');
@@ -100,7 +103,7 @@ export default new Vuex.Store({
             
             state.api.interceptors.response.use(onResponse, onError);
 
-            state.api.get('auth');
+            state.api.get('auth', { params: {timestamp: new Date() / 1 } });
         },
         LOADING(state, value) {
             state.loading = value;
@@ -153,7 +156,7 @@ export default new Vuex.Store({
             state.snackbar.visible = false;
         },
         ACCOUNT(state, data) {
-            state.account.balance = data.balance;
+            state.account = data;
         }
     },
     actions: {
@@ -164,7 +167,14 @@ export default new Vuex.Store({
             let response;
 
             try {
-                response = await state.api[method || 'get'](endpoint, payload);
+                let config = {
+                    url: endpoint,
+                    method: method || 'get',
+                };
+
+                config.method === 'get' ? config.params = payload : config.data = payload;
+
+                response = await state.api(config);
             }
             catch(err) {
                 console.log('ERROR', err);

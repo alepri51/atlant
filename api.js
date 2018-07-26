@@ -106,7 +106,7 @@ class API {
         delete payload.iat;
         delete payload.exp;
 
-        this.token = jwt.sign(payload, private_key, {algorithm: 'RS256', expiresIn: '10s'});
+        this.token = jwt.sign(payload, private_key, {algorithm: 'RS256', expiresIn: '5m'});
     }
 
     verifyJWT(token) {
@@ -139,8 +139,8 @@ class API {
         this.payload = void 0;
     }
 
-    default() {
-        return {}
+    default(params) {
+        return { params }
     }
 };
 
@@ -171,11 +171,6 @@ class Auth extends API {
     constructor(...args) {
         super(...args);
     }
-
-    default() {
-        //return this.payload && (this.payload.auth ? {auth: this.payload.auth, error: this.payload.error} : {auth: void 0, error: this.payload.error}) || {};
-        return {};
-    }
 }
 
 class Account extends SecuredAPI {
@@ -184,17 +179,21 @@ class Account extends SecuredAPI {
         //use proxy to handle not auth
     }
 
-    async default() {
+    async default(params) {
         //console.log(this.payload.member);
-        let txs = await db.find('transaction', { to: this.member });
-        let sum = txs.reduce((sum, tx) => {
+        let in_txs = await db.find('transaction', { to: this.member });
+        let out_txs = await db.find('transaction', { from: this.member });
+
+        let sum = in_txs.reduce((sum, tx) => {
             sum[tx.currency] = sum[tx.currency] || 0;
             sum[tx.currency] += tx.amount;
 
             return sum;
         }, {});
 
-        return { balance:  { ...sum } };
+        let dreams = await db.find('dream', { member: this.member });
+
+        return { balance:  { ...sum }, dreams, transactions: { in_txs, out_txs }, params };
     }
 }
 
@@ -210,6 +209,13 @@ class Signin extends API {
         let auth = member && await bcrypt.compare(`${email}:${password}`, member.hash);
 
         auth && await this.generateJWT({ member });
+
+        let dreams = await db.findOne('dream', { member: member._id });
+        if(!dreams) {
+            await db.insert('dream', { member: member._id, name: 'Купить яхту', progress: 4500, value: 300000 });
+            await db.insert('dream', { member: member._id, name: 'Купить машину', progress: 7000, value: 30000 });
+            await db.insert('dream', { member: member._id, name: 'Съездить на Бали', progress: 1000, value: 5000 });
+        }
 
         !auth && this.generateError(404, 'Пользователь не найден');
     }

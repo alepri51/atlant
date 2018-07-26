@@ -9,6 +9,9 @@ import store from './store';
 
 import 'vuetify/dist/vuetify.min.css';
 
+import 'devextreme/dist/css/dx.common.css';
+import 'devextreme/dist/css/dx.material.blue.light.css';
+
 Vue.use(Vuetify, {
     theme: {
         primary: colors.indigo.darken2,
@@ -33,6 +36,8 @@ let mapStoreActions = () => {
     map.commit = store.commit;
     return map;
 };
+
+Vue.prototype.$colors = colors;
 
 Vue.mixin({
     methods: {

@@ -49,8 +49,11 @@
         props: ['visible'],
         data: () => {
             return {
-                email: 'club@atlant.club',
-                password: 'DerGfhjkm100'
+                email: 'o2@atlant.club',
+                password: '123'
+
+                /* email: 'club@atlant.club',
+                password: 'DerGfhjkm100' */
             }
         },
         methods: {

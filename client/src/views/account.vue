@@ -1,5 +1,5 @@
 <template>
-	<dashboard class="dashboard" :layout="layout" :components="components" :data={} v-resize="onResize" />
+	<dashboard class="dashboard" :layout="layout" :components="components" :data={} v-resize="onResize" @dreams-update="update"/>
 </template>
 
 
@@ -13,36 +13,46 @@
 
 			}
         },
-        activated() {
-            this.execute({ 
-                endpoint: 'account',
-                callback: response => this.commit('ACCOUNT', response.data)
-            });
+        methods: {
+            update() {
+                this.execute({ 
+                    endpoint: 'account',
+                    method: 'get',
+                    payload: {hello: 'world'},
+                    callback: response => this.commit('ACCOUNT', response.data)
+                });
+            },
+            onResize() {
+
+            }
+        },
+        created() {
+            this.update();
         },
 		data() {
 			return {
 				layout: {
-					cols: 9,
-					rows: 6
+					cols: 8,
+					rows: 7
 				},
 				components: [
+                    {
+                        "id": 1,
+                        "x": 1,
+                        "y": 1,
+                        "w": 6,
+                        "h": 6,
+                        "text": "dreams",
+                        "available": false,
+                        "comp": "dreams"
+                    },
                     {
                         "id": 2,
                         "x": 1,
                         "y": 0,
                         "w": 6,
-                        "h": 6,
-                        "text": "GRID",
-                        "available": false,
-                        "comp": "dreams"
-                    },
-                    {
-                        "id": 3,
-                        "x": 7,
-                        "y": 0,
-                        "w": 1,
-                        "h": 2,
-                        "text": "GRID",
+                        "h": 1,
+                        "text": "bio",
                         "available": false,
                         "comp": "bio"
                     }

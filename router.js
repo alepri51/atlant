@@ -21,7 +21,6 @@ router.all(patterns, async (req, res, next) => {
     let params = Object.keys(req.body).length === 0 ? req.query : req.body;
     let result = await executor(params);
 
-    //let auth = object.payload && object.payload.auth;
     let { token, auth, error } = object;
 
     res.json({ token, auth, error, ...result } || {}).end();

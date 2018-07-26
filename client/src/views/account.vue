@@ -16,7 +16,7 @@
         methods: {
             update() {
                 this.execute({ 
-                    endpoint: 'account',
+                    endpoint: 'account:100.default',
                     method: 'get',
                     payload: {hello: 'world'},
                     callback: response => this.commit('ACCOUNT', response.data)
@@ -26,7 +26,7 @@
 
             }
         },
-        created() {
+        activated() {
             this.update();
         },
 		data() {

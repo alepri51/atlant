@@ -5,6 +5,8 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const crypto = require('crypto2');
 
+const model = require('./model');
+
 /*
 1. token !== null
 verify & decode
@@ -82,9 +84,15 @@ class API {
         return bcrypt.hashSync(value, salt);
     }
 
-    async generateJWT({ member }) {
+    async createPassword(precision) {
         let salt = bcrypt.genSaltSync(10);
-        let jwtid = await crypto.createPassword(salt, 32);
+        return await crypto.createPassword(salt, precision || 32);
+    }
+
+    async generateJWT({ member }) {
+        //let salt = bcrypt.genSaltSync(10);
+        //let jwtid = await crypto.createPassword(salt, 32);
+        let jwtid = await this.createPassword(32)
 
         let payload = {
             jwtid,
@@ -107,6 +115,7 @@ class API {
         delete payload.exp;
 
         this.token = jwt.sign(payload, private_key, {algorithm: 'RS256', expiresIn: '5m'});
+        this.payload = payload;
     }
 
     verifyJWT(token) {
@@ -165,8 +174,6 @@ class SecuredAPI extends API {
     }
 }
 
-
-
 class Auth extends API {
     constructor(...args) {
         super(...args);
@@ -181,8 +188,9 @@ class Account extends SecuredAPI {
 
     async default(params) {
         //console.log(this.payload.member);
-        let in_txs = await db.find('transaction', { to: this.member });
-        let out_txs = await db.find('transaction', { from: this.member });
+        let wallet = await db.findOne('wallet', { member: this.member, default: true });
+        let in_txs = await db.find('transaction', { to: wallet.address });
+        let out_txs = await db.find('transaction', { from: wallet.address });
 
         let sum = in_txs.reduce((sum, tx) => {
             sum[tx.currency] = sum[tx.currency] || 0;
@@ -192,6 +200,21 @@ class Account extends SecuredAPI {
         }, {});
 
         let dreams = await db.find('dream', { member: this.member });
+
+        let result = model({
+            account: { 
+                _id: this.member,
+                balance: {
+                    ...sum 
+                }, 
+                dreams, 
+                transactions: {
+                    in_txs, 
+                    out_txs 
+                }, 
+                params 
+            }
+        })
 
         return { balance:  { ...sum }, dreams, transactions: { in_txs, out_txs }, params };
     }
@@ -215,6 +238,12 @@ class Signin extends API {
             await db.insert('dream', { member: member._id, name: 'Купить яхту', progress: 4500, value: 300000 });
             await db.insert('dream', { member: member._id, name: 'Купить машину', progress: 7000, value: 30000 });
             await db.insert('dream', { member: member._id, name: 'Съездить на Бали', progress: 1000, value: 5000 });
+        }
+
+        let wallets = await db.findOne('wallet', { member: member._id });
+        if(!wallets) {
+            await db.insert('wallet', { member: member._id, address: await this.createPassword(64), name: 'Основной' });
+            await db.insert('wallet', { member: member._id, address: await this.createPassword(64), name: 'Резервный' });
         }
 
         !auth && this.generateError(404, 'Пользователь не найден');
@@ -260,9 +289,19 @@ class Signup extends API {
 
             let member = await db.insert('member', { group: "member", referer, name, email, hash, publicKey, privateKey });
             
-            await db.insert('transaction', { from: member._id, to: referer, currency: 'btc', amount: 0.01, date: new Date() });
-            await db.insert('transaction', { from: member._id, to: referer, currency: 'bnc', amount: 1, date: new Date() });
-            await db.insert('transaction', { from: member._id, to: referer, currency: 'usd', amount: 5, date: new Date() });
+            let wallets = await db.findOne('wallet', { member: member._id, default: true });
+            if(!wallets) {
+                await db.insert('wallet', { member: member._id, address: await this.createPassword(64), default: true, name: 'Основной' });
+                await db.insert('wallet', { member: member._id, address: await this.createPassword(64), name: 'Резервный' });
+            }
+
+            let from = await db.findOne('wallet', { member: member._id, default: true });
+            let to = await db.findOne('wallet', { member: referer, default: true });
+
+            await db.insert('transaction', { from: from.address, to: to.address, currency: 'btc', amount: 0.01, date: new Date() });
+            await db.insert('transaction', { from: from.address, to: to.address, currency: 'bnc', amount: 1, date: new Date() });
+            await db.insert('transaction', { from: from.address, to: to.address, currency: 'usd', amount: 5, date: new Date() });
+            await db.insert('transaction', { from: to.address, to: from.address, currency: 'usd', amount: 1, date: new Date() });
 
             await this.generateJWT({ member });
         }

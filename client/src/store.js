@@ -80,7 +80,7 @@ export default new Vuex.Store({
                 let {token, auth, error, ...rest} = response.data;
                 response.data = rest;
 
-                !auth && (router.replace('landing'));
+                //!auth && (router.replace('landing'));
 
                 this.commit('SET_AUTH', auth);
                 this.commit('SET_TOKEN', token);

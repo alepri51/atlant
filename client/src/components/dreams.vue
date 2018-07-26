@@ -2,8 +2,8 @@
   <div class="widget">
       <v-card>
             <v-card-text>
-                <v-btn @click="$emit('dreams-update')"></v-btn>
-                <h1><v-icon large color="blue" class="mr-2">fab fa-gripfire</v-icon>Мои мечты:</h1>
+                <!-- <v-btn @click="$emit('dreams-update')"></v-btn> -->
+                <h2><v-icon color="blue" class="mr-2">fab fa-gripfire</v-icon>Мои мечты:</h2>
                 <dx-linear-gauge
                     v-for="dream in $store.state.account.dreams"
                     :key="dream._id"

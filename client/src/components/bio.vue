@@ -10,8 +10,8 @@
                     <v-divider vertical class="mr-4"/>
                     <v-flex xs4>
                         <h2><v-icon small color="primary" class="mr-2 mb-1">fas fa-dollar-sign</v-icon>баланс:</h2>
-                        <v-layout wrap v-if="Object.keys(balance).length">
-                            <v-flex class="" v-for="(sum, key) in balance" :key="key">
+                        <v-layout wrap v-if="entities.member && Object.keys(entities.member[auth.member].balance).length">
+                            <v-flex class="" v-for="(sum, key) in entities.member[auth.member].balance" :key="key">
                                 <v-icon small class="mr-1" color="green darken-2">fas fa-money-bill-alt</v-icon>
                                 {{sum}} {{key}}
                             </v-flex>

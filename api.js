@@ -98,6 +98,7 @@ class API {
             jwtid,
             member: member._id,
             auth: {
+                member: member._id,
                 email: member.email,
                 name: member.name
             },
@@ -189,15 +190,27 @@ class Account extends SecuredAPI {
     async default(params) {
         //console.log(this.payload.member);
         let wallet = await db.findOne('wallet', { member: this.member, default: true });
-        let in_txs = await db.find('transaction', { to: wallet.address });
-        let out_txs = await db.find('transaction', { from: wallet.address });
+        let transactions = await db.find('transaction', { $or: [{ to: wallet.address } , { from: wallet.address }] });
+        //let out_txs = await db.find('transaction', { from: wallet.address });
 
-        let sum = in_txs.reduce((sum, tx) => {
+        let sum = transactions.reduce((sum, tx) => {
+            sum[tx.currency] = sum[tx.currency] || 0;
+            tx.to === wallet.address ? sum[tx.currency] += tx.amount : sum[tx.currency] -= tx.amount;
+
+            return sum;
+        }, {});
+
+        /* let outcome = out_txs.reduce((sum, tx) => {
             sum[tx.currency] = sum[tx.currency] || 0;
             sum[tx.currency] += tx.amount;
 
             return sum;
         }, {});
+
+        let sum = Object.entries(outcome).reduce((sum, [currency, value]) => {
+            sum[currency] = income[currency] - value;
+            return sum;
+        }, {}); */
 
         let dreams = await db.find('dream', { member: this.member });
 
@@ -208,15 +221,14 @@ class Account extends SecuredAPI {
                     ...sum 
                 }, 
                 dreams, 
-                transactions: {
-                    in_txs, 
-                    out_txs 
-                }, 
+                transactions, 
                 params 
             }
-        })
+        });
 
-        return { balance:  { ...sum }, dreams, transactions: { in_txs, out_txs }, params };
+        return result;
+
+        //return { balance:  { ...sum }, dreams, transactions: { in_txs, out_txs }, params };
     }
 }
 
@@ -227,7 +239,8 @@ class Signin extends API {
 
     async submit({email, password}) {
         //console.log(email, password);
-        
+        this.error = void 0;
+
         let member = await db.findOne('member', {email});
         let auth = member && await bcrypt.compare(`${email}:${password}`, member.hash);
 

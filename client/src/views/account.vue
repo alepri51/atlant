@@ -19,7 +19,7 @@
                     endpoint: 'account:100.default',
                     method: 'get',
                     payload: {hello: 'world'},
-                    callback: response => this.commit('ACCOUNT', response.data)
+                    callback: response => this.commit('ACCOUNT', this.auth.member)
                 });
             },
             onResize() {

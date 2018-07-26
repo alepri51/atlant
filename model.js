@@ -128,18 +128,41 @@ model = (data) => {
 
     const _member = new schema.Entity('member', {
         dreams: [_dream],
-        transactions: {
-            in_txs: [_transaction],
-            out_txs: [_transaction]
+        transactions: [_transaction]
+    }, { 
+        idAttribute: '_id',
+        processStrategy: (value, parent, key) => {
+            //value.entity = 'member';
+            return value;
         }
-    }, { idAttribute: '_id' });
+    });
 
     const db = new schema.Entity('database', {
         account: _member
     }, { idAttribute: 'api' });
 
+    let map = {};
+
+    let mapping = (schema) => {
+        let entries = Object.entries(schema);
+        entries.forEach(entry => {
+            let from = entry[0];
+            let to = entry[1];
+            to = to instanceof Array ? to[0] : to;
+    
+            if(to._key) {
+                map[from] = to._key;
+                mapping(to.schema);        
+            }
+            else mapping(to);
+        });
+    }
+
+    mapping(db.schema);
+    map.database = 'database';
+
     let normalized = normalizer.normalize(data, db);
-    normalized = {...normalized, entry: 'database'};
+    normalized = {...normalized, entry: 'database', map: map};
 
     return normalized;
 };

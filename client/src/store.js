@@ -2,6 +2,7 @@ import Vue from 'vue';
 import Vuex from 'vuex';
 import router from './router';
 import axios from 'axios';
+import deepmerge from 'deepmerge';
 
 Vue.use(Vuex);
 
@@ -28,6 +29,7 @@ export default new Vuex.Store({
         },
         token: void 0,
         auth: void 0,
+        entities: {},
         account: {
             balance: {}
         },
@@ -77,18 +79,22 @@ export default new Vuex.Store({
             });
 
             let onResponse = (response => {
-                let {token, auth, error, ...rest} = response.data;
-                response.data = rest;
-
-                //!auth && (router.replace('landing'));
-
-                this.commit('SET_AUTH', auth);
-                this.commit('SET_TOKEN', token);
+                let {token, auth, error, entities, map, result, entry, ...rest} = response.data;
 
                 if(error) {
                     let vertical = error.message.length > 50;
                     this.commit('SHOW_SNACKBAR', { text: `ОШИБКА: ${error.message}`, vertical });
                     response.error = error;
+                }
+                else {
+                    response.data = rest;
+
+                    //!auth && (router.replace('landing'));
+
+                    this.commit('SET_AUTH', auth);
+                    this.commit('SET_TOKEN', token);
+
+                    entities && this.commit('SET_ENTITIES', { entities, map, result, entry, method: response.config.method });
                 }
 
                 return response;
@@ -155,9 +161,32 @@ export default new Vuex.Store({
         HIDE_SNACKBAR(state) {
             state.snackbar.visible = false;
         },
-        ACCOUNT(state, data) {
-            state.account = data;
-        }
+        ACCOUNT(state, id) {
+            state.account = id;
+        },
+        SET_ENTITIES(state, { entities, map, result, entry, method }) {
+            let merge = deepmerge(state.entities, entities || {}, {
+                arrayMerge: function (destination, source, options) {
+                    //ALL ARRAYS MUST BE SIMPLE IDs HOLDER AFTER NORMALIZE
+                    if(method.toUpperCase() === 'DELETE') {
+                        if(destination.length) {
+                            return destination.filter(id => source.indexOf(id) === -1);
+                        }
+                        else {
+                            return source;
+                        }
+                    }
+
+                    let a = new Set(destination);
+                    let b = new Set(source);
+                    let union = Array.from(new Set([...a, ...b]));
+
+                    return union;
+                }
+            });
+
+            state.entities = entities;
+        },
     },
     actions: {
         async execute({ commit, state }, { method, endpoint, payload, callback }) {

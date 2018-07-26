@@ -56,11 +56,8 @@ Vue.mixin({
         auth() {
             return this.$store.state.auth || {name: 'Аноним'};
         },
-        account() {
-            return this.$store.state.account || {}
-        },
-        balance() {
-            return (this.$store.state.account && this.$store.state.account.balance) || {}
+        entities() {
+            return this.$store.state.entities;
         }
     }
 });

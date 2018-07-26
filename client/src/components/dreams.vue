@@ -5,7 +5,7 @@
                 <!-- <v-btn @click="$emit('dreams-update')"></v-btn> -->
                 <h2><v-icon color="blue" class="mr-2">fab fa-gripfire</v-icon>Мои мечты:</h2>
                 <dx-linear-gauge
-                    v-for="dream in $store.state.account.dreams"
+                    v-for="dream in entities.dream"
                     :key="dream._id"
                     v-bind="gauge"
                     :value="dream.progress * 100 / dream.value" 

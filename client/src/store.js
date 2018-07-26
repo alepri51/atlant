@@ -185,7 +185,7 @@ export default new Vuex.Store({
                 }
             });
 
-            state.entities = entities;
+            state.entities = merge;
         },
     },
     actions: {

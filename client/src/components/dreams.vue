@@ -4,7 +4,21 @@
         
         <v-layout column align-content-space-between>
             <v-card-title>
-                <v-speed-dial
+                <v-btn
+                    absolute
+                    right
+
+                    fab
+                    dark
+
+                    small
+                    color="green"
+                    @click="false"
+                >
+                    <v-icon>fas fa-plus</v-icon>
+                </v-btn>
+
+                <!-- <v-speed-dial
                     absolute
 
                     v-model="fab"
@@ -31,14 +45,15 @@
                     <v-btn
                         fab
                         dark
+                        flat
                         small
                         color="green"
-                        @click="expand"
+                        @click="false"
                     >
                         <v-icon>fas fa-plus</v-icon>
                     </v-btn>
 
-                </v-speed-dial>
+                </v-speed-dial> -->
                 <h2><v-icon color="blue" class="mr-2">fab fa-gripfire</v-icon>Мои мечты:</h2>
             </v-card-title>
             <v-card-text>

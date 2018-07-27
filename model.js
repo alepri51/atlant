@@ -75,54 +75,6 @@ model = (data) => {
 
     let schema = normalizer.schema;
 
-    const _profile = new schema.Entity('profile', {});
-/*
-    const _profile = new schema.Entity('profile', {}, {
-        idAttribute: 'user' // to use not standard ID
-    });
-*/
-
-    const _phone = new schema.Entity('phone', {});
-    const _post = new schema.Entity('post', {});
-
-    const _feed = new schema.Entity('feed', {
-        posts: [_post]
-    });
-
-    const _message = new schema.Entity('message', {});
-
-    const _chat = new schema.Entity('chat', {
-        messages: [_message],
-    });
-
-    const _user = new schema.Entity('user', {
-        phones: [_phone],
-        profile: _profile,
-        chats: [_chat]
-    });
-
-    const _scope = new schema.Entity('scope', {});
-
-    const _client = new schema.Entity('client', {
-        users: [_user],
-        scopes: [_scope]
-    });
-
-    _user.define({applications: [_client]});
-    _user.define({friends: [_user]});
-
-    _chat.define({users: [_user]});
-    _chat.define({owner: _user});
-
-    const _create = new schema.Entity('create', {
-        user: _user,
-        scope: _scope,
-        client: _client
-    });
-
-    const _node = new schema.Entity('node', {});
-    const _edge = new schema.Entity('edge', {});
-
     const _transaction = new schema.Entity('transaction', {}, { idAttribute: '_id' });
     const _dream = new schema.Entity('dream', {}, { idAttribute: '_id' });
 
@@ -162,7 +114,7 @@ model = (data) => {
     map.database = 'database';
 
     let normalized = normalizer.normalize(data, db);
-    normalized = {...normalized, entry: 'database', map: map};
+    normalized = {...normalized, entry: 'database', map};
 
     return normalized;
 };

@@ -29,6 +29,11 @@
         activated() {
             this.update();
         },
+        created() {
+            this.components.forEach(element => {
+                this.commit('REGISTER_COMPONENT', element.comp);
+            });
+        },
 		data() {
 			return {
 				layout: {

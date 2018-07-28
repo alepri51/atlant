@@ -260,6 +260,10 @@ class Signin extends API {
         }
 
         !auth && this.generateError(404, 'Пользователь не найден');
+        /* if(auth) {
+            let account = new Account(this.token);
+            return account.default();
+        } */
     }
 }
 

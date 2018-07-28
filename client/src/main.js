@@ -12,6 +12,8 @@ import 'vuetify/dist/vuetify.min.css';
 import 'devextreme/dist/css/dx.common.css';
 import 'devextreme/dist/css/dx.material.blue.light.css';
 
+import './../public/custom.css';
+
 Vue.use(Vuetify, {
     theme: {
         primary: colors.indigo.darken2,
@@ -47,6 +49,9 @@ Vue.mixin({
         }
     },
     computed: {
+        state() {
+            return this.$store.state;
+        },
         api() {
             return this.$store.state.api;
         },
@@ -67,6 +72,6 @@ new Vue({
     store,
     render: h => h(App),
     created() {
-        this.$store.commit('INIT');
+        //this.$store.commit('INIT');
     }
 }).$mount('#app');

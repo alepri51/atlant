@@ -1,125 +1,153 @@
 <template>
-  <!-- <div > -->
-    <v-card height="100%" width="100%">
-        
-        <v-layout column align-content-space-between>
-            <v-card-title>
-                <v-btn
-                    absolute
-                    right
-
-                    fab
-                    dark
-
-                    small
-                    color="green"
-                    @click="false"
-                >
-                    <v-icon>fas fa-plus</v-icon>
-                </v-btn>
-
-                <!-- <v-speed-dial
-                    absolute
-
-                    v-model="fab"
-                    :top="false"
-                    :bottom="bottom"
-                    :right="right"
-                    :left="left"
-                    :direction="direction"
-                    :open-on-hover="hover"
-                    :transition="transition"
-                >
-                    <v-btn
-                        slot="activator"
-                        v-model="fab"
-                        :style="active || fab ? 'background-color: ' + $colors.green.darken2 : 'background-color: rgb(96, 125, 139, 0.5)'"
-                        dark
-                        fab
-                        small
-                    >
-                        <v-icon>fas fa-cogs</v-icon>
-                        <v-icon>fas fa-times</v-icon>
-                    </v-btn>
-
-                    <v-btn
-                        fab
-                        dark
-                        flat
-                        small
-                        color="green"
-                        @click="false"
-                    >
-                        <v-icon>fas fa-plus</v-icon>
-                    </v-btn>
-
-                </v-speed-dial> -->
-                <h2><v-icon color="blue" class="mr-2">fab fa-gripfire</v-icon>Мои мечты:</h2>
-            </v-card-title>
-            <v-card-text>
-                <!-- <v-btn absolute top right fab small color="secondary"><v-icon>fas fa-plus</v-icon></v-btn> -->
-                
-
-                <dx-linear-gauge
-                    v-for="dream in entities.dream"
-                    :key="dream._id"
+    <v-card width="100%">
+        <v-card-title style="position: relative">
+            <h2><v-icon color="primary" class="mr-2">fas fa-user-circle</v-icon>Мои мечты: {{inc}}</h2>
+            <v-btn
+                absolute
+                right
+                fab
+                dark
+                top
+                color="green"
+                @click="inc += 1"
+            >
+                <v-icon>fas fa-plus</v-icon>
+            </v-btn>
+        </v-card-title>
+        <v-divider/>
+        <!-- <v-card-text style="overflow: auto; position: relative" id="scroll-target"> -->
+            <!-- <dx-scroll-view > -->
+        <v-card-text style="overflow: auto; position: relative" id="scrollable">
+            <v-card @mouseover="onHover(dream._id)" @mouseout="value[dream._id] = false" class="mb-2" flat hover v-scroll:#scrollable="onScroll"
+                v-for="dream in entities.dream"
+                :key="dream._id"
+            >
+                <dx-linear-gauge 
                     v-bind="gauge"
                     :value="dream.progress * 100 / dream.value" 
                     :subvalues="[dream.progress * 100 / dream.value]"
-                    :title="title(dream.name, dream.value)"
+                    :title="chart_title(dream.name, dream.value)"
                 >
-                    <v-speed-dial
+                    <v-speed-dial 
                         absolute
-
-                        v-model="fab"
-                        :top="false"
+                        v-model="fab[dream._id]"
+                        
                         :bottom="bottom"
                         :right="right"
                         :left="left"
                         :direction="direction"
                         :open-on-hover="hover"
                         :transition="transition"
-                        v-show="value"
+                        v-show="dream._id === active"
                     >
                         <v-btn
                             slot="activator"
-                            v-model="fab"
-                            :style="active || fab ? 'background-color: rgb(48, 63, 159)' : 'background-color: rgb(96, 125, 139, 0.5)'"
+                            v-model="fab[dream._id]"
+                            :style="fab[dream._id] ? 'background-color: rgb(48, 63, 159)' : 'background-color: rgb(96, 125, 139, 0.5)'"
                             dark
                             fab
                             small
-                            @mouseover="active = true" @mouseout="active = false"
+                            
                         >
-                            <v-icon>fas fa-cogs</v-icon>
+                            <v-icon>fas fa-chevron-down</v-icon>
+                            <v-icon>fas fa-chevron-up</v-icon>
+                        </v-btn>
+                        <v-btn
+                            fab
+                            dark
+                            small
+                            color="green darken-2"
+                            @click="false"
+                        >
+                            <v-icon>fas fa-pen</v-icon>
+                        </v-btn>
+                        <v-btn
+                            fab
+                            dark
+                            small
+                            color="red darken-2"
+                            @click="false"
+                        >
                             <v-icon>fas fa-times</v-icon>
                         </v-btn>
-
-                    </v-speed-dial>  
+                    </v-speed-dial>
                 </dx-linear-gauge>
-                
-            </v-card-text>
-        </v-layout>
-        <div style="position: absolute; bottom: 4px; right: 8px; font-size: 10px" class="grey--text">мечты</div>
+            </v-card>
+        </v-card-text>
+            <!-- </dx-scroll-view> -->
     </v-card>
-      
-  <!-- </div> -->
+         
 </template>
 
+<style scoped>
+    .v-speed-dial {
+        margin-top: 16px;
+        /* margin-right: 16px; */
+    }
+
+    .v-card {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .content {
+        width: 100%;
+        flex: 1 1 auto;
+        overflow: auto;
+    }
+
+    /* .widget div:first-child {
+        height: 100%;
+    } */
+</style>
+
 <script>
-     import { DxLinearGauge } from 'devextreme-vue';
+     import { DxLinearGauge, DxScrollView } from 'devextreme-vue';
 
     export default {
         components: {
-            DxLinearGauge
+            DxLinearGauge,
+            DxScrollView
+        },
+        created() {
+            debugger;
+        },
+        mounted() {
+            debugger;
+        },
+        activated() {
+            var container = this.$el.querySelector("#scrollable");
+            container.scrollTop = this.inc;
+        },
+        methods: {
+            onScroll(e) {
+                this.inc = e.target.scrollTop;
+                //console.log('SCROLL', e.target.scrollTop);
+            },
+            onHover(id) {
+                //debugger;
+                this.value[id] = true;
+                this.active = id;
+                //console.log(JSON.stringify(this.value, null, '\t'));
+            },
+            chart_title(title, subtitle) {
+                let title_config = {...this.gauge.title};
+                title_config.text = title;
+                title_config.subtitle = {...this.gauge.title.subtitle};
+                title_config.subtitle.text = subtitle + '$';
+
+                return title_config;
+            }
         },
         data() {
 
             return {
+                inc: 0,
+
                 active: false,
-                value: false,
+                value: {},
                 direction: 'bottom',
-                fab: true,
-                fling: false,
+                fab: {},
                 hover: true,
                 tabs: null,
                 top: true,
@@ -130,7 +158,7 @@
                 
                 gauge: {
                     size: {
-                        height: 150
+                        height: 170
                     },
                     title: {
                         font: {
@@ -201,33 +229,9 @@
                     }
                 }
             }
-        },
-        methods: {
-            title(title, subtitle) {
-                let title_config = {...this.gauge.title};
-                title_config.text = title;
-                title_config.subtitle = {...this.gauge.title.subtitle};
-                title_config.subtitle.text = subtitle + '$';
-
-                return title_config;
-            }
         }
     }
 </script>
 
-<style scoped>
-    .v-speed-dial {
-        /* position: absolute; */
-        right: 32px;
-    }
 
-    .widget {
-        width: 100%;
-        height: 100%;
-    }
-
-    /* .widget div:first-child {
-        height: 100%;
-    } */
-</style>
 

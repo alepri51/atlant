@@ -14,6 +14,10 @@ let patterns = ['/:type\::id\.:action', '/:type\.:action', '/:type\::id', '/:typ
 router.all(patterns, async (req, res, next) => {
     let {type, id, action} = req.params;
 
+    console.log('REQUEST:', { type, id, action });
+
+    !types[type] && (type = 'auth');
+
     let object = new types[type](req.headers.authorization, id);
 
     let executor = action ? object[action].bind(object) : object.default.bind(object);

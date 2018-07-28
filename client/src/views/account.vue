@@ -1,5 +1,5 @@
 <template>
-	<dashboard class="dashboard" :layout="layout" :components="components" :data={} v-resize="onResize" @dreams-update="update"/>
+	<dashboard class="dashboard" :layout="layout" :components="components" :data={} v-resize="onResize" @REGISTER-COMPONENT="registerComponent"/>
 </template>
 
 
@@ -14,6 +14,10 @@
 			}
         },
         methods: {
+            registerComponent(name) {
+                //debugger;
+                this.commit('REGISTER_COMPONENT', name);
+            },
             update() {
                 this.execute({ 
                     endpoint: 'account:100.default',
@@ -27,12 +31,13 @@
             }
         },
         activated() {
-            this.update();
+            //this.update();
         },
         created() {
-            this.components.forEach(element => {
+            //РЕГИСТРАЦИЯ
+            /* this.components.forEach(element => {
                 this.commit('REGISTER_COMPONENT', element.comp);
-            });
+            }); */
         },
 		data() {
 			return {
@@ -55,11 +60,21 @@
                         "id": 2,
                         "x": 1,
                         "y": 0,
-                        "w": 6,
+                        "w": 4,
                         "h": 1,
                         "text": "bio",
                         "available": false,
                         "comp": "bio"
+                    },
+                    {
+                        "id": 3,
+                        "x": 5,
+                        "y": 0,
+                        "w": 2,
+                        "h": 1,
+                        "text": "balance",
+                        "available": false,
+                        "comp": "balance"
                     }
                 ]
 			}

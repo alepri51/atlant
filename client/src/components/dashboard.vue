@@ -62,9 +62,10 @@ export default {
 	created() {
         this.calc();
         //debugger;
-        /* this.components.forEach(element => {
-            this.commit('REGISTER_COMPONENT', element.comp);
-        }); */
+        this.components.forEach(element => {
+            //this.commit('REGISTER_COMPONENT', element.comp);
+            this.$emit('REGISTER-COMPONENT', element.comp);
+        });
 	},
 
 	methods: {

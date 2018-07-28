@@ -9,7 +9,7 @@
         <v-content class="vcontent">
             <transition name="fade" mode="out-in">
                 <keep-alive>
-                <component :is="$store.state.view"></component>
+                    <component :is="$store.state.view"></component>
                 </keep-alive>
             </transition>
         </v-content>

@@ -30,11 +30,16 @@
         },
         methods: {
             submit() {
-                //this.$refs.form.validate() && this.$store.actions.signin({ email: this.email, password: this.password });'
-                //debugger;
-                this.execute({ method: 'post', endpoint: 'signout.submit' });
-                this.commit('HIDE_DIALOG', 'signout');
-                this.$router.replace('landing');
+
+                this.execute({ 
+                    method: 'post', 
+                    endpoint: 'signout.submit',
+                    callback: () => {
+                        this.commit('CLEAR_CACHE');
+                        this.commit('HIDE_DIALOG', 'signout');
+                        this.$router.replace('landing');
+                    }    
+                });
             }
         }
     }    

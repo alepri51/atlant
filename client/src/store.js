@@ -3,8 +3,13 @@ import Vuex from 'vuex';
 import router from './router';
 import axios from 'axios';
 import deepmerge from 'deepmerge';
+//import MockAdapter from 'axios-mock-adapter';
+import { cacheAdapterEnhancer, throttleAdapterEnhancer, Cache } from 'axios-extensions';
+
 
 Vue.use(Vuex);
+
+let requests_cache = new Cache();
 
 export default new Vuex.Store({
     strict: true,
@@ -62,16 +67,20 @@ export default new Vuex.Store({
         ]
     },
     mutations: {
+        CLEAR_CACHE() {
+            requests_cache.reset();
+        },
         INIT(state) {
             state.api = axios.create({ 
                 baseURL: 'https://localhost:8000/api',
+                headers: { 'Cache-Control': 'no-cache' },
+	            adapter: throttleAdapterEnhancer(cacheAdapterEnhancer(axios.defaults.adapter))
                 /* transformRequest: (data, headers) => {
                     return JSON.stringify(data);
                 } */
             });
 
             state.token = sessionStorage.getItem('token');
-            //state.api.defaults.headers.common['Authorization'] = state.token ? state.token : '';
 
             let onRequest = (config => {
                 state.token && (config.headers.common.authorization = state.token);
@@ -79,24 +88,22 @@ export default new Vuex.Store({
             });
 
             let onResponse = (response => {
-                let {token, auth, error, entities, map, result, entry, ...rest} = response.data;
+                let {token, auth, error, entities, map, result, entry, cached, ...rest} = response.data;
 
                 if(error) {
                     let vertical = error.message.length > 50;
                     this.commit('SHOW_SNACKBAR', { text: `ОШИБКА: ${error.message}`, vertical });
-                    response.error = error;
-                }
-                else {
-                    response.data = rest;
-
-                    //!auth && (router.replace('landing'));
-
-                    this.commit('SET_AUTH', auth);
-                    this.commit('SET_TOKEN', token);
-
-                    entities && this.commit('SET_ENTITIES', { entities, map, result, entry, method: response.config.method });
+                    //response.error = error;
                 }
 
+                //!auth && (router.replace('landing'));
+
+                this.commit('SET_AUTH', auth);
+                this.commit('SET_TOKEN', token);
+
+                !cached && this.commit('SET_ENTITIES', { entities, map, result, entry, method: response.config.method });
+
+                response.data.cached = !!response.config.cache;
                 return response;
             });
             
@@ -109,7 +116,7 @@ export default new Vuex.Store({
             
             state.api.interceptors.response.use(onResponse, onError);
 
-            state.api.get('auth', { params: {timestamp: new Date() / 1 } });
+            //state.api.get('auth', { params: {timestamp: new Date() / 1 } });
         },
         LOADING(state, value) {
             state.loading = value;
@@ -134,6 +141,14 @@ export default new Vuex.Store({
             state.referer = referer;
         },
         LOCATION(state, view) {
+            /* if(!state.api) {
+                this.commit('INIT');
+                this.dispatch('execute', { endpoint: view, method: 'get' });
+            } */
+
+            !state.api && this.commit('INIT');
+            this.dispatch('execute', { endpoint: view, method: 'get' });
+
             state.view = view;
             state.notFound = false;
         },
@@ -161,45 +176,52 @@ export default new Vuex.Store({
         HIDE_SNACKBAR(state) {
             state.snackbar.visible = false;
         },
+        SET_ENTITIES(state, { entities, map, result, entry, method }) {
+            if(entities) {
+                let merge = deepmerge(state.entities, entities || {}, {
+                    arrayMerge: function (destination, source, options) {
+                        //ALL ARRAYS MUST BE SIMPLE IDs HOLDER AFTER NORMALIZE
+                        if(method.toUpperCase() === 'DELETE') {
+                            if(destination.length) {
+                                return destination.filter(id => source.indexOf(id) === -1);
+                            }
+                            else {
+                                return source;
+                            }
+                        }
+
+                        let a = new Set(destination);
+                        let b = new Set(source);
+                        let union = Array.from(new Set([...a, ...b]));
+
+                        return union;
+                    }
+                });
+
+                state.entities = merge;
+            }
+            else !state.auth && (state.entities = {});
+        },
+        //PROJECT SPECIFIC
         ACCOUNT(state, id) {
             state.account = id;
-        },
-        SET_ENTITIES(state, { entities, map, result, entry, method }) {
-            let merge = deepmerge(state.entities, entities || {}, {
-                arrayMerge: function (destination, source, options) {
-                    //ALL ARRAYS MUST BE SIMPLE IDs HOLDER AFTER NORMALIZE
-                    if(method.toUpperCase() === 'DELETE') {
-                        if(destination.length) {
-                            return destination.filter(id => source.indexOf(id) === -1);
-                        }
-                        else {
-                            return source;
-                        }
-                    }
-
-                    let a = new Set(destination);
-                    let b = new Set(source);
-                    let union = Array.from(new Set([...a, ...b]));
-
-                    return union;
-                }
-            });
-
-            state.entities = merge;
-        },
+        }
     },
     actions: {
         async execute({ commit, state }, { method, endpoint, payload, callback }) {
-            //debugger;
-            commit('LOADING', true);
-
+            
             let response;
 
+            let config = {
+                url: endpoint,
+                method: method || 'get',
+            };
+
+            config.cache = config.method === 'get' ? requests_cache : false;
+
+            commit('LOADING', true);
+
             try {
-                let config = {
-                    url: endpoint,
-                    method: method || 'get',
-                };
 
                 config.method === 'get' ? config.params = payload : config.data = payload;
 
@@ -209,7 +231,7 @@ export default new Vuex.Store({
                 console.log('ERROR', err);
             };
 
-            commit('LOADING', false);
+            commit('LOADING', false);            
 
             if(callback) 
                 callback(response); 

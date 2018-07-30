@@ -1,5 +1,15 @@
 'use strict'
+//https://github.com/louischatriot/nedb
 
+//Как запросы сделать:
+//const db = require('./db');
+//await db.remove('$имя_коллекции$', { _id: payload._id })
+//await db.update('$имя_коллекции$', { _id: payload._id }, { ...payload }) 
+//await db.insert('$имя_коллекции$', { ...payload });
+//await db.findOne('$имя_коллекции$', { _id: payload.member });
+//await db.find('$имя_коллекции$', { _id: payload.member });
+
+//массив коллекций, создается при старте
 let collections = ['member', 'token', 'transaction', 'product', 'list', 'dream', 'wallet'];
 
 const cluster = require('cluster');
@@ -37,40 +47,37 @@ if(cluster.isMaster) {
     };
 
     db.remove = function (collection, query, options) {
-        return new Promise(function (resolve, reject) {
+        return new Promise(async function (resolve, reject) {
+            let to_remove = await db.findOne(collection, query);
             db[collection].remove(query, {multi: true}, function (err, results) {
-                err ? reject(err) : resolve(results);
+                err ? reject(err) : resolve(to_remove);
             });
 
         });
     };
 
-    /* db.update = function (collection, query, body) {
+    db.update = function (collection, query, data) {
         return new Promise(async function (resolve, reject) {
 
-            body.created = body.created || new Date() / 1;
-            body.updated = new Date() / 1;
+            data.created = data.created || new Date() / 1;
+            data.updated = new Date() / 1;
 
-            let object = await db.findOne(collection, query, {allow_empty: true});
-            object && (body = {...object, ...body});
-            body && (delete body.id);
+            let object = await db.findOne(collection, query);
+            object && (data = {...object, ...data});
 
-            db[collection].update(query, body, {upsert: true}, async function (err, results, upsert) {
-                if (!results || err) {
-                    reject(err || new NotFoundError(collection));
-                }
-                else {
-                    results = upsert ? await db.find(collection, {_id: upsert._id}) : await db.find(collection, query);
-                    results && resolve(results);
-                    //reject(err || new NotFoundError(collection));
-                }
+            db[collection].update(query, data, { upsert: true }, async function (err, results, upsert) {
+                results = upsert ? await db.findOne(collection, { _id: upsert._id }) : await db.findOne(collection, query);
+                results && resolve(results);
             });
 
         });
-    }; */
+    };
 
     db.insert = function (collection, data) {
         return new Promise(async function (resolve, reject) {
+            data.created = data.created || new Date() / 1;
+            data.updated = new Date() / 1;
+
             db[collection].insert(data, function (err, inserted) {
                 err ? reject(err) : resolve(inserted);
             });

@@ -20,10 +20,12 @@ router.all(patterns, async (req, res, next) => {
 
     let object = new types[type](req.headers.authorization, id);
 
+    !object[action] && (action = 'default');
+
     let executor = action ? object[action].bind(object) : object.default.bind(object);
 
     let params = Object.keys(req.body).length === 0 ? req.query : req.body;
-    let result = await executor(params);
+    let result = await executor(params, req);
 
     let { token, auth, error } = object;
 

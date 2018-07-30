@@ -44,8 +44,8 @@ Vue.prototype.$colors = colors;
 Vue.mixin({
     methods: {
         ...mapStoreActions(),
-        call(action) {
-            this[action]();
+        call(action, ...args) {
+            this[action](...args);
         }
     },
     computed: {

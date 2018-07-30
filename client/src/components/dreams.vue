@@ -1,7 +1,7 @@
 <template>
     <v-card width="100%">
         <v-card-title style="position: relative">
-            <h2><v-icon color="primary" class="mr-2">fas fa-user-circle</v-icon>Мои мечты: {{inc}}</h2>
+            <h2><v-icon color="primary" class="mr-2">fas fa-cloud</v-icon>Мои мечты:</h2>
             <v-btn
                 absolute
                 right
@@ -9,24 +9,23 @@
                 dark
                 top
                 color="green"
-                @click="inc += 1"
+                @click="commit('SHOW_DIALOG', { dialog: 'dream', data: { percent: 50, name: 'hello' }})"
             >
                 <v-icon>fas fa-plus</v-icon>
             </v-btn>
         </v-card-title>
         <v-divider/>
-        <!-- <v-card-text style="overflow: auto; position: relative" id="scroll-target"> -->
-            <!-- <dx-scroll-view > -->
-        <v-card-text style="overflow: auto; position: relative" id="scrollable">
-            <v-card @mouseover="onHover(dream._id)" @mouseout="value[dream._id] = false" class="mb-2" flat hover v-scroll:#scrollable="onScroll"
+
+        <v-card-text class="scrollable" id="scrollable">
+            <v-card class="ma-2" @mouseover="onHover(dream._id)" @mouseout="value[dream._id] = false" hover v-scroll:#scrollable="onScroll"
                 v-for="dream in entities.dream"
                 :key="dream._id"
             >
                 <dx-linear-gauge 
                     v-bind="gauge"
-                    :value="dream.progress * 100 / dream.value" 
-                    :subvalues="[dream.progress * 100 / dream.value]"
-                    :title="chart_title(dream.name, dream.value)"
+                    :value="54"
+                    :subvalues="[54]"
+                    :title="chart_title(dream.name, dream.value, dream.percent)"
                 >
                     <v-speed-dial 
                         absolute
@@ -57,7 +56,7 @@
                             dark
                             small
                             color="green darken-2"
-                            @click="false"
+                            @click="edit(dream)"
                         >
                             <v-icon>fas fa-pen</v-icon>
                         </v-btn>
@@ -66,15 +65,17 @@
                             dark
                             small
                             color="red darken-2"
-                            @click="false"
+                            @click="remove(dream)"
                         >
                             <v-icon>fas fa-times</v-icon>
                         </v-btn>
                     </v-speed-dial>
                 </dx-linear-gauge>
             </v-card>
-        </v-card-text>
-            <!-- </dx-scroll-view> -->
+        </v-card-text> 
+        <div style="position: absolute; bottom: 4px; right: 8px; font-size: 10px" class="grey--text">мечты</div>
+
+        <dream :options="Object.assign({}, dialogs.dream)" @remove="onRemove"/>
     </v-card>
          
 </template>
@@ -82,6 +83,7 @@
 <style scoped>
     .v-speed-dial {
         margin-top: 16px;
+        padding-bottom: 6px;
         /* margin-right: 16px; */
     }
 
@@ -90,10 +92,16 @@
         flex-direction: column;
     }
 
-    .content {
-        width: 100%;
-        flex: 1 1 auto;
-        overflow: auto;
+    .scrollable {
+        overflow: auto; 
+        position: relative; 
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+
+    .tile {
+        margin: 4px;
     }
 
     /* .widget div:first-child {
@@ -102,24 +110,34 @@
 </style>
 
 <script>
-     import { DxLinearGauge, DxScrollView } from 'devextreme-vue';
+    import { DxLinearGauge } from 'devextreme-vue';
 
     export default {
         components: {
             DxLinearGauge,
-            DxScrollView
+            dream: () => import('./modals/dream')
         },
         created() {
-            debugger;
+            //debugger;
         },
         mounted() {
-            debugger;
+            //debugger;
         },
         activated() {
             var container = this.$el.querySelector("#scrollable");
-            container.scrollTop = this.inc;
+            container && (container.scrollTop = this.inc);
         },
         methods: {
+            edit(dream) {
+                 this.commit('SHOW_DIALOG', { dialog: 'dream', data: { ...dream }})
+            },
+            remove(dream) {
+                 this.commit('SHOW_DIALOG', { dialog: 'dream', data: { disabled: true, ...dream }});
+            },
+            onRemove(id) {
+                //debugger;
+                delete this.entities.dream[id];
+            },
             onScroll(e) {
                 this.inc = e.target.scrollTop;
                 //console.log('SCROLL', e.target.scrollTop);
@@ -130,9 +148,9 @@
                 this.active = id;
                 //console.log(JSON.stringify(this.value, null, '\t'));
             },
-            chart_title(title, subtitle) {
+            chart_title(title, subtitle, percent) {
                 let title_config = {...this.gauge.title};
-                title_config.text = title;
+                title_config.text = title + ' (' + percent + '%)';
                 title_config.subtitle = {...this.gauge.title.subtitle};
                 title_config.subtitle.text = subtitle + '$';
 
@@ -140,7 +158,6 @@
             }
         },
         data() {
-
             return {
                 inc: 0,
 
@@ -158,7 +175,7 @@
                 
                 gauge: {
                     size: {
-                        height: 170
+                        height: 200
                     },
                     title: {
                         font: {

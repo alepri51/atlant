@@ -69,7 +69,7 @@ class API {
         return method;
     }
 
-    generateError(code, message, data) {
+    generateError({ code, message, data, system }) {
         let error = this.error;
         //data = data || this.error.data;
         this.error = new APIError(code, message);
@@ -77,6 +77,8 @@ class API {
         this.error.data = data;
         this.error.history = this.error.history || [];
         error && this.error.history.push(error);
+
+        this.error.system = system;
     }
 
     hash(value) {
@@ -139,7 +141,7 @@ class API {
         }
         catch(err) {
             this.revokeJWT(payload.jwtid);
-            this.generateError(403, err.message, err.expiredAt);
+            this.generateError({ code: 403, message: err.message, data: err.expiredAt, system: true });
         };
 
     }
@@ -167,7 +169,7 @@ class SecuredAPI extends API {
         let self = this;
         if(!except && !this.auth) {
             return function(...args) { 
-                self.generateError(403, `${self.constructor.name} AUTHENTICATION REQUIRED`);
+                self.generateError({ code:403, message: 'Отказано в доступе. Пожалуйста аутентифицируйтесь', data: self.constructor.name });
             };
         }
 
@@ -259,7 +261,7 @@ class Signin extends API {
             await db.insert('wallet', { member: member._id, address: await this.createPassword(64), name: 'Резервный' });
         }
 
-        !auth && this.generateError(404, 'Пользователь не найден');
+        !auth && this.generateError({ code: 404, message: 'Пользователь не найден' });
         /* if(auth) {
             let account = new Account(this.token);
             return account.default();
@@ -322,7 +324,28 @@ class Signup extends API {
 
             await this.generateJWT({ member });
         }
-        else this.generateError(404, 'Не корректный адрес почтового ящика или пользователь уже зарегистрирован.');
+        else this.generateError({ code: 404, message: 'Не корректный адрес почтового ящика или пользователь уже зарегистрирован.' });
+    }
+}
+
+class Dream extends SecuredAPI {
+    constructor(...args) {
+        super(...args);
+    }
+
+    async submit(payload, req) {
+        payload.member = this.member;
+
+        let dream = payload._id ? req.method === 'DELETE' ? await db.remove('dream', { _id: payload._id }) : await db.update('dream', { _id: payload._id }, { ...payload }) : await db.insert('dream', { ...payload });
+
+        let result = model({
+            account: {
+                _id: this.member,
+                dreams: [dream]
+            }
+        });
+
+        return result;
     }
 }
 
@@ -332,7 +355,8 @@ let classes = {
     Signup,
     Signout,
     Auth,
-    Account
+    Account,
+    Dream
 }
 
 module.exports = Object.entries(classes).reduce((memo, item) => {

@@ -30,6 +30,15 @@ export default new Vuex.Store({
             },
             stepper: {
                 visible: false
+            },
+            dream: {
+                visible: false,
+                defaults: {
+                    name: 'ooo',
+                    percent: 0,
+                    value: 0,
+                    _id: void 0
+                }
             }
         },
         token: void 0,
@@ -91,9 +100,13 @@ export default new Vuex.Store({
                 let {token, auth, error, entities, map, result, entry, cached, ...rest} = response.data;
 
                 if(error) {
-                    let vertical = error.message.length > 50;
-                    this.commit('SHOW_SNACKBAR', { text: `ОШИБКА: ${error.message}`, vertical });
-                    //response.error = error;
+                    if(!error.system) {
+                        let vertical = error.message.length > 50;
+                        this.commit('SHOW_SNACKBAR', { text: `ОШИБКА: ${error.message}`, vertical });
+                    }
+                    else console.error(error.code, error.message, error.data);
+                    //Для упрощения достопа к ошибке
+                    response.error = error;
                 }
 
                 //!auth && (router.replace('landing'));
@@ -155,8 +168,11 @@ export default new Vuex.Store({
         NOT_FOUND(state) {
             state.notFound = true;
         },
-        SHOW_DIALOG(state, dialog) {
-            state.dialogs[dialog].visible = true;
+        SHOW_DIALOG(state, payload) {
+            let {disabled, ...data} = payload.data || {};
+            state.dialogs[payload.dialog].disabled = disabled;
+            state.dialogs[payload.dialog].defaults = { ...state.dialogs[payload.dialog].defaults, ...data };
+            state.dialogs[payload.dialog].visible = true;
         },
         HIDE_DIALOG(state, dialog) {
             state.dialogs[dialog].visible = false;

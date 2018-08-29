@@ -193,6 +193,7 @@ class SignUp extends API {
         let ua = uaParser(req.headers['user-agent']);
 
         let user = {
+            id: generate('abcdefghijklmnopqrstuvwxyz', 10),
             name: req.ip + ':' + req.headers['user-agent']
         };
 

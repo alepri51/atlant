@@ -26,15 +26,15 @@
                         "y": 0,
                         "w": 6,
                         "h": 2,
-                        "available": false,
+                        "available": true,
                         "comp": "selection"
                     },
                     {
                         "id": 2,
                         "x": 1,
-                        "y": 2,
+                        "y": 0,
                         "w": 6,
-                        "h": 13,
+                        "h": 15,
                         "available": false,
                         "comp": "news"
                     },

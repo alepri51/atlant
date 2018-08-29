@@ -41,9 +41,16 @@ class API {
                     return async function (...args) {
                         let result = await method.apply(self, args);
                         result = self.onExecuted ? self.onExecuted(propKey, result) : result;
-                        console.log('CALLED:', self.class_name, propKey, self.onExecuted ? 'EXECUTED' : 'NO INERSEPTOR');
+                        //console.log('CALLED:', self.class_name, propKey, self.onExecuted ? 'EXECUTED' : 'NO INERSEPTOR');
+                        //console.log('CALLED:', result);
                         return result;
                     };
+                    /* return function (...args) {
+                        let result = method.apply(self, args);
+                        result = self.onExecuted ? self.onExecuted(propKey, result) : result;
+                        console.log('CALLED:', self.class_name, propKey, self.onExecuted ? 'EXECUTED' : 'NO INERSEPTOR');
+                        return result;
+                    }; */
                 }
                 else return origMethod;
             }

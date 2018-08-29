@@ -61,6 +61,9 @@ let io = void 0;
 router.all(patterns, processToken, async (req, res, next) => {
     try {
         let response = await proccedRequest(req, res);
+
+        console.log(req.path, response);
+        
         res.json(response).end();
     }
     catch(err) {

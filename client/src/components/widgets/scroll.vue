@@ -9,8 +9,8 @@
 
             </div>    
         </div>
-        
-        <v-flex v-for="n in 1" :key="n" >
+        <v-divider slot="divider" class="mb-4"/>
+        <v-flex v-for="n in 10" :key="n" >
             <!-- <sui-image :src="`https://placeimg.com/300/${200 + n}/nature`" /> -->
             <!-- <sui-card>
                 

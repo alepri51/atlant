@@ -7,6 +7,7 @@ export default {
         widget: () => import('./widget')
     },
     async created() {
+        //console.log('created', this.entity);
         this.load();
     },
     methods: {

@@ -1,10 +1,9 @@
 <template>
-  <v-toolbar app color="primary" tabs>
-    <v-icon large color="background">fas fa-home</v-icon>
+  <v-toolbar app color="primary" tabs flat>
+    <v-icon large color="background shadow">fab fa-empire</v-icon>
         
     <v-toolbar-title class="toolbar-title">
-      <span class="background--text">Дом</span>
-      <span class="background--text">БУК</span>
+      <span class="background--text">Atlant.club</span>
     </v-toolbar-title>
 
     <v-tabs v-if="menu" slot="default"

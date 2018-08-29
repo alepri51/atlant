@@ -77,6 +77,8 @@ export default new Vuex.Store({
             state.entities = {}
         },
         RESET_CACHE(state) {
+            console.log('RESET', state.auth ? state.auth.signed : 'NULL');
+            //console.log('RESET', state.auth.signed);
             requests_cache.reset();
         },
         INIT(state, view) {
@@ -91,6 +93,7 @@ export default new Vuex.Store({
             state.token = sessionStorage.getItem('token');
 
             let onRequest = (config => {
+                console.log('request', config.url, requests_cache.length);
                 state.token && (config.headers.common.authorization = state.token);
                 return config;
             });
@@ -98,24 +101,33 @@ export default new Vuex.Store({
             let onResponse = (response => {
 
                 let {token, auth, error, entities, _cached, ...rest} = response.data;
-
-                //token MUST EXISTS!
-                this.commit('SET_TOKEN', token);
-                this.commit('SET_AUTH', auth);
-
-                error && !error.system && this.commit('SHOW_SNACKBAR', { text: `ОШИБКА: ${error.message}` });
-                //commit('REGISTER_MODAL', 'signin');
-                error && error.code === 403 && !error.system && auth.signed !== 1 && this.commit('SHOW_MODAL', { signin: void 0 });
-
-                response.error = error; //DO NOT REMOVE
-
-                //оставшиеся данные
-                response.rest_data = { ...rest };
-
-                entities && this.commit('SET_ENTITIES', { entities, method: response.config.method });
                 
-                //SAVE CACHED STATE IF IS
-                response.data._cached = !!response.config.cache;
+                if(!token) {
+                    this.dispatch('execute', { cache: false, endpoint: 'signup.silent'});
+                }
+                else {
+                    //auth && [0, 1].includes(auth.signed) && this.commit('RESET_CACHE');
+                    console.log('response', response.config.url, _cached, requests_cache.length);
+
+                    //token MUST EXISTS!
+                    this.commit('SET_TOKEN', token);
+                    this.commit('SET_AUTH', auth);
+
+
+                    error && !error.system && this.commit('SHOW_SNACKBAR', { text: `ОШИБКА: ${error.message}` });
+                    //commit('REGISTER_MODAL', 'signin');
+                    error && error.code === 403 && !error.system && auth.signed !== 1 && this.commit('SHOW_MODAL', { signin: void 0 });
+
+                    response.error = error; //DO NOT REMOVE
+
+                    //оставшиеся данные
+                    response.rest_data = { ...rest };
+
+                    entities && this.commit('SET_ENTITIES', { entities, method: response.config.method });
+                    
+                    //SAVE CACHED STATE IF IS
+                    response.data._cached = !!response.config.cache;
+                }
 
                 return response;
             });
@@ -234,7 +246,7 @@ export default new Vuex.Store({
     },
     actions: {
         async execute({ commit, state }, { cache = true, method, endpoint, payload, headers, callback }) {
-            console.log('REQUEST:', endpoint);
+            //console.log('REQUEST:', endpoint);
 
             let response;
 

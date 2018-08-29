@@ -5,7 +5,7 @@ const jwt = require('jsonwebtoken');
 const crypto = require('crypto2');
 
 
-const { User } = require('../db');
+const { getAccountPrivateKey } = require('../db');
 
 let KEYS_CACHE = {};
 
@@ -132,9 +132,7 @@ class API {
             payload.insecure && (private_key = payload.key);
 
             if(!private_key) {
-                let user = await User.findOne({ _id: payload.id });
-
-                private_key = user.account.private_key;
+                private_key = await getAccountPrivateKey(payload.id);
                 KEYS_CACHE[payload.id] = private_key;
             }
 

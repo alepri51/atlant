@@ -5,40 +5,12 @@
                 <h2 size="medium">YOUTUBE</h2>
             </v-layout>   
             <div>
-                <sui-dropdown class="ui floating labeled icon dropdown button">
-                    <i class="filter icon"></i>
-                    <span class="text">Filter</span>
-                    <sui-menu>
-                        <div class="header">
-                        Search Issues
-                        </div>
-                        <div class="ui left icon input">
-                        <i class="search icon"></i>
-                        <input type="text" name="search" placeholder="Search...">
-                        </div>
-                        <div class="header">
-                        <i class="tags icon"></i>
-                        Filter by tag
-                        </div>
-                        <div class="item">
-                        <div class="ui red empty circular label"></div>
-                        Important
-                        </div>
-                        <div class="item">
-                        <div class="ui blue empty circular label"></div>
-                        Announcement
-                        </div>
-                        <div class="item">
-                        <div class="ui black empty circular label"></div>
-                        Discussion
-                        </div>
-                    </sui-menu>
-                    </sui-dropdown>
+                
 
             </div>    
         </div>
         
-        <v-flex v-for="n in 101" :key="n" >
+        <v-flex v-for="n in 1" :key="n" >
             <!-- <sui-image :src="`https://placeimg.com/300/${200 + n}/nature`" /> -->
             <!-- <sui-card>
                 

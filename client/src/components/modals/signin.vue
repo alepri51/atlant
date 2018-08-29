@@ -33,10 +33,10 @@
                 </v-card-text>
             </v-card-text>
             <v-card-actions>
-                <v-btn color="inactive" flat @click.native="commit('HIDE_MODAL', { signin: void 0 })">Вспомнить пароль</v-btn>
+                <v-btn flat @click.native="commit('HIDE_MODAL', { signin: void 0 })">Вспомнить пароль</v-btn>
                 <v-spacer></v-spacer>
-                <v-btn color="inactive" flat @click.native="commit('HIDE_MODAL', { signin: void 0 })">Не входить</v-btn>
-                <v-btn dark class="default-action" flat @click.native="submit">Войти</v-btn>
+                <v-btn flat @click.native="commit('HIDE_MODAL', { signin: void 0 })">Не входить</v-btn>
+                <v-btn color="secondary" flat @click.native="submit">Войти</v-btn>
             </v-card-actions>
 
         </v-card>
@@ -52,7 +52,7 @@
         data: (vm) => {
             return {
                 //entity: 'signin',
-                email: 'ya@ya.ru',
+                email: '7r@email.com',
                 password: '123'
 
                 /* email: 'club@atlant.club',
@@ -70,12 +70,13 @@
                         payload: this.$data, 
                         callback: (response) => {
                             if(!response.error) {
+                                this.commit('RESET_CACHE');
                                 this.commit('HIDE_MODAL', { signin: void 0 });
                                 
                                 //this.state.view !== 'newslayout' ? this.state.signed_in ? this.commit('LOCATION', this.state.view) : this.$router.replace('newslayout') : this.commit('LOCATION', 'newslayout');
                                 //debugger;
                                 //this.state.signed_in ? this.commit('LOCATION', this.state.view) : this.$router.replace('newslayout');
-                                this.state.view === 'landing' ? this.$router.replace('home') : this.commit('LOCATION', this.state.view);
+                                this.state.view === 'landing' ? this.$router.replace('newslayout') : this.commit('LOCATION', this.state.view);
                             }
                         }
                     })

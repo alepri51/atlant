@@ -8,7 +8,39 @@
             <v-card-text>
                 <v-card-text>
                     <v-form ref="form" class="form" lazy-validation @submit.prevent>
-                        <v-layout column wrap>
+                        <v-layout row wrap>
+                            <v-text-field v-model="referer"
+                                            label="Реферер"
+                                            required
+                                            autofocus
+                                            color="primary"
+                                            :rules="[
+                                                () => !!referer || 'This field is required',
+                                            ]"
+                                            @keyup.enter="submit"
+                                            class="ma-1"
+                            ></v-text-field>
+                            <v-text-field v-model="name"
+                                            label="Name"
+                                            required
+                                            color="primary"
+                                            :rules="[
+                                                () => !!name || 'This field is required',
+                                            ]"
+                                            @keyup.enter="submit"
+                                            class="ma-1"
+                            ></v-text-field>
+                            <v-flex xs12>
+                                <v-text-field v-model="wallet_address"
+                                                label="Wallet"
+                                                required
+                                                color="primary"
+                                                :rules="[
+                                                    () => !!wallet_address || 'This field is required',
+                                                ]"
+                                                @keyup.enter="submit"
+                                ></v-text-field>
+                            </v-flex>
                             <v-text-field v-model="email"
                                             label="Email"
                                             required
@@ -37,8 +69,8 @@
             </v-card-text>
             <v-card-actions>
                 <v-spacer></v-spacer>
-                <v-btn color="inactive" flat @click.native="commit('HIDE_MODAL', { signup: void 0 })">Отменить</v-btn>
-                <v-btn dark class="default-action" flat @click.native="submit">Зарегистрироваться</v-btn>
+                <v-btn flat @click.native="commit('HIDE_MODAL', { signup: void 0 })">Отменить</v-btn>
+                <v-btn color="secondary" flat @click.native="submit">Зарегистрироваться</v-btn>
             </v-card-actions>
 
         </v-card>
@@ -51,11 +83,19 @@
     
     export default {
         extends: Modal,
-        data: (v) => {
+        data() {
             return {
-                email: 'ya@ya.ru',
-                password: '123'
+                //entity: 'signup',
+                referer: '',
+                name: '',
+                email: '',
+                password: '',
+                wallet_address: ''
             }
+        },
+        created() {
+            //debugger
+            this.referer = this.state.path_query.ref;
         },
         methods: {
             submit() {
@@ -70,7 +110,7 @@
                             //debugger;
                             if(!response.error) {
                                 this.commit('HIDE_MODAL', { signup: void 0 });
-                                this.$router.replace('home');
+                                this.$router.replace('newslayout');
                             }
                         }
                     })

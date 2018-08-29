@@ -4,7 +4,6 @@ const normalizer = require('normalizr');
 
 const { SecuredAPI } = require('./base_api');
 const db = require('../db');
-let { User } = db;
 
 class Model extends SecuredAPI {
     constructor(...args) {
@@ -20,7 +19,7 @@ class Model extends SecuredAPI {
 
             const _reply = new schema.Entity('reply', {});
 
-            const _questionnaire = new schema.Entity('questionnaire', {
+            /* const _questionnaire = new schema.Entity('questionnaire', {
                 replies: [_reply]
             });
 
@@ -36,16 +35,13 @@ class Model extends SecuredAPI {
 
             const _home = new schema.Entity('home', {
                 filters: [_filter]
-            });
+            }); */
+
+            const _news = new schema.Entity('news', {});
 
             const db = new schema.Entity('database', {
                 user: _user,
-                questionnaire: [_questionnaire],
-                //account: _member,
-                //auth: _auth,
-                //error: _error,
-                //defaults: {_defaults}
-               home: _home
+                news: [_news]
             }, { 
                 idAttribute: 'api'
             });
@@ -67,7 +63,33 @@ class Model extends SecuredAPI {
     
 }
 
-class Home extends Model {
+class NewsLayout extends Model {
+    constructor(...args) {
+        super(...args);
+    }
+
+    default() {
+    }
+}
+
+class News extends Model {
+    constructor(...args) {
+        super(...args);
+    }
+
+    async default() {
+        //let news = await db.News._query('MATCH (node:Новость)', { });
+        let news = await db.News._findAll();
+
+        let result = model({
+            news
+        });
+
+        return result;
+    }
+}
+
+/* class Home extends Model {
     constructor(...args) {
         super(...args);
     }
@@ -168,6 +190,6 @@ class Questionnaire extends Model {
             ]
         };
     }
-}
+} */
 
-module.exports = { Home, Questionnaire };
+module.exports = { News };

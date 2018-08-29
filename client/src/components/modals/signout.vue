@@ -12,8 +12,8 @@
             </v-card-text>
             <v-card-actions>
                 <v-spacer></v-spacer>
-                <v-btn color="inactive" flat @click.native="commit('HIDE_MODAL', { signout: void 0 })">Не выходить</v-btn>
-                <v-btn dark class="default-action" flat @click.native="submit">Выйти</v-btn>
+                <v-btn flat @click.native="commit('HIDE_MODAL', { signout: void 0 })">Не выходить</v-btn>
+                <v-btn color="secondary" flat @click.native="submit">Выйти</v-btn>
             </v-card-actions>
 
         </v-card>

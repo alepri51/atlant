@@ -2,7 +2,7 @@ import Vue from 'vue';
 import Vuex from 'vuex';
 import io from 'socket.io-client';
 
-const BASE_URL = 'https://localhost:8001';
+const BASE_URL = 'https://localhost:8000';
 
 //debugger;
 const socket = io(BASE_URL);
@@ -49,11 +49,28 @@ export default new Vuex.Store({
 
         menu: [
             {
-                name: 'landing',
-                to: 'landing'
+                icon: 'fas fa-newspaper',
+                name: 'Новости',
+                to: 'newslayout'
+            },
+            {
+                icon: '',
+                name: 'Статьи',
+                to: 'articlelayout'
+            },
+            {
+                icon: '',
+                name: 'Структура',
+                to: 'structure'
+            },
+            {
+                icon: '',
+                name: 'Финансы',
+                to: 'payment'
             }
         ],
-        notFound: false
+        notFound: false,
+        path_query: {}
     },
     mutations: {
         RESET_ENTITIES(state) {
@@ -88,7 +105,7 @@ export default new Vuex.Store({
 
                 error && !error.system && this.commit('SHOW_SNACKBAR', { text: `ОШИБКА: ${error.message}` });
                 //commit('REGISTER_MODAL', 'signin');
-                error && !error.system && auth.signed !== 1 && this.commit('SHOW_MODAL', { signin: void 0 });
+                error && error.code === 403 && !error.system && auth.signed !== 1 && this.commit('SHOW_MODAL', { signin: void 0 });
 
                 response.error = error; //DO NOT REMOVE
 
@@ -140,6 +157,9 @@ export default new Vuex.Store({
                 name,
                 async () => import(`./components/modals/${name}`)
             );
+        },
+        SET_PATH_QUERY(state, query) {
+            state.path_query = query;
         },
         LOCATION(state, view) {
             state.view = view;

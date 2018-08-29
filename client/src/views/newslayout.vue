@@ -36,7 +36,7 @@
                         "w": 6,
                         "h": 13,
                         "available": false,
-                        "comp": "scroll"
+                        "comp": "news"
                     },
                     {
                         "id": 4,

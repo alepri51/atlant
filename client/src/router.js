@@ -17,7 +17,8 @@ let router = new Router({
 
 router.beforeEach(async (to, from, next) => {
     let name = to.path.slice(1);
-    
+    to.query && store.commit('SET_PATH_QUERY', to.query);
+
     store.commit('INIT', name);
     !store.state.token && await store.dispatch('execute', { cache: false, endpoint: 'signup.silent'});
 

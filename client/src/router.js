@@ -15,11 +15,12 @@ let router = new Router({
     ]
 });
 
-router.beforeEach((to, from, next) => {
+router.beforeEach(async (to, from, next) => {
     let name = to.path.slice(1);
     
-    to.query.ref && store.commit('REFERER', to.query.ref);
-    
+    store.commit('INIT', name);
+    !store.state.token && await store.dispatch('execute', { cache: false, endpoint: 'signup.silent'});
+
     store.commit('REGISTER_VIEW', name);
     store.commit('LOCATION', name);
 

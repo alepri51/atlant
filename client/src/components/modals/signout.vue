@@ -12,7 +12,7 @@
             </v-card-text>
             <v-card-actions>
                 <v-spacer></v-spacer>
-                <v-btn color="inactive" flat @click.native="commit('HIDE_DIALOG', 'signout')">Не выходить</v-btn>
+                <v-btn color="inactive" flat @click.native="commit('HIDE_MODAL', { signout: void 0 })">Не выходить</v-btn>
                 <v-btn dark class="default-action" flat @click.native="submit">Выйти</v-btn>
             </v-card-actions>
 
@@ -22,21 +22,24 @@
 </template>
 
 <script>
+    import Modal from '../class_modal';
+    
     export default {
-        props: ['visible'],
+        extends: Modal,
         data: () => {
             return {
+                //entity: 'signout'
             }
         },
         methods: {
             submit() {
-
                 this.execute({ 
                     method: 'post', 
                     endpoint: 'signout.submit',
                     callback: () => {
-                        this.commit('CLEAR_CACHE');
-                        this.commit('HIDE_DIALOG', 'signout');
+                        
+                        this.commit('HIDE_MODAL', { [this.entity]: void 0 });
+                        
                         this.$router.replace('landing');
                     }    
                 });

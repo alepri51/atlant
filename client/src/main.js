@@ -1,24 +1,22 @@
 import Vue from 'vue';
 import Vuetify from 'vuetify';
 import colors from 'vuetify/es5/util/colors';
-import axios from 'axios';
+import SuiVue from 'semantic-ui-vue';
  
 import App from './App.vue';
 import router from './router';
 import store from './store';
 
 import 'vuetify/dist/vuetify.min.css';
-
-import 'devextreme/dist/css/dx.common.css';
-import 'devextreme/dist/css/dx.material.blue.light.css';
+import 'semantic-ui-css/semantic.min.css';
 
 import './../public/custom.css';
 
 Vue.use(Vuetify, {
     theme: {
-        primary: colors.indigo.darken2,
-        secondary: colors.amber.darken2,
-        accent: colors.shades.black,
+        primary: colors.blueGrey.darken2,
+        accent: colors.amber.darken2,
+        secondary: colors.green.darken2,
         'primary-light': '#F5F5F5',
         error: colors.red.darken2,
         inactive: colors.blueGrey.base,
@@ -28,50 +26,12 @@ Vue.use(Vuetify, {
 
 Vue.config.productionTip = false;
 
-let mapStoreActions = () => {
-    let actions = Object.keys(store._actions);
-    let map = actions.reduce((memo, name) => {
-        memo[name] = store._actions[name][0];
-        return memo;
-    }, {});
-
-    map.commit = store.commit;
-    return map;
-};
-
 Vue.prototype.$colors = colors;
 
-Vue.mixin({
-    methods: {
-        ...mapStoreActions(),
-        call(action, ...args) {
-            this[action](...args);
-        }
-    },
-    computed: {
-        state() {
-            return this.$store.state;
-        },
-        api() {
-            return this.$store.state.api;
-        },
-        dialogs() {
-            return this.$store.state.dialogs;
-        },
-        auth() {
-            return this.$store.state.auth || {name: 'Аноним'};
-        },
-        entities() {
-            return this.$store.state.entities;
-        }
-    }
-});
+Vue.use(SuiVue);
 
 new Vue({
     router,
     store,
-    render: h => h(App),
-    created() {
-        //this.$store.commit('INIT');
-    }
+    render: h => h(App)
 }).$mount('#app');

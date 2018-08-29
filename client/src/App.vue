@@ -6,36 +6,20 @@
 
         <navigation :menu="$store.state.menu"/>
 
-        <v-content class="vcontent">
+        <v-content >
             <transition name="fade" mode="out-in">
                 <keep-alive>
                     <component :is="$store.state.view"></component>
                 </keep-alive>
             </transition>
         </v-content>
-        <!-- <v-content>
-            <greeting/>
-            
-            <mobile-menu :menu="$store.state.menu" class="hidden-sm-and-up"/>
-            <painpoint id="earthworks"/>
-            <products/>
-            <demo id="features"/>
-            <consulting/>
-            <ic-footer/>
-        </v-content>
-
-        <signin :visible="dialogs.signin.visible" />
-        <signup :visible="dialogs.signup.visible" />
-        <signout :visible="dialogs.signout.visible" /> -->
-
-        <signin :visible="dialogs.signin.visible" />
-        <signup :visible="dialogs.signup.visible" />
-        <signout :visible="dialogs.signout.visible" />
-
-        <stepper :visible="dialogs.stepper.visible" />
+        
+        <!-- <signin/>
+        <signup/>
+        <signout/> -->
 
         <v-snackbar
-            @input="commit('HIDE_SNACKBAR')"
+            @input="$store.commit('HIDE_SNACKBAR')"
             :value="$store.state.snackbar.visible"
             :color="$store.state.snackbar.color"
             :timeout="$store.state.snackbar.timeout"
@@ -46,7 +30,7 @@
             <v-btn
                 dark
                 flat
-                @click="commit('HIDE_SNACKBAR')"
+                @click="$store.commit('HIDE_SNACKBAR')"
             >
                 {{ $store.state.snackbar.caption }}
             </v-btn>
@@ -56,36 +40,22 @@
 
 <script>
     export default {
+        //extends: Base,
         name: 'App',
         components: {
             navigation: () => import('./components/navigation'),
-            //landing: () => import('./views/landing'),
-            signin: () => import('./components/modals/signin'),
+            /* signin: () => import('./components/modals/signin'),
             signup: () => import('./components/modals/signup'),
-            signout: () => import('./components/modals/signout'),
-            stepper: () => import('./components/modals/stepper')
-
-            /* navigation: () => import('./components/navigation'),
-            greeting: () => import('./components/greeting'),
-            mobileMenu: () => import('./components/mobileMenu'),
-            painpoint: () => import('./components/painpoint'),
-            products: () => import('./components/products'),
-            demo: () => import('./components/demo'),
-            consulting: () => import('./components/consulting'),
-            icFooter: () => import('./components/footer'),
-            signin: () => import('./components/signin'),
-            signup: () => import('./components/signup'),
-            signout: () => import('./components/signout') */
-        },
-        data () {
-            return {
-
-            }
+            signout: () => import('./components/modals/signout') */
         }
     }
 </script>
 
 <style scoped>
+    .v-content {
+        height: 100vh; /* SET THIS FUCKING HEIGHT !!! */
+    }
+
     .loader-overlay::before {
         background-color: #212121;
     }
@@ -150,10 +120,13 @@
         }
     }
 
-    .application, .application .display-2 {
+    /* body {
         font-family: 'Roboto Condensed'!important;
     }
-
+    .application, .application .display-2 {
+        font-family: 'Roboto Condensed'!important;
+    } */
+/*
     .brand-logo {
         font-family: 'Roboto Condensed', serif;
         font-size: 36px!important;
@@ -185,6 +158,6 @@
     }
     .brand-text {
         font-weight: bold;
-    }
+    } */
 
 </style>

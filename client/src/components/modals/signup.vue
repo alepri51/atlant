@@ -8,42 +8,36 @@
             <v-card-text>
                 <v-card-text>
                     <v-form ref="form" class="form" lazy-validation @submit.prevent>
-                        <v-text-field v-model="name"
-                                        label="Name"
-                                        required
-                                        autofocus
-                                        color="primary"
-                                        :rules="[
-                                            () => !!name || 'This field is required',
-                                        ]"
-                                        @keyup.enter="submit"
-                        ></v-text-field>
-                        <v-text-field v-model="email"
-                                        label="Email"
-                                        required
-                                        color="primary"
-                                        :rules="[
-                                            () => !!email || 'This field is required',
-                                        ]"
-                                        @keyup.enter="submit"
-                        ></v-text-field>
-                        <v-text-field v-model="password"
-                                        label="Password"
-                                        type="password"
-                                        required
-                                        color="primary"
-                                        :rules="[
-                                            () => !!password || 'This field is required',
-                                        ]"
-                                        @keyup.enter="submit"
-                        ></v-text-field>
+                        <v-layout column wrap>
+                            <v-text-field v-model="email"
+                                            label="Email"
+                                            required
+                                            color="primary"
+                                            :rules="[
+                                                () => !!email || 'This field is required',
+                                            ]"
+                                            @keyup.enter="submit"
+                                            class="ma-1"
+                            ></v-text-field>
+                            <v-text-field v-model="password"
+                                            label="Password"
+                                            type="password"
+                                            required
+                                            color="primary"
+                                            :rules="[
+                                                () => !!password || 'This field is required',
+                                            ]"
+                                            @keyup.enter="submit"
+                                            class="ma-1"
+                            ></v-text-field>
+                        </v-layout>
                     </v-form>
                     <small>*indicates required field</small>
                 </v-card-text>
             </v-card-text>
             <v-card-actions>
                 <v-spacer></v-spacer>
-                <v-btn color="inactive" flat @click.native="commit('HIDE_DIALOG', 'signup')">Отменить</v-btn>
+                <v-btn color="inactive" flat @click.native="commit('HIDE_MODAL', { signup: void 0 })">Отменить</v-btn>
                 <v-btn dark class="default-action" flat @click.native="submit">Зарегистрироваться</v-btn>
             </v-card-actions>
 
@@ -53,25 +47,32 @@
 </template>
 
 <script>
+    import Modal from '../class_modal';
+    
     export default {
-        props: ['visible'],
-        data: () => {
+        extends: Modal,
+        data: (v) => {
             return {
-                name: '',
-                email: '',
-                password: ''
+                email: 'ya@ya.ru',
+                password: '123'
             }
         },
         methods: {
             submit() {
-                this.$data.referer = this.$store.state.referer;
+                //this.$data.referer = this.$store.state.referer;
 
                 this.$refs.form.validate() ? 
                     this.execute({ 
                         method: 'post', 
                         endpoint: 'signup.submit', 
                         payload: this.$data, 
-                        callback: (response) =>  !response.error && (this.commit('HIDE_DIALOG', 'signup'), this.$router.replace('account')) 
+                        callback: (response) => {
+                            //debugger;
+                            if(!response.error) {
+                                this.commit('HIDE_MODAL', { signup: void 0 });
+                                this.$router.replace('home');
+                            }
+                        }
                     })
                     :
                     this.commit('SHOW_SNACKBAR', {text: 'Не корректно введены данные' });

@@ -33,9 +33,9 @@
                 </v-card-text>
             </v-card-text>
             <v-card-actions>
-                <v-btn color="inactive" flat @click.native="commit('HIDE_DIALOG', 'signin')">Вспомнить пароль</v-btn>
+                <v-btn color="inactive" flat @click.native="commit('HIDE_MODAL', { signin: void 0 })">Вспомнить пароль</v-btn>
                 <v-spacer></v-spacer>
-                <v-btn color="inactive" flat @click.native="commit('HIDE_DIALOG', 'signin')">Не входить</v-btn>
+                <v-btn color="inactive" flat @click.native="commit('HIDE_MODAL', { signin: void 0 })">Не входить</v-btn>
                 <v-btn dark class="default-action" flat @click.native="submit">Войти</v-btn>
             </v-card-actions>
 
@@ -45,11 +45,14 @@
 </template>
 
 <script>
+    import Modal from '../class_modal';
+    
     export default {
-        props: ['visible'],
-        data: () => {
+        extends: Modal,
+        data: (vm) => {
             return {
-                email: 'o2@atlant.club',
+                //entity: 'signin',
+                email: 'ya@ya.ru',
                 password: '123'
 
                 /* email: 'club@atlant.club',
@@ -67,9 +70,12 @@
                         payload: this.$data, 
                         callback: (response) => {
                             if(!response.error) {
-                                this.commit('CLEAR_CACHE');
-                                this.commit('HIDE_DIALOG', 'signin');
-                                this.state.view !== 'account' ? this.$router.replace('account') : this.commit('LOCATION', 'account');
+                                this.commit('HIDE_MODAL', { signin: void 0 });
+                                
+                                //this.state.view !== 'newslayout' ? this.state.signed_in ? this.commit('LOCATION', this.state.view) : this.$router.replace('newslayout') : this.commit('LOCATION', 'newslayout');
+                                //debugger;
+                                //this.state.signed_in ? this.commit('LOCATION', this.state.view) : this.$router.replace('newslayout');
+                                this.state.view === 'landing' ? this.$router.replace('home') : this.commit('LOCATION', this.state.view);
                             }
                         }
                     })

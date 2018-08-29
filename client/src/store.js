@@ -1,52 +1,42 @@
 import Vue from 'vue';
 import Vuex from 'vuex';
-import router from './router';
+import io from 'socket.io-client';
+
+const BASE_URL = 'https://localhost:8001';
+
+//debugger;
+const socket = io(BASE_URL);
+
+Vue.prototype.$socket = socket;
+
+socket.on('connect', () => {
+    console.log('SOCKET CONNECTED:', socket.connected); // true
+});
+
+socket.on('disconnect', (data) => {
+    console.log('SOCKET DISCONNECTED:', data);
+});
+
 import axios from 'axios';
 import deepmerge from 'deepmerge';
-//import MockAdapter from 'axios-mock-adapter';
 import { cacheAdapterEnhancer, throttleAdapterEnhancer, Cache } from 'axios-extensions';
-
 
 Vue.use(Vuex);
 
 let requests_cache = new Cache();
+let api = void 0;
 
 export default new Vuex.Store({
     strict: true,
     state: {
-        api: void 0,
         loading: false,
         view: '',
-        referer: void 0,
-        dialogs: {
-            signin: {
-                visible: false
-            },
-            signup: {
-                visible: false
-            },
-            signout: {
-                visible: false
-            },
-            stepper: {
-                visible: false
-            },
-            dream: {
-                visible: false,
-                defaults: {
-                    name: 'ooo',
-                    percent: 0,
-                    value: 0,
-                    _id: void 0
-                }
-            }
-        },
+        modals: {},
+        
         token: void 0,
         auth: void 0,
         entities: {},
-        account: {
-            balance: {}
-        },
+
         snackbar: {
             visible: false,
             color: 'red darken-2',
@@ -56,37 +46,29 @@ export default new Vuex.Store({
             icon: '',
             vertical: false
         },
-        notFound: false,
+
         menu: [
             {
-                icon: '',
-                name: 'Кабинет',
-                to: 'account'
-            },
-            {
-                icon: '',
-                name: 'Магазин',
-                to: 'shop'
-            },
-            {
-                icon: '',
-                name: 'Настройки',
-                to: 'settings'
+                name: 'landing',
+                to: 'landing'
             }
-        ]
+        ],
+        notFound: false
     },
     mutations: {
-        CLEAR_CACHE() {
+        RESET_ENTITIES(state) {
+            state.entities = {}
+        },
+        RESET_CACHE(state) {
             requests_cache.reset();
         },
-        INIT(state) {
-            state.api = axios.create({ 
-                baseURL: 'https://localhost:8000/api',
+        INIT(state, view) {
+            if(api) return;
+
+            api = axios.create({ 
+                baseURL: `${BASE_URL}/api`,
                 headers: { 'Cache-Control': 'no-cache' },
 	            adapter: throttleAdapterEnhancer(cacheAdapterEnhancer(axios.defaults.adapter))
-                /* transformRequest: (data, headers) => {
-                    return JSON.stringify(data);
-                } */
             });
 
             state.token = sessionStorage.getItem('token');
@@ -97,39 +79,39 @@ export default new Vuex.Store({
             });
 
             let onResponse = (response => {
-                let {token, auth, error, entities, map, result, entry, cached, ...rest} = response.data;
 
-                if(error) {
-                    if(!error.system) {
-                        let vertical = error.message.length > 50;
-                        this.commit('SHOW_SNACKBAR', { text: `ОШИБКА: ${error.message}`, vertical });
-                    }
-                    else console.error(error.code, error.message, error.data);
-                    //Для упрощения достопа к ошибке
-                    response.error = error;
-                }
+                let {token, auth, error, entities, _cached, ...rest} = response.data;
 
-                //!auth && (router.replace('landing'));
-
-                this.commit('SET_AUTH', auth);
+                //token MUST EXISTS!
                 this.commit('SET_TOKEN', token);
+                this.commit('SET_AUTH', auth);
 
-                !cached && this.commit('SET_ENTITIES', { entities, map, result, entry, method: response.config.method });
+                error && !error.system && this.commit('SHOW_SNACKBAR', { text: `ОШИБКА: ${error.message}` });
+                //commit('REGISTER_MODAL', 'signin');
+                error && !error.system && auth.signed !== 1 && this.commit('SHOW_MODAL', { signin: void 0 });
 
-                response.data.cached = !!response.config.cache;
+                response.error = error; //DO NOT REMOVE
+
+                //оставшиеся данные
+                response.rest_data = { ...rest };
+
+                entities && this.commit('SET_ENTITIES', { entities, method: response.config.method });
+                
+                //SAVE CACHED STATE IF IS
+                response.data._cached = !!response.config.cache;
+
                 return response;
             });
-            
+
             let onError = (error => {
-                //Promise.reject(error);
                 this.commit('SHOW_SNACKBAR', { text: `ОШИБКА: ${error.message}` });
             });
 
-            state.api.interceptors.request.use(onRequest, onError);
+            api.interceptors.request.use(onRequest, onError);
             
-            state.api.interceptors.response.use(onResponse, onError);
+            api.interceptors.response.use(onResponse, onError);
 
-            //state.api.get('auth', { params: {timestamp: new Date() / 1 } });
+            this.dispatch('execute', { endpoint: view, method: 'get' });
         },
         LOADING(state, value) {
             state.loading = value;
@@ -143,43 +125,51 @@ export default new Vuex.Store({
             );
         },
         REGISTER_COMPONENT(state, name) {
+            //debugger
             Vue.component(
                 name,
-                async () => import(`./components/${name}`).catch(() => {
-                    return import(`./components/stub`);
+                async () => import(`./components/${name}`).catch((err) => {
+                    return import(`./components/widgets/${name}`).catch((err) => {
+                        return import(`./components/stub`);
+                    })
                 })
             );
         },
-        REFERER(state, referer) {
-            state.referer = referer;
+        REGISTER_MODAL(state, name) {
+            Vue.component(
+                name,
+                async () => import(`./components/modals/${name}`)
+            );
         },
         LOCATION(state, view) {
-            /* if(!state.api) {
-                this.commit('INIT');
-                this.dispatch('execute', { endpoint: view, method: 'get' });
-            } */
-
-            !state.api && this.commit('INIT');
-            this.dispatch('execute', { endpoint: view, method: 'get' });
-
             state.view = view;
             state.notFound = false;
         },
         NOT_FOUND(state) {
             state.notFound = true;
         },
-        SHOW_DIALOG(state, payload) {
-            let {disabled, ...data} = payload.data || {};
-            state.dialogs[payload.dialog].disabled = disabled;
-            state.dialogs[payload.dialog].defaults = { ...state.dialogs[payload.dialog].defaults, ...data };
-            state.dialogs[payload.dialog].visible = true;
+        SHOW_MODAL(state, params) {
+
+            let [name] = Object.keys(params);
+
+            let [ data = {}, options ] = Object.values(params);
+            
+            Vue.set(state.modals, name, { data, options } || {});
         },
-        HIDE_DIALOG(state, dialog) {
-            state.dialogs[dialog].visible = false;
+        HIDE_MODAL(state, params) {
+            let name = Object.keys(params)[0];
+            state.modals[name] = false;
+        },
+        HIDE_MODALS(state) {
+            state.modals = {};
         },
         SET_TOKEN(state, token) {
-            token ? sessionStorage.setItem('token', token) : sessionStorage.removeItem('token');
-            state.token = token;
+            //token ? sessionStorage.setItem('token', token) : sessionStorage.removeItem('token');
+
+            if(token) { //ONLY SET AND SAVE TOKEN, NOT ALLOWED TO REMOVE DUE TO REMEMBER ANY USER
+                sessionStorage.setItem('token', token);
+                state.token = token;
+            }
         },
         SET_AUTH(state, auth) {
             state.auth = auth;
@@ -187,15 +177,17 @@ export default new Vuex.Store({
         SHOW_SNACKBAR(state, options) {
             state.snackbar.visible = true;
             Object.assign(state.snackbar, options);
-            console.log(state.snackbar);
+            //console.log(state.snackbar);
         },
         HIDE_SNACKBAR(state) {
             state.snackbar.visible = false;
         },
         SET_ENTITIES(state, { entities, map, result, entry, method }) {
             if(entities) {
-                let merge = deepmerge(state.entities, entities || {}, {
+                //debugger;
+                let merge = Object.keys(entities).length ? deepmerge(state.entities, entities || {}, {
                     arrayMerge: function (destination, source, options) {
+                        //debugger;
                         //ALL ARRAYS MUST BE SIMPLE IDs HOLDER AFTER NORMALIZE
                         if(method.toUpperCase() === 'DELETE') {
                             if(destination.length) {
@@ -212,36 +204,37 @@ export default new Vuex.Store({
 
                         return union;
                     }
-                });
+                })
+                :
+                {};
 
-                state.entities = merge;
+                Object.keys(merge).length && Vue.set(state, 'entities',  merge);
             }
-            else !state.auth && (state.entities = {});
         },
-        //PROJECT SPECIFIC
-        ACCOUNT(state, id) {
-            state.account = id;
-        }
     },
     actions: {
-        async execute({ commit, state }, { method, endpoint, payload, callback }) {
-            
+        async execute({ commit, state }, { cache = true, method, endpoint, payload, headers, callback }) {
+            console.log('REQUEST:', endpoint);
+
             let response;
+
+            headers = headers || {};
 
             let config = {
                 url: endpoint,
                 method: method || 'get',
+                headers
             };
 
-            config.cache = config.method === 'get' ? requests_cache : false;
+            config.cache = config.method === 'get' ? cache ? requests_cache : false : false;
 
             commit('LOADING', true);
 
             try {
 
                 config.method === 'get' ? config.params = payload : config.data = payload;
-
-                response = await state.api(config);
+                response = await api(config);
+                
             }
             catch(err) {
                 console.log('ERROR', err);

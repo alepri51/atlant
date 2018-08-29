@@ -1,102 +1,94 @@
 'use strict'
-//https://github.com/louischatriot/nedb
 
-//Как запросы сделать:
-//const db = require('./db');
-//await db.remove('$имя_коллекции$', { _id: payload._id })
-//await db.update('$имя_коллекции$', { _id: payload._id }, { ...payload }) 
-//await db.insert('$имя_коллекции$', { ...payload });
-//await db.findOne('$имя_коллекции$', { _id: payload.member });
-//await db.find('$имя_коллекции$', { _id: payload.member });
+const crypto = require('crypto2');
+const bcrypt = require('bcryptjs');
+const generate = require('nanoid/generate');
 
-//массив коллекций, создается при старте
-let collections = ['member', 'token', 'transaction', 'product', 'list', 'dream', 'wallet'];
+let hash = value => {
+    let salt = bcrypt.genSaltSync(10);
+    return bcrypt.hashSync(value, salt);
+}
 
-const cluster = require('cluster');
-const path = require('path');
+const mongoose = require('mongoose');
+const { Schema, Model } = mongoose;
 
-const Datastore = require('nedb');
+const mongo_port = 32771;
+//const mongo_port = 32774;
 
-if(cluster.isMaster) { 
+mongoose.connect(`mongodb://localhost:${mongo_port}/myapp`, {
+    useNewUrlParser: true
+});
 
-    let db = module.exports;
+//////////////////////////MODELS//////////////////////////////////////
 
-    for (let inx in collections) {
-        let collection = collections[inx];
-        db[collection] = new Datastore({filename: path.join(__dirname, `nedb/_${collection}.db`), autoload: true});
+Model.prototype.projection = function() {
+    let { _id, __v, ...keys } = this.schema.paths;
+
+    let projection = Object.keys(keys).reduce((memo, key) => {
+        this[key] && !(keys[key] instanceof Schema.Types.ObjectId) && !(keys[key] instanceof Schema.Types.Embedded) && (memo[key] = this[key]);
+        return memo;
+    }, {});
+
+    projection.id = this.id;
+    
+    return projection;
+};
+
+let User = mongoose.model('User', new Schema({ 
+    name: {
+        type: String,
+        select: true
+    },
+    /* account: { 
+        type: Schema.Types.ObjectId, 
+        ref: 'Account' 
+    } */
+    account: new Schema({
+        hash: String,
+        email: String,
+        private_key: String,
+        public_key: String
+    })
+}));
+
+/* let Account = mongoose.model('Account', new Schema({
+    hash: String,
+    email: String,
+    private_key: String,
+    public_key: String
+})); */
+
+//////////////////////////MODELS//////////////////////////////////////
+
+(async () => { //DB INIT IF NEEDED
+    /* let accounts = await Account.find();
+
+    let users = await User.find().populate('account');
+    if(!users.length) {
+        let account = new Account({
+            hash: generate('abcdefghijklmnopqrstuvwxyz', 32),
+            email: generate('abcdefghijklmnopqrstuvwxyz@.', 16),
+        });
+
+        account = await account.save();
+
+        let user = new User({
+            name: generate('abcdefghijklmnopqrstuvwxyz ', 10),
+            account
+        });
+
+        user = await user.save();
+        console.log(user);
     }
+    else {
+        users = await User.deleteMany();
+        accounts = await Account.deleteMany();
+        console.log(users);
+    } */
 
-    db.find = function (collection, query, options) {
-        return new Promise(function (resolve, reject) {
-            db[collection].find(query).exec(function (err, results) {
-                err ? reject(err) : resolve(results);
-            })
-        });
-    };
+})();
 
-    db.findOne = function (collection, query, options) {
-        return new Promise(async function (resolve, reject) {
-            try {
-                let results = await db.find(collection, query, options);
-                resolve(results[0]);
-            }
-            catch (err) {
-                reject(err);
-            }
-        });
-    };
-
-    db.remove = function (collection, query, options) {
-        return new Promise(async function (resolve, reject) {
-            let to_remove = await db.findOne(collection, query);
-            db[collection].remove(query, {multi: true}, function (err, results) {
-                err ? reject(err) : resolve(to_remove);
-            });
-
-        });
-    };
-
-    db.update = function (collection, query, data) {
-        return new Promise(async function (resolve, reject) {
-
-            data.created = data.created || new Date() / 1;
-            data.updated = new Date() / 1;
-
-            let object = await db.findOne(collection, query);
-            object && (data = {...object, ...data});
-
-            db[collection].update(query, data, { upsert: true }, async function (err, results, upsert) {
-                results = upsert ? await db.findOne(collection, { _id: upsert._id }) : await db.findOne(collection, query);
-                results && resolve(results);
-            });
-
-        });
-    };
-
-    db.insert = function (collection, data) {
-        return new Promise(async function (resolve, reject) {
-            data.created = data.created || new Date() / 1;
-            data.updated = new Date() / 1;
-
-            db[collection].insert(data, function (err, inserted) {
-                err ? reject(err) : resolve(inserted);
-            });
-        });
-    };
-
-    /* db.throttleLead = function (fn, threshhold = 250, scope) {
-        let last;
-        return function(...args) {
-            const context = scope || this;
-            const now = +(new Date());
-
-            if (last && now > last + threshhold) {
-                last = now;
-                fn.apply(context, args);
-            } else if (!last) {
-                last = now;
-                fn.apply(context, args);
-            }
-        };
-    }; */
+module.exports = {
+    User,
+    //Account
 }

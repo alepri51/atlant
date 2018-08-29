@@ -3,7 +3,7 @@
         <v-card flat fill-height>
             <v-card-text class="pa-2">
                 <v-date-picker 
-                    color="secondary"
+                    color="primary"
                     full-width
                     locale="ru-ru"
                     v-model="picker" 

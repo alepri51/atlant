@@ -16,16 +16,16 @@ Vue.use(SuiVue);
 
 Vue.use(Vuetify, {
     theme: {
-        primary: colors.purple.darken2,
-        secondary: colors.green.darken1,
-        accent: colors.yellow.base,
+        primary: colors.green.darken2,
+        secondary: colors.purple.darken1,
+        accent: colors.orange.base,
         error: colors.red.accent4,
         warning: colors.yellow.accent4,
         info: colors.lightBlue.accent4,
         success: colors.green.darken2,
 
         background: '#f5f5f5',
-  
+        unimportant: colors.blueGrey.base
     }
 });
 

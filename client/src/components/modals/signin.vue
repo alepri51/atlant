@@ -33,10 +33,10 @@
                 </v-card-text>
             </v-card-text>
             <v-card-actions>
-                <v-btn flat @click.native="commit('HIDE_MODAL', { signin: void 0 })">Вспомнить пароль</v-btn>
+                <v-btn color="unimportant" flat @click.native="commit('HIDE_MODAL', { signin: void 0 })">Вспомнить пароль</v-btn>
                 <v-spacer></v-spacer>
-                <v-btn flat @click.native="commit('HIDE_MODAL', { signin: void 0 })">Не входить</v-btn>
-                <v-btn color="secondary" flat @click.native="submit">Войти</v-btn>
+                <v-btn color="unimportant" flat @click.native="commit('HIDE_MODAL', { signin: void 0 })">Не входить</v-btn>
+                <v-btn color="primary" flat @click.native="submit">Войти</v-btn>
             </v-card-actions>
 
         </v-card>

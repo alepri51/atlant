@@ -37,10 +37,11 @@ class Model extends SecuredAPI {
                 filters: [_filter]
             }); */
 
-            const _news = new schema.Entity('news', {});
+            const _member = new schema.Entity('member', {}, { idAttribute: '_id' });
+            const _news = new schema.Entity('news', {}, { idAttribute: '_id' });
 
             const db = new schema.Entity('database', {
-                user: _user,
+                member: _member,
                 news: [_news]
             }, { 
                 idAttribute: 'api'
@@ -78,12 +79,12 @@ class News extends Model {
     }
 
     async default() {
-        //let news = await db.News._query('MATCH (node:Новость)', { });
-        let news = await db.News._findAll();
+        let news = await db.News._query('MATCH (node:Новость)', { });
+        //let news = await db.News._findAll();
 
-        let result = model({
+        let result = {
             news
-        });
+        };
 
         return result;
     }

@@ -38,9 +38,10 @@ class API {
 
                     let method = self.security(propKey, origMethod);
                     
-                    return function (...args) {
-                        let result = method.apply(self, args);
+                    return async function (...args) {
+                        let result = await method.apply(self, args);
                         result = self.onExecuted ? self.onExecuted(propKey, result) : result;
+                        console.log('CALLED:', self.class_name, propKey, self.onExecuted ? 'EXECUTED' : 'NO INERSEPTOR');
                         return result;
                     };
                 }

@@ -1,5 +1,5 @@
 <template>
-  <v-toolbar app color="secondary" tabs>
+  <v-toolbar app color="primary" tabs>
     <v-icon large color="background">fas fa-home</v-icon>
         
     <v-toolbar-title class="toolbar-title">
@@ -11,7 +11,7 @@
         class="ml-2"
         v-model="active"
         slider-color="accent"
-        color="secondary"
+        color="primary"
     >
       <v-tab
         class="background--text"

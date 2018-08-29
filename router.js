@@ -15,9 +15,9 @@ let patterns = ['/:type\::id\.:action', '/:type\.:action', '/:type\::id', '/:typ
 let processToken = function(req, res, next) {
     let { type, id, action } = req.params;
 
-    console.log('---------------BEGIN-----------------');
+    /* console.log('---------------BEGIN-----------------');
     console.log('REQUEST:', req.path);
-    console.log('---------------BEGIN-----------------');
+    console.log('---------------BEGIN-----------------'); */
 
     type = type.toLowerCase();
     !types[type] && (type = 'unknown');
@@ -48,10 +48,10 @@ let proccedRequest = async function(req, res) {
 
     let { token, auth, error } = object;
 
-    console.log('----------------END------------------');
+    /* console.log('----------------END------------------');
     console.log('RESPONSE:', req.path);
     console.log('RESULT:', result);
-    console.log('----------------END------------------');
+    console.log('----------------END------------------'); */
 
     return { token, auth, error, ...result };
 };

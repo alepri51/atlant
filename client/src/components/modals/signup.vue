@@ -69,8 +69,8 @@
             </v-card-text>
             <v-card-actions>
                 <v-spacer></v-spacer>
-                <v-btn flat @click.native="commit('HIDE_MODAL', { signup: void 0 })">Отменить</v-btn>
-                <v-btn color="secondary" flat @click.native="submit">Зарегистрироваться</v-btn>
+                <v-btn color="unimportant" flat @click.native="commit('HIDE_MODAL', { signup: void 0 })">Отменить</v-btn>
+                <v-btn color="primary" flat @click.native="submit">Зарегистрироваться</v-btn>
             </v-card-actions>
 
         </v-card>

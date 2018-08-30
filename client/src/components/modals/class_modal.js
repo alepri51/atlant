@@ -11,7 +11,7 @@ export default {
     },
     methods: {
         submit() {
-            debugger
+            //debugger
             let validated = this.options.remove || this.$refs.form.validate();
 
             let headers = {};
@@ -63,6 +63,9 @@ export default {
         },
     },
     watch: {
-        
+        'visible': async function(val) {
+            console.log(this.entity, 'visible', val);
+            this.defaults = this.auth.signed === 1 ? await this.execute({ endpoint: `${this.entity}.defaults`, cache: false }) : {};
+        }
     }
 }

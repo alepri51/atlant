@@ -93,8 +93,8 @@ router.all(patterns, processToken, multipartDetector, async (req, res, next) => 
     try {
         let response = await proccedRequest(req, res);
 
-        console.log(req.path, response);
-        
+        //console.log(req.path, response);
+
         res.json(response).end();
     }
     catch(err) {

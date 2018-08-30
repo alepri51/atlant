@@ -1,5 +1,5 @@
 <template>
-    <widget name="scroll" wrap>
+    <widget name="scroll" wrap justify-center>
         <div slot="header">
             <v-layout justify-center class="ma-2">
                 <h2 size="medium">YOUTUBE</h2>
@@ -10,29 +10,8 @@
             </div>    
         </div>
         <v-divider slot="divider" class="mb-4"/>
-        <v-flex v-for="n in 10" :key="n" >
-            <!-- <sui-image :src="`https://placeimg.com/300/${200 + n}/nature`" /> -->
-            <!-- <sui-card>
-                
-                <sui-embed
-                
-                icon="far fa-eye"
-                id="90Omh7_I8vI"
-                :placeholder="`https://placeimg.com/300/${200 + n}/nature`"
-                source="youtube"
-                />
-                <sui-card-content>
-                    <sui-card-header>Kristy</sui-card-header>
-                    <sui-card-meta>Joined in 2013</sui-card-meta>
-                    <sui-card-description>Kristy is an art director living in New York.</sui-card-description>
-                    <sui-rating icon="star" :max-rating="5" :rating="rating" @rate="rating = arguments[1].rating"/>
-                </sui-card-content>
-                <sui-card-content extra>
-                    <sui-icon name="user" />
-                    22 Friends
-                </sui-card-content>
-                
-            </sui-card> -->
+        <v-flex v-for="n in 32" :key="n" style="max-width: 250px">
+            
             <v-card color="blue-grey darken-2" class="white--text" :width="200" hover>
                 <sui-embed
                     icon="fas fa-eye embed-icon"

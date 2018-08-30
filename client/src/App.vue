@@ -51,8 +51,9 @@
         computed: {
             cssProps() {
                 return {
-                    //'--scroll-background': this.$vuetify.theme.scroll,
-                    '--scroll-color': this.$vuetify.theme.scrollColor
+                    '--scroll-background': this.$colors.shades.transparent,
+                    '--scroll-color': this.$vuetify.theme.scrollColor,
+                    '--embed-icon-color': this.$colors.shades.white
                 }
             }
         },

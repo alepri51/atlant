@@ -87,7 +87,7 @@ class API {
         return await crypto.createPassword(salt, precision || 32);
     }
 
-    signJWT(payload, private_key, options = {algorithm: 'RS256', expiresIn: '100s'}) {
+    signJWT(payload, private_key, options = {algorithm: 'RS256', expiresIn: '10s'}) {
         //console.log('IAT:', payload.iat);
         delete payload.iat;
         delete payload.exp;
@@ -144,6 +144,10 @@ class API {
     default(params) {
         return { params }
     }
+
+    defaults() {
+        return {empty: true}
+    }
 };
 
 class Unknown extends API {
@@ -151,9 +155,9 @@ class Unknown extends API {
         super(...args);
     }
 
-    async defaults() {
+    /* async defaults() {
         return {empty: true}
-    }
+    } */
 }
 
 class SecuredAPI extends API {

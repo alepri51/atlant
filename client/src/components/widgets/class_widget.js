@@ -12,7 +12,7 @@ export default {
     },
     methods: {
         load() {
-            this.execute({ endpoint: this.entity, method: 'get' });
+            this.auth.signed === 1 && this.execute({ endpoint: this.entity, method: 'get' });
         }
     },
     computed: {
@@ -26,7 +26,7 @@ export default {
     watch: {
         'auth.signed': function(val, old) {
             console.log('SIGN CHANGED from:', old, 'TO:', val);
-            val === 1 && this.load();
+            this.load();
         }
     }
 }

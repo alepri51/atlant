@@ -1,8 +1,11 @@
 <template>
-    <widget name="новости" wrap>
+    <widget name="новости" wrap justify-center>
         <div slot="header">
             <v-layout class="ma-2">
-                <h2 class="primary--text"><v-icon color="primary" medium class="mr-2 shadow">fas fa-exclamation-circle</v-icon>Новости платформы:</h2>
+                <h2 class="primary--text">
+                    <v-icon color="primary" medium class="mr-2 shadow">fas fa-exclamation-circle</v-icon>
+                    {{ `Новости платформы ${ date ? 'на ' + new Date(date).toLocaleDateString() : '' }:` }}
+                </h2>
                 <v-speed-dial 
                     v-if="auth.group === 'admins'"
                     class="top-dial" 
@@ -33,7 +36,7 @@
                         fab
                         dark
                         small
-                        color="success"
+                        color="accent"
                         @click="commit('SHOW_MODAL', { news: void 0 })"
                     >
                         <v-tooltip left>
@@ -45,7 +48,7 @@
                         fab
                         dark
                         small
-                        color="success"
+                        color="accent"
                         @click="commit('SHOW_MODAL', { news: void 0 })"
                     >
                         <v-tooltip left>
@@ -65,20 +68,21 @@
 
         <v-divider slot="divider" class="mb-4"/>
 
-        <v-flex v-if="filter.length" v-for="item in filter" :key="item._id">
+        <v-flex v-if="filter.length" v-for="item in filter" :key="item._id" style="max-width: 200px">
             <sui-card :class="{ 'elevation-1': active !== item._id, 'elevation-10': active === item._id }" @mouseover="active = item._id" @mouseout="active = false">
                 <!-- <sui-image src="static/images/avatar/large/matthew.png" /> -->
                 <!-- :placeholder="`https://placeimg.com/300/${200 + item._id}/nature`" -->
                 <sui-embed
                     icon="fas fa-film"
                     id="90Omh7_I8vI"
-                    :placeholder="`https://localhost:8000/${item._id}/files/${item.compressed}`"
+                    :placeholder="item.compressed ? `https://localhost:8000/${item._id}/files/${item.compressed}` : ''"
                     source="youtube"
                     :iframe="{allowFullScreen: true }"
                 />
                 <sui-card-content>
-                    <sui-card-header>{{ item.title }}</sui-card-header>
-                    <sui-card-meta><small>{{ new Date(item.updated).toLocaleString() }}</small></sui-card-meta>
+                    <sui-card-header class="primary--text">{{ item.title }}</sui-card-header>
+                    <!-- <sui-card-meta><small>{{ item.created }}</small></sui-card-meta> -->
+                    <sui-card-meta><small>{{ new Date(parseInt(item.created)).toLocaleString() }}</small></sui-card-meta>
 
                     <v-divider/>
 
@@ -125,7 +129,7 @@
                             icon
                             dark
                             small
-                            color="success"
+                            color="accent"
                             @click="commit('SHOW_MODAL', { news: item })"
                         >
                             <v-tooltip left>
@@ -151,10 +155,10 @@
                 
         </v-flex>
         <v-flex v-if="!filter.length">
-            <sui-card class="elevation-1">
+            <sui-card class="elevation-0 not-found">
                 <sui-card-content>
-                    <sui-card-header>Ничего не найдено</sui-card-header>
-                    <sui-card-meta><small>{{ new Date(date).toLocaleDateString() }}</small></sui-card-meta>
+                    <sui-card-header>{{ date ? `Новостей за ${new Date(date).toLocaleDateString()} не найдено` : '' }}</sui-card-header>
+                    <!-- <sui-card-meta><small>{{ new Date(date).toLocaleDateString() }}</small></sui-card-meta> -->
                 </sui-card-content>
             </sui-card>
         </v-flex>
@@ -174,10 +178,11 @@
         },
         computed: {
             filter() {
+                //debugger
                 let raw_data = this.raw_data;
-                this.date ? raw_data = this.raw_data.filter((item) => new Date(item.updated).toDateString() === new Date(this.date).toDateString()) : raw_data = this.raw_data
+                this.date ? raw_data = this.raw_data.filter((item) => new Date(parseInt(item.created)).toDateString() === new Date(this.date).toDateString()) : raw_data = this.raw_data
 
-                return raw_data.sort((a, b) => b.updated - a.updated);
+                return raw_data.sort((a, b) => b.created - a.created);
             },
         },
         methods: {
@@ -236,6 +241,12 @@
 
     .ui.card, .ui.card>:first-child {
         border-radius: 0px!important;
+    }
+
+    .ui.card.not-found {
+        text-align: center;
+        width: inherit!important;
+        cursor: default;
     }
 
     .ui.card {

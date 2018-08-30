@@ -23,6 +23,7 @@ import { cacheAdapterEnhancer, throttleAdapterEnhancer, Cache } from 'axios-exte
 
 Vue.use(Vuex);
 
+const CancelToken = axios.CancelToken;
 let requests_cache = new Cache();
 let api = void 0;
 
@@ -92,9 +93,17 @@ export default new Vuex.Store({
 
             state.token = sessionStorage.getItem('token');
 
+            let activeRequests = [];
+
             let onRequest = (config => {
                 console.log('request', config.url, requests_cache.length);
                 state.token && (config.headers.common.authorization = state.token);
+
+                /* config.cancelToken = new CancelToken(function executor(cancel) {
+                    // An executor function receives a cancel function as a parameter
+                    activeRequests.push(cancel);
+                }); */
+
                 return config;
             });
 
@@ -115,8 +124,19 @@ export default new Vuex.Store({
 
 
                     error && !error.system && this.commit('SHOW_SNACKBAR', { text: `ОШИБКА: ${error.message}` });
-                    //commit('REGISTER_MODAL', 'signin');
-                    error && error.code === 403 && !error.system && auth.signed !== 1 && this.commit('SHOW_MODAL', { signin: void 0 });
+
+                    //error && error.code === 403 && !error.system && auth.signed !== 1 && this.commit('SHOW_MODAL', { signin: void 0 });
+                    if(error && error.code === 403 && !error.system && auth.signed !== 1) {
+                        //debugger;
+                        /* for(let req = 0; req < activeRequests.length; req++) {
+                            activeRequests[req] && activeRequests[req]();
+                        }
+                        
+                        activeRequests = []; */
+
+                        console.log('SIGN IN SHOW');
+                        this.commit('SHOW_MODAL', { signin: void 0 });
+                    }
 
                     response.error = error; //DO NOT REMOVE
 
@@ -183,11 +203,13 @@ export default new Vuex.Store({
         },
         SHOW_MODAL(state, params) {
 
-            let [name] = Object.keys(params);
+            if(!state.modals[name]) {
+                let [name] = Object.keys(params);
 
-            let [ data = {}, options ] = Object.values(params);
-            
-            Vue.set(state.modals, name, { data, options } || {});
+                let [ data = {}, options ] = Object.values(params);
+                
+                Vue.set(state.modals, name, { data, options } || {});
+            }
         },
         HIDE_MODAL(state, params) {
             let name = Object.keys(params)[0];
@@ -206,6 +228,7 @@ export default new Vuex.Store({
         },
         SET_AUTH(state, auth) {
             state.auth = auth;
+            this.commit('HIDE_SNACKBAR');
         },
         SHOW_SNACKBAR(state, options) {
             state.snackbar.visible = true;
@@ -270,7 +293,7 @@ export default new Vuex.Store({
             };
 
             config.cache = config.method === 'get' ? cache ? requests_cache : false : false;
-
+            //config.cache = false;
             commit('LOADING', true);
 
             try {

@@ -30,16 +30,19 @@
 ::-webkit-scrollbar {
     width: 8px;
     height: 8px;
-    background-color: var(--scroll-background);
+    /* background-color: var(--scroll-background)!important; */
+    background-color: var(--scroll-background)!important;;
     border-radius: 5px;
 }
 
 ::-webkit-scrollbar-track {
     border-radius: 5px;
+    background-color: var(--scroll-background)!important;;
 }
 
 body ::-webkit-scrollbar-track {
     border-radius: 5px;
+    background-color: var(--scroll-background)!important;;
 }
 
 ::-webkit-scrollbar-thumb {
@@ -73,4 +76,9 @@ body ::-webkit-scrollbar-track {
 
 a.v-tabs__item:hover {
     color: inherit;
+}
+
+.ui.embed>.icon:before {
+    font-size: 2em;
+    color: var(--embed-icon-color)!important;
 }

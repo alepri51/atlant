@@ -28,7 +28,7 @@ Vue.use(Vuetify, {
         unimportant: colors.blueGrey.base,
         transparent: colors.teal.lighten5,
         scroll: colors.cyan.lighten4,
-        scrollColor: colors.cyan.lighten2,
+        scrollColor: colors.cyan.lighten3,
     }
 });
 

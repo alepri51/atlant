@@ -18,6 +18,13 @@ class News extends DBAccess {
         super(...args);
     }
 
+    async defaults() {
+        return {
+            title: 'Заголовок',
+            text: 'Текст'
+        }
+    }
+
     async default() {
         let news = await db.News._query('MATCH (node:Новость)', { });
         //let news = await db.News._findAll();

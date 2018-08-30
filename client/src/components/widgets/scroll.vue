@@ -72,7 +72,7 @@
 </script>
 
 
-<style>
+<style scoped>
     .v-card, .ui.card {
         margin: auto;
     }

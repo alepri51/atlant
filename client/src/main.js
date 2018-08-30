@@ -16,16 +16,19 @@ Vue.use(SuiVue);
 
 Vue.use(Vuetify, {
     theme: {
-        primary: colors.green.darken2,
-        secondary: colors.purple.darken1,
-        accent: colors.orange.base,
+        primary: colors.teal.darken1,
+        secondary: colors.cyan.darken1,
+        accent: colors.deepOrange.base,
         error: colors.red.accent4,
         warning: colors.yellow.accent4,
         info: colors.lightBlue.accent4,
         success: colors.green.darken2,
 
         background: '#f5f5f5',
-        unimportant: colors.blueGrey.base
+        unimportant: colors.blueGrey.base,
+        transparent: colors.teal.lighten5,
+        scroll: colors.cyan.lighten4,
+        scrollColor: colors.cyan.lighten2,
     }
 });
 
@@ -36,5 +39,6 @@ Vue.prototype.$colors = colors;
 new Vue({
     router,
     store,
+    
     render: h => h(App)
 }).$mount('#app');

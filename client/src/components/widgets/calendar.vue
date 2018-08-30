@@ -3,7 +3,8 @@
         <v-card flat fill-height>
             <v-card-text class="pa-2">
                 <v-date-picker 
-                    color="primary"
+                    header-color="primary"
+                    color="secondary"
                     full-width
                     locale="ru-ru"
                     v-model="picker" 
@@ -23,7 +24,7 @@
 
             <v-card-actions>
                 <v-spacer/>
-                <v-btn flat color="primary" @click="$emit('date-changed', void 0), picker = void 0">Сбросить</v-btn>
+                <v-btn flat color="secondary" @click="$emit('date-changed', void 0), picker = void 0">Сбросить</v-btn>
             </v-card-actions>
         </v-card>
     </widget>

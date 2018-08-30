@@ -1,5 +1,5 @@
 <template>
-    <v-app>
+    <v-app :style="cssProps">
         <div class="loader-overlay" v-if="$store.state.loading">
             <div style="" class="spinner spinner--circle-4"></div>
         </div>
@@ -47,7 +47,15 @@
             /* signin: () => import('./components/modals/signin'),
             signup: () => import('./components/modals/signup'),
             signout: () => import('./components/modals/signout') */
-        }
+        },
+        computed: {
+            cssProps() {
+                return {
+                    //'--scroll-background': this.$vuetify.theme.scroll,
+                    '--scroll-color': this.$vuetify.theme.scrollColor
+                }
+            }
+        },
     }
 </script>
 

@@ -71,18 +71,6 @@ class API {
         return method;
     }
 
-    /* generateError({ code, message, data, system }) {
-        let error = this.error;
-        //data = data || this.error.data;
-        this.error = new APIError(code, message);
-        this.error.class = this.class_name;
-        this.error.data = data;
-        this.error.history = this.error.history || [];
-        error && this.error.history.push(error);
-
-        this.error.system = system;
-    } */
-
     hash(value) {
         let salt = bcrypt.genSaltSync(10);
         return bcrypt.hashSync(value, salt);
@@ -99,7 +87,7 @@ class API {
         return await crypto.createPassword(salt, precision || 32);
     }
 
-    signJWT(payload, private_key, options = {algorithm: 'RS256', expiresIn: '10s'}) {
+    signJWT(payload, private_key, options = {algorithm: 'RS256', expiresIn: '100s'}) {
         //console.log('IAT:', payload.iat);
         delete payload.iat;
         delete payload.exp;

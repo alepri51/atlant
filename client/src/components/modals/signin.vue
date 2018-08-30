@@ -2,8 +2,8 @@
     <v-dialog v-model="visible" persistent max-width="500px">
         <v-card>
             <v-card-title>
-                <v-icon class="mr-1 primary--text">fas fa-user-circle</v-icon>
-                <span class="headline primary--text">Аутентификация</span>
+                <v-icon class="mr-1 primary--text shadow">fas fa-sign-in-alt</v-icon>
+                <span class="headline primary--text">Вход</span>
             </v-card-title>
             <v-card-text>
                 <v-card-text>
@@ -36,7 +36,7 @@
                 <v-btn color="unimportant" flat @click.native="commit('HIDE_MODAL', { signin: void 0 })">Вспомнить пароль</v-btn>
                 <v-spacer></v-spacer>
                 <v-btn color="unimportant" flat @click.native="commit('HIDE_MODAL', { signin: void 0 })">Не входить</v-btn>
-                <v-btn color="primary" flat @click.native="submit">Войти</v-btn>
+                <v-btn dark color="secondary" @click.native="submit">Войти</v-btn>
             </v-card-actions>
 
         </v-card>
@@ -45,7 +45,7 @@
 </template>
 
 <script>
-    import Modal from '../class_modal';
+    import Modal from './class_modal';
     
     export default {
         extends: Modal,

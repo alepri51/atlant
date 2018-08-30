@@ -1,68 +1,8 @@
 'use strict';
 
-const normalizer = require('normalizr');
-
-const { SecuredAPI } = require('./base_api');
+const { Model, DBAccess } = require('./db_api');
 const db = require('../db');
 
-class Model extends SecuredAPI {
-    constructor(...args) {
-        super(...args);
-
-        this.error = void 0;
-    }
-
-    model(data = {}) {
-        if(Object.keys(data).length) {
-            data.api = data.api || 'v1';
-            const schema = normalizer.schema;
-
-            const _reply = new schema.Entity('reply', {});
-
-            /* const _questionnaire = new schema.Entity('questionnaire', {
-                replies: [_reply]
-            });
-
-            _reply.define({ questionnaire: [_questionnaire] });
-
-            const _account = new schema.Entity('account', {});
-
-            const _user = new schema.Entity('user', {
-                account: _account
-            });
-
-            const _filter = new schema.Entity('filter', {});
-
-            const _home = new schema.Entity('home', {
-                filters: [_filter]
-            }); */
-
-            const _member = new schema.Entity('member', {}, { idAttribute: '_id' });
-            const _news = new schema.Entity('news', {}, { idAttribute: '_id' });
-
-            const db = new schema.Entity('database', {
-                member: _member,
-                news: [_news]
-            }, { 
-                idAttribute: 'api'
-            });
-
-            let normalized = normalizer.normalize(data, db);
-            normalized = { ...normalized, entry: 'database' };
-
-            return normalized;
-        }
-        else return data;
-    }
-
-    onExecuted(name, result) {
-        if(typeof result === 'object' && Object.keys(result).length) {
-            return this.model(result);
-        }
-    }
-
-    
-}
 
 class NewsLayout extends Model {
     constructor(...args) {
@@ -73,7 +13,7 @@ class NewsLayout extends Model {
     }
 }
 
-class News extends Model {
+class News extends DBAccess {
     constructor(...args) {
         super(...args);
     }
@@ -81,6 +21,7 @@ class News extends Model {
     async default() {
         let news = await db.News._query('MATCH (node:Новость)', { });
         //let news = await db.News._findAll();
+        //news = news.sort((a, b) => b.updated - a.updated);
 
         let result = {
             news
@@ -88,109 +29,42 @@ class News extends Model {
 
         return result;
     }
-}
 
-/* class Home extends Model {
-    constructor(...args) {
-        super(...args);
+    checkSecurity(name, method) {
+        let accessDeniedError = function(...args) {
+            this.generateError({ code: 400, message: 'Вам отказано в доступе. Возможно Ваша учетная запись не обладает достаточным уровнем привелегий для выполнения запрошенной операции', data: { class: this.constructor.name }});
+        };
+
+        method = super.checkSecurity(name, method);
+
+        if(name === 'save') {
+            method = method || (this.auth.group !== 'admins' && accessDeniedError);
+        }
+
+        return method;
     }
 
-    default() {
-        console.log('HOME DEFAULT');
+    accessGranted(payload) {
+        //return true;
+        return (payload._id && parseInt(payload.author) === this.auth.member) || !!!payload._id;
+    }
+
+    async beforeInsert(payload, req) {
+        payload.author = { _id: this.auth.member };
+        payload.date = Date.now();
+        return payload;
+    }
+
+    async beforeUpdate(payload, req) {
+        payload.author = { _id: payload.author };
+        return payload;
+    }
+
+    async transformData(data, req) {
         return {
-            user: {
-                id: 1
-            },
-            home: {
-                id: 1,
-                hello: 'world',
-                filters: [
-                    {
-                        id: 1,
-                        label: 'Бюджет',
-                        type: 'money',
-                        min: '1000K',
-                        max: '100000K',
-                        step: '5000K'
-                    },
-                    {
-                        id: 2,
-                        label: 'Стоимость м2',
-                        type: 'money',
-                        min: '1000K',
-                        max: '100000K',
-                        step: '5000K'
-                    },
-                    {
-                        id: 3,
-                        label: 'Локация',
-                        type: 'select',
-                        enum: ['ЦАО', 'САО', 'СВАО']
-                    },
-                    {
-                        id: 4,
-                        label: 'Комнатность',
-                        type: 'select',
-                        enum: ['СТ+', '1+', '2+', '3+', '4+']
-                    }
-                ]
-            }
+            news: [data]
         };
     }
 }
 
-class Questionnaire extends Model {
-    constructor(...args) {
-        super(...args);
-    }
-
-    default() {
-        console.log('HOME DEFAULT');
-        return {
-            user: {
-                id: 1,
-                account: {
-                    id: 1,
-                    email: 'asdasdasd'
-                },
-            },
-            [this.class_name]: [
-                {
-                    id: 1,
-                    question: 'Are you ready ?',
-                    replies: [
-                        {
-                            id: 1,
-                            reply: 'yes',
-                            [this.class_name]: [
-                                {
-                                    id: 2,
-                                    question: 'Do you like eat ?',
-                                    replies: [
-                                        {
-                                            id: 3,
-                                            reply: 'yes',
-                                            [this.class_name]: []
-                                        },
-                                        {
-                                            id: 4,
-                                            reply: 'no',
-                                            [this.class_name]: []
-                                        },
-                                    ]
-                                }
-                            ]
-                        },
-                        {
-                            id: 2,
-                            reply: 'no',
-                            [this.class_name]: []
-                        },
-                    ]
-                }
-            ]
-        };
-    }
-} */
-
-module.exports = { News };
+module.exports = { NewsLayout, News };

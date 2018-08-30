@@ -1,4 +1,4 @@
-import Base from './class_base';
+import Base from '../class_base';
 
 export default {
     extends: Base,
@@ -11,6 +11,7 @@ export default {
     },
     methods: {
         submit() {
+            debugger
             let validated = this.options.remove || this.$refs.form.validate();
 
             let headers = {};
@@ -40,7 +41,7 @@ export default {
                             this.options.remove && this.$emit('removed', this.form._id);
                             !this.form._id && this.$emit('appended', this.form._id);
 
-                            !this.options.remove && this.form._id && this.commit('MUTATE_ENTITY', { entity: this.entity, id: this.form._id, data: {...this.form} });
+                            this.commit('MUTATE_ENTITY', { entities: response.entities, entity: this.entity, id: this.form._id, deleted: this.options.remove });
                         }
                     }
                 })

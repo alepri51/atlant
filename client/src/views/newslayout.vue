@@ -1,5 +1,5 @@
 <template>
-    <dashboard v-if="true"  :layout="layout" :components="components" :data="{}" @REGISTER-COMPONENT="registerComponent"/>
+    <dashboard v-if="true"  :layout="layout" :components="components" :data="{}" @REGISTER-COMPONENT="registerComponent" @date-changed="selected_date = arguments[0]" :date="selected_date"/>
     <div v-else>
         ДОСТУП ЗАКРЫТ
     </div>
@@ -15,6 +15,7 @@
         },
         data() {
 			return {
+                selected_date: void 0,
 				layout: {
 					cols: 10,
 					rows: 15

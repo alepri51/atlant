@@ -121,7 +121,8 @@ export default new Vuex.Store({
                     response.error = error; //DO NOT REMOVE
 
                     //оставшиеся данные
-                    response.rest_data = { ...rest };
+                    response.rest = { ...rest };
+                    response.entities = entities;
 
                     entities && this.commit('SET_ENTITIES', { entities, method: response.config.method });
                     
@@ -214,8 +215,18 @@ export default new Vuex.Store({
         HIDE_SNACKBAR(state) {
             state.snackbar.visible = false;
         },
-        SET_ENTITIES(state, { entities, map, result, entry, method }) {
+        MUTATE_ENTITY(state, payload) {
+            let { entities, entity, id, deleted } = payload;
             if(entities) {
+                if(id) {
+                    entities[entity] && entities[entity][id] && deleted ? Vue.delete(state.entities[entity], id) : Vue.set(state.entities[entity], id, entities[entity][id]);
+                    !deleted && this.commit('SET_ENTITIES', { entities, method: 'GET' });
+                }
+                else this.commit('SET_ENTITIES', { entities, method: 'GET' });
+            }
+        },
+        SET_ENTITIES(state, { entities, map, result, entry, method }) {
+            if(entities && method.toUpperCase() === 'GET') {
                 //debugger;
                 let merge = Object.keys(entities).length ? deepmerge(state.entities, entities || {}, {
                     arrayMerge: function (destination, source, options) {

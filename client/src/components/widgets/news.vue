@@ -24,7 +24,7 @@
 
                         dark
                         fab
-                        color="green"
+                        color="secondary"
                     >
                         <v-icon>fas fa-plus</v-icon>
                         <v-icon>fas fa-times</v-icon>
@@ -33,7 +33,7 @@
                         fab
                         dark
                         small
-                        color="green"
+                        color="success"
                         @click="commit('SHOW_MODAL', { news: void 0 })"
                     >
                         <v-tooltip left>
@@ -45,7 +45,7 @@
                         fab
                         dark
                         small
-                        color="green"
+                        color="success"
                         @click="commit('SHOW_MODAL', { news: void 0 })"
                     >
                         <v-tooltip left>
@@ -61,114 +61,105 @@
             </div>    
         </div>
 
-        <!-- <v-card slot="header" :width="'100%'" :height="50" tile flat style="min-height: 50px">
-            <v-card-title style="position: relative" class="primary--text">
-                <h2><v-icon color="primary" medium class="mr-2 shadow">fas fa-exclamation-circle</v-icon>Новости платформы:</h2>
-
-                <v-speed-dial 
-                    v-if="auth.group === 'admins'"
-                    class="top-dial" 
-                    absolute
-                    v-model="append"
-                    
-                    bottom
-                    right
-
-                    direction="bottom"
-                    :open-on-hover="true"
-
-                    :transition="transition"
-                >
-                    <v-btn
-                        slot="activator"
-                        v-model="append"
-                        
-
-                        dark
-                        fab
-                        color="green"
-                    >
-                        <v-icon>fas fa-plus</v-icon>
-                        <v-icon>fas fa-times</v-icon>
-                    </v-btn>
-                    <v-btn
-                        fab
-                        dark
-                        small
-                        color="green"
-                        @click="commit('SHOW_MODAL', { news: void 0 })"
-                    >
-                        <v-tooltip left>
-                            <v-icon slot="activator">far fa-newspaper</v-icon>
-                            <span>Добавить новость</span>
-                        </v-tooltip>
-                    </v-btn>
-                    <v-btn
-                        fab
-                        dark
-                        small
-                        color="green"
-                        @click="commit('SHOW_MODAL', { news: void 0 })"
-                    >
-                        <v-tooltip left>
-                            <v-icon slot="activator">far fa-calendar-alt</v-icon>
-                            <span>Добавить событие</span>
-                        </v-tooltip>
-                    </v-btn>
-                </v-speed-dial>
-
-            </v-card-title>
-        </v-card> -->
+        
 
         <v-divider slot="divider" class="mb-4"/>
 
-        <v-flex v-for="n in 114" :key="n">
-            <sui-card :class="{ 'elevation-1': active !== n, 'elevation-10': active === n }" @mouseover="active = n" @mouseout="active = -1">
+        <v-flex v-if="filter.length" v-for="item in filter" :key="item._id">
+            <sui-card :class="{ 'elevation-1': active !== item._id, 'elevation-10': active === item._id }" @mouseover="active = item._id" @mouseout="active = false">
                 <!-- <sui-image src="static/images/avatar/large/matthew.png" /> -->
+                <!-- :placeholder="`https://placeimg.com/300/${200 + item._id}/nature`" -->
                 <sui-embed
-                    icon="fas fa-eye embed-icon"
+                    icon="fas fa-film"
                     id="90Omh7_I8vI"
-                    :placeholder="`https://placeimg.com/300/${200 + n}/nature`"
+                    :placeholder="`https://localhost:8000/${item._id}/files/${item.compressed}`"
                     source="youtube"
                     :iframe="{allowFullScreen: true }"
                 />
                 <sui-card-content>
-                    <sui-card-header>Matt Giampietro</sui-card-header>
-                    <sui-card-meta>Friends</sui-card-meta>
+                    <sui-card-header>{{ item.title }}</sui-card-header>
+                    <sui-card-meta><small>{{ new Date(item.updated).toLocaleString() }}</small></sui-card-meta>
+
+                    <v-divider/>
+
                     <sui-card-description>
-                        Matthew is an interior designer living in New York.
-                        Matthew is an interior designer living in New York.
-                        Matthew is an interior designer living in New York.
-                        Matthew is an interior designer living in New York.
-                        Matthew is an interior designer living in New York.
-                        Matthew is an interior designer living in New York.
+                        {{ item.text }}
                     </sui-card-description>
                 </sui-card-content>
                 <sui-card-content extra>
-                     
-                    <v-btn dark flat color="secondary" icon small class="ma-0"><v-icon small>fas fa-user</v-icon></v-btn>
-                    <span slot="right">Joined in 2013</span>
+                    <div v-if="item.tags" style="overflow: hidden; white-space: nowrap; text-overflow: ellipsis; display: inline-block; max-width: 140px">
+                        <v-icon class="mr-1 secondary--text" :size="12">fas fa-tags</v-icon>
+                        <small>{{ item.tags.reduce((str, item, inx, arr) => str = str + item + (inx === arr.length - 1 ? '' : ' | '), '') }}</small>
+                    </div>
+                    <v-btn slot="right" dark flat color="secondary" icon small class="ma-0"><v-icon small>fas fa-expand</v-icon></v-btn>
+                </sui-card-content>
+
+                <v-speed-dial class="card-dial"
+                        v-if="auth.group === 'admins'"
+                        absolute
+                        v-model="fab[item._id]"
+                        
+                        :bottom="bottom"
+                        :right="right"
+                        :left="left"
+                        :direction="direction"
+                        :open-on-hover="hover"
+                        :transition="transition"
+                        v-show="item._id === active"
+                    >
+                    <!-- :style="fab[item._id] ? 'background-color: rgb(142, 36, 170)' : 'background-color: rgb(142, 36, 170, 0.5)'" -->
+                        <v-btn
+                            slot="activator"
+                            v-model="fab[item._id]"
+                            
+                            dark
+                            fab
+                            small
+                            color="secondary"
+                            :style="!fab[item._id] && 'opacity: 0.5'"
+                        >
+                            <v-icon>fas fa-chevron-down</v-icon>
+                            <v-icon>fas fa-chevron-up</v-icon>
+                        </v-btn>
+                        <v-btn
+                            icon
+                            dark
+                            small
+                            color="success"
+                            @click="commit('SHOW_MODAL', { news: item })"
+                        >
+                            <v-tooltip left>
+                                <v-icon slot="activator" :size="13" style="margin-bottom: 1px">fas fa-pen</v-icon>
+                                <span>Редактировать</span>
+                            </v-tooltip>
+                        </v-btn>
+                        <v-btn
+                            icon
+                            dark
+                            small
+                            color="error"
+                            @click.native="commit('SHOW_MODAL', { news: item, options: { remove: true }})"
+                        >
+                            <v-tooltip left>
+                                <v-icon slot="activator" small>fas fa-times</v-icon>
+                                <span>Удалить</span>
+                            </v-tooltip>
+                        </v-btn>
+                    </v-speed-dial>
+
+            </sui-card>
+                
+        </v-flex>
+        <v-flex v-if="!filter.length">
+            <sui-card class="elevation-1">
+                <sui-card-content>
+                    <sui-card-header>Ничего не найдено</sui-card-header>
+                    <sui-card-meta><small>{{ new Date(date).toLocaleDateString() }}</small></sui-card-meta>
                 </sui-card-content>
             </sui-card>
-            <!-- <v-card color="blue-grey darken-2" class="white--text" :width="200" hover>
-                <sui-embed
-                    icon="fas fa-eye embed-icon"
-                    id="90Omh7_I8vI"
-                    :placeholder="`https://placeimg.com/300/${200 + n}/nature`"
-                    source="youtube"
-                    :iframe="{allowFullScreen: true }"
-                />
-                
-              <v-card-title primary-title>
-                <div class="headline">Unlimited music now</div>
-                <div>Listen to your favorite artists and albums whenever and wherever, online and offline.</div>
-              </v-card-title>
-              <v-card-actions>
-                <v-btn flat dark>Listen now</v-btn>
-              </v-card-actions>
-            </v-card> -->
         </v-flex>
-        <!-- <news @removed="removed" @appended="appended"/> -->
+
+        <news @removed="removed" @appended="appended"/>
     </widget>        
 </template>
 
@@ -179,19 +170,25 @@
         props: ['date'],
         extends: Widget,
         components: {
-            //news: () => import('../modals/signin'),
+            news: () => import('../modals/news'),
         },
         computed: {
             filter() {
                 let raw_data = this.raw_data;
-                this.date ? raw_data = this.raw_data.filter((item) => new Date(item.date).toDateString() === new Date(this.date).toDateString()) : raw_data = this.raw_data
+                this.date ? raw_data = this.raw_data.filter((item) => new Date(item.updated).toDateString() === new Date(this.date).toDateString()) : raw_data = this.raw_data
 
-                return raw_data;
+                return raw_data.sort((a, b) => b.updated - a.updated);
             },
         },
         methods: {
+            tags(item) {
+                return item.tags.reduce((str, item, inx) => str = str + item, '')
+            },
             appended(_id) {
                 debugger;
+            },
+            removed() {
+
             },
             onHover(id) {
                 this.value[id] = true;
@@ -223,10 +220,14 @@
 </script>
 
 <style scoped>
+    .v-card, .ui.card {
+        margin: auto;
+    }
+
     .card-dial {
         margin-top: 16px;
         padding-bottom: 6px;
-        z-index: 1;
+        /* z-index: 1; */
     }
 
     .top-dial {
@@ -243,7 +244,8 @@
     }
     
     .description {
-        max-height: 150px;
+        min-height: 100px;
+        max-height: 100px;
         overflow: hidden;
     }
 
@@ -263,6 +265,12 @@
             rgba(255,255,255, 0) 100%
         );
         pointer-events: none; 
+    }
+
+    .header {
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        overflow: hidden;
     }
 
 </style>

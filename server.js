@@ -10,7 +10,7 @@ const helmet = require('helmet');
 
 const express = require('express');
 const staticFileMiddleware = express.static('client/dist', {});
-//const staticImagesMiddleware = express.static('uploads', {});
+const staticImagesMiddleware = express.static('uploads', {});
 
 const history = require('connect-history-api-fallback');
 const cors = require('cors');
@@ -50,7 +50,8 @@ app.use(staticFileMiddleware);
 
 app.use(history({
     disableDotRule: false,
-    verbose: true
+    verbose: false
 }));
 
 app.use(staticFileMiddleware);
+app.use(staticImagesMiddleware);

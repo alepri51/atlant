@@ -111,13 +111,15 @@ export default new Vuex.Store({
             let onResponse = (response => {
 
                 let {token, auth, error, entities, _cached, ...rest} = response.data;
-                
+                ВОЗВРАЩАЕТ УЖЕ ОБНОВЛЕННЫЙ ТОКЕН БЕЗ РАЗРЕШЕНИЯ КОДА ИЗ ПРОСМОТРА НОВОСТИ ВОЗВРАТ ПРОИСХОДИТ
                 if(!token) {
                     this.dispatch('execute', { cache: false, endpoint: 'signup.silent'});
                 }
                 else {
                     //auth && [0, 1].includes(auth.signed) && this.commit('RESET_CACHE');
                     console.log('response', response.config.url, _cached, requests_cache.length);
+                    //УБРАТЬ СТАРЫЕ ДАННЫЕ ПРИ ВХОДЕ
+                    //auth.signed === 1 && state.auth && state.auth.signed === 0 && (entities = {}, this.commit('RESET_ENTITIES'));
 
                     //token MUST EXISTS!
                     this.commit('SET_TOKEN', token);

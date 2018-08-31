@@ -26,10 +26,9 @@ class API {
 
         this.error = void 0;
 
-        token && (this.payload = this.verifyJWT(this.token));
-    
-
         let self = this;
+
+        this.payload = token ? this.verifyJWT(this.token) : void 0;
 
         const handler = {
             get(target, propKey, receiver) {
@@ -60,7 +59,7 @@ class API {
     }
 
     get auth() {
-        return this.payload && this.payload.auth;
+        return (this.payload && this.payload.auth);
     }
 
     get class_name() {
@@ -97,26 +96,7 @@ class API {
     }
 
     verifyJWT(token) {
-        let payload = jwt.decode(token);
-
-        try {
-            jwt.verify(token, payload.key);
-
-            return payload;
-        }
-        catch(err) {
-            console.log('ERROR:', err);
-            //this.revokeJWT();
-            this.error = err;
-             
-            if(err.name === 'TokenExpiredError') {
-                this.error.expired = true;
-                this.error.system = true;
-
-                payload.auth.signed === 1 ? payload.auth.signed = 2 : payload.auth.signed = 0;
-                return payload;
-            }
-        };
+        return jwt.decode(token);
     }
 
     async refreshJWT() {
@@ -164,7 +144,33 @@ class SecuredAPI extends API {
     constructor(...args) {
         super(...args);
 
+        let { token, id, io, req, res } = args;
         this.error = void 0;
+
+    }
+
+    verifyJWT(token) {
+        let payload = super.verifyJWT(token);
+
+        try {
+            jwt.verify(token, payload.key);
+
+            return payload;
+        }
+        catch(err) {
+            console.log('ERROR:', err);
+            //this.revokeJWT();
+            this.error = err;
+             
+            if(err.name === 'TokenExpiredError') {
+                this.error.class_name = this.class_name;
+                this.error.expired = true;
+                this.error.system = true;
+
+                payload.auth.signed === 1 ? payload.auth.signed = 2 : payload.auth.signed = 0;
+                return payload;
+            }
+        };
     }
 
     checkSecurity(name, method) {

@@ -14,7 +14,24 @@
 			return {
                 selected_date: void 0,
                 layouts: {
-                    'xs,md,sm,lg,xl': {
+                    'xs,sm': {
+                        layout: {
+                            cols: 10,
+                            rows: 15
+                        },
+                        components: [
+                            {
+                                "id": 2,
+                                "x": 0,
+                                "y": 0,
+                                "w": 10,
+                                "h": 15,
+                                "available": false,
+                                "comp": "singlenews"
+                            }
+                        ]
+                    },
+                    'md,lg,xl': {
                         layout: {
                             cols: 10,
                             rows: 15

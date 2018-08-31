@@ -31,10 +31,6 @@
         <v-btn flat @click="commit('SHOW_MODAL', { signup: void 0 })" color="background">
             <v-icon small class="mr-1">far fa-user-circle</v-icon>РЕГИСТРАЦИЯ
         </v-btn>
-
-        <v-btn flat @click="commit('SHOW_MODAL', { signin: void 0 })" color="background">
-            <v-icon small class="mr-1">fas fa-sign-in-alt</v-icon>Войти
-        </v-btn>
     </v-toolbar-items>
 
     <v-toolbar-items v-if="authenticated">
@@ -43,9 +39,17 @@
             <!-- <v-icon small class="mr-1" :class="{ 'red--text': auth.signed !== 1 }">fas {{ auth.signed === 1 ? 'fa-user-circle' : 'fa-user-secret'}}</v-icon> -->
             {{ auth.email || 'Аноним' }}
         </v-btn>
+    </v-toolbar-items>
 
+    <v-toolbar-items v-if="auth && auth.signed === 1">
         <v-btn flat @click="commit('SHOW_MODAL', { signout: void 0 })" color="background">
             Выход<v-icon small class="ml-1">fas fa-sign-out-alt</v-icon>
+        </v-btn>
+    </v-toolbar-items>
+
+    <v-toolbar-items v-if="auth && auth.signed !== 1">
+        <v-btn flat @click="commit('SHOW_MODAL', { signin: void 0 })" color="background">
+            <v-icon small class="mr-1">fas fa-sign-in-alt</v-icon>Войти
         </v-btn>
     </v-toolbar-items>
 

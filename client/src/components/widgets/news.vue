@@ -93,7 +93,7 @@
                         <v-icon class="mr-1 secondary--text" :size="12">fas fa-tags</v-icon>
                         <small>{{ item.tags.reduce((str, item, inx, arr) => str = str + item + (inx === arr.length - 1 ? '' : ' | '), '') }}</small>
                     </div>
-                    <v-btn slot="right" :to="`readnews:${item._id}`" dark flat color="secondary" icon small class="ma-0"><v-icon small>fas fa-expand</v-icon></v-btn>
+                    <v-btn slot="right" @click.stop :to="`readnews:${item._id}`" dark flat color="secondary" icon small class="ma-0"><v-icon small>fas fa-expand</v-icon></v-btn>
                 </sui-card-content>
 
                 <v-speed-dial class="card-dial"

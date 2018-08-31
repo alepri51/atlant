@@ -44,6 +44,7 @@
                             validate-on-blur
                         />
                         <vue-editor v-model="form.text" 
+                            :disabled="options.remove"
                             useMarkdownShortcuts
                             :editorToolbar="toolbar"/>
                         <!-- <v-textarea 

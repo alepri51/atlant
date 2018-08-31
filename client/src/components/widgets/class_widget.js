@@ -12,7 +12,9 @@ export default {
     },
     methods: {
         load() {
-            this.auth.signed === 1 && this.execute({ endpoint: this.entity, method: 'get' });
+            //debugger;
+            let endpoint = `${this.entity}${ this.route.id ? ':' + this.route.id : '' }`;
+            this.auth.signed === 1 && this.execute({ endpoint, method: 'get' });
         }
     },
     computed: {

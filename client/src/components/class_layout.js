@@ -30,7 +30,8 @@ export default {
     },
     data() {
         return {
-            current_layout: this.$vuetify.breakpoint.name
+            current_layout: this.$vuetify.breakpoint.name,
+            layouts: {}
         }
     }
 }

@@ -1,6 +1,7 @@
 'use strict';
 
-const { Model, DBAccess } = require('./db_api');
+const { normalize, Model, DBAccess } = require('./db_api');
+const { API } = require('./base_api');
 const db = require('../db');
 
 
@@ -10,6 +11,26 @@ class NewsLayout extends Model {
     }
 
     default() {
+    }
+}
+
+class SingleNews extends API {
+    constructor(...args) {
+        super(...args);
+    }
+
+    async default() {
+        //let news = await db.News._query('MATCH (node:Новость {_id:{id}})', { id: parseInt(this.id) });
+        let news = await db.News._findOne({ _id: parseInt(this.id) }, { compositions: [] });
+        //news = news.sort((a, b) => b.updated - a.updated);
+
+        let result = {
+            singlenews: [news]
+        };
+
+        result = normalize(result);
+
+        return result;
     }
 }
 
@@ -27,8 +48,8 @@ class News extends DBAccess {
     }
 
     async default() {
-        let news = await db.News._query('MATCH (node:Новость)', { });
-        //let news = await db.News._findAll();
+        //let news = await db.News._query('MATCH (node:Новость)', { });
+        let news = await db.News._findAll();
         //news = news.sort((a, b) => b.updated - a.updated);
 
         let result = {
@@ -75,4 +96,4 @@ class News extends DBAccess {
     }
 }
 
-module.exports = { NewsLayout, News };
+module.exports = { NewsLayout, News, SingleNews };

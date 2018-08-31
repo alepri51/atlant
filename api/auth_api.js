@@ -211,7 +211,7 @@ class SignUp extends API {
 
         this.token = this.signJWT(payload, payload.key, {});
 
-        console.log(params);
+        //console.log(params);
     }
 }
 

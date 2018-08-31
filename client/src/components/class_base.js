@@ -1,10 +1,14 @@
 
 export default {
     data() {
+        let [entity, id] = this.$options._componentTag.split('_');
+
         return {
             loaded: false,
             events: {},
-            entity: this.$options._componentTag
+            entity,
+            component_name: this.$options._componentTag,
+            component_id: id || this.$store.state.route.id
         }
     },
     async created() {
@@ -24,9 +28,10 @@ export default {
         } */
     },
     watch: {
-        'auth.signed': function(val) {
+        'auth.signed': function(val, old) {
             [0, 1].includes(val) && this.commit('RESET_CACHE');
             val === 0 && this.commit('RESET_ENTITIES');
+            old === 0 && val === 1 && this.commit('RESET_ENTITIES');
         }
     },
     methods: {
@@ -54,6 +59,9 @@ export default {
             //debugger;
             return this.auth ? this.auth.signed !== 0 : false;
         },
+        route() {
+            return this.state.route;
+        }
     }
 }
 

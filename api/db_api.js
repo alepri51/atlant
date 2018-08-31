@@ -9,6 +9,37 @@ const db = require('../db');
 
 const { SecuredAPI } = require('./base_api');
 
+let normalize = function normalize(data = {}) {
+    if(Object.keys(data).length) {
+        data.api = data.api || 'v1';
+        const schema = normalizer.schema;
+
+        const _member = new schema.Entity('member', {}, { idAttribute: '_id' });
+
+        const _news = new schema.Entity('news', {
+            author: _member
+        }, { idAttribute: '_id' });
+
+        const _singlenews = new schema.Entity('singlenews', {
+            author: _member
+        }, { idAttribute: '_id' });
+
+        const db = new schema.Entity('database', {
+            member: _member,
+            news: [_news],
+            singlenews: [_singlenews]
+        }, { 
+            idAttribute: 'api'
+        });
+
+        let normalized = normalizer.normalize(data, db);
+        normalized = { ...normalized, entry: 'database' };
+
+        return normalized;
+    }
+    else return data;
+}
+
 class Model extends SecuredAPI {
     constructor(...args) {
         super(...args);
@@ -17,8 +48,9 @@ class Model extends SecuredAPI {
         this.transforms = ['default'];
     }
 
-    model(data = {}) {
-        if(Object.keys(data).length) {
+    normalize(data = {}) {
+        return normalize(data);
+        /* if(Object.keys(data).length) {
             data.api = data.api || 'v1';
             const schema = normalizer.schema;
 
@@ -39,14 +71,14 @@ class Model extends SecuredAPI {
 
             return normalized;
         }
-        else return data;
+        else return data; */
     }
 
     onExecuted(name, result) {
         let transform = this.transforms.includes(name);
 
         if(transform && typeof result === 'object' && Object.keys(result).length) {
-            return this.model(result);
+            return this.normalize(result);
         }
         else return result;
     }
@@ -185,7 +217,7 @@ class DBAccess extends Model {
             }
 
             let transformed = await this.transformData(data, req);
-            //let normalized = this.model(transformed || {});
+            //let normalized = this.normalize(transformed || {});
 
             this.afterSave(data, transformed, req);
 
@@ -199,4 +231,4 @@ class DBAccess extends Model {
     }
 }
 
-module.exports = { Model, DBAccess }
+module.exports = { Model, DBAccess, normalize }

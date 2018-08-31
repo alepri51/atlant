@@ -1,16 +1,22 @@
 <template>
-    <widget name="новость" column>
+    <widget v-if="item" name="новость" column>
         <div slot="header">
             <v-layout class="ma-2" column>
                 <sui-card-meta><small>{{ new Date(parseInt(item.created)).toLocaleString() }}</small></sui-card-meta>
 
-                <sui-card style="width: 100%;">
+                <sui-card style="width: 30vw; align-self: center">
                     <sui-embed v-if="item.video_url"
                         icon="fas fa-film"
                         :id="item.video_id"
                         :placeholder="item.compressed ? `https://localhost:8000/${item._id}/files/${item.compressed}` : ''"
                         :source="item.video_provider"
-                        :iframe="{ allowFullScreen: true, allowfullscreen: true, mozallowfullscreen: true, webkitallowfullscreen: true}"
+                        :iframe="{ 
+                            allowFullScreen: true, 
+                            allowfullscreen: true, 
+                            mozallowfullscreen: true, 
+                            webkitallowfullscreen: true,
+                        }"
+                        
                     />
                     <v-card-media v-else-if="item.compressed" :height="'30vh'" :src="item.compressed ? `https://localhost:8000/${item._id}/files/${item.compressed}` : ''" />
                     <v-card-media v-else :height="'30vh'" :src="`https://placeimg.com/500/${500 + item._id}/nature`" />
@@ -67,13 +73,19 @@
         },
         computed: {
             item() {
-                //debugger;
-                return this.raw_data.filter(item => item._id === this.state.route.id)[0] || {};
+                return this.raw_data.filter(item => item._id === this.state.route.id)[0];
+            }
+        },
+        methods: {
+            load() {
+                debugger;
+                let endpoint = `${this.component_name}:${ this.component_id}`;
+                this.execute({ endpoint, method: 'get', cache: false });
             }
         },
         data() {
             return {
-                entity: 'news'
+                //entity: 'news'
             }
         }
     }

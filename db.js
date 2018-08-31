@@ -107,6 +107,9 @@ let Info = neoModel(neo, 'Информация', info);
 let news = {
     picture: String,
     compressed: String,
+    video_url: String,
+    video_provider: String,
+    video_id: String,
     tags: Array,
     ...info
 };

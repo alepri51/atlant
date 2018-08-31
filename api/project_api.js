@@ -20,8 +20,9 @@ class News extends DBAccess {
 
     async defaults() {
         return {
-            title: 'Заголовок',
-            text: 'Текст'
+            title: `Заголовок - ${new Date().toLocaleString()}`,
+            text: 'Текст',
+            tags: ['Новость']
         }
     }
 

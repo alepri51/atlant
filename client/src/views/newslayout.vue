@@ -10,54 +10,72 @@
     
     export default {
         extends: Layout,
-        components: { 
-             dashboard: () => import('../components/dashboard') 
-        },
         data() {
 			return {
                 selected_date: void 0,
-				layout: {
-					cols: 10,
-					rows: 15
-				},
-				components: [
-                    {
-                        "id": 1,
-                        "x": 1,
-                        "y": 0,
-                        "w": 6,
-                        "h": 2,
-                        "available": true,
-                        "comp": "selection"
+                layouts: {
+                    'md': {
+                        layout: {
+                            cols: 10,
+                            rows: 15
+                        },
+                        components: [
+                            {
+                                "id": 2,
+                                "x": 1,
+                                "y": 0,
+                                "w": 8,
+                                "h": 15,
+                                "available": false,
+                                "comp": "news"
+                            }
+                        ]
                     },
-                    {
-                        "id": 2,
-                        "x": 1,
-                        "y": 0,
-                        "w": 6,
-                        "h": 15,
-                        "available": false,
-                        "comp": "news"
+                    'sm,xs': {
+                        layout: {
+                            cols: 10,
+                            rows: 15
+                        },
+                        components: [
+                            {
+                                "id": 2,
+                                "x": 0,
+                                "y": 0,
+                                "w": 10,
+                                "h": 15,
+                                "available": false,
+                                "comp": "news"
+                            }
+                        ]
                     },
-                    {
-                        "id": 4,
-                        "x": 7,
-                        "y": 0,
-                        "w": 2,
-                        "h": 9,
-                        "available": false,
-                        "comp": "calendar"
-                    },
-                    {
-                        "id": 5,
-                        "x": 7,
-                        "y": 9,
-                        "w": 2,
-                        "h": 6,
-                        "available": false,
-                        "comp": "scroll"
+                    'lg,xl': {
+                        layout: {
+                            cols: 10,
+                            rows: 15
+                        },
+                        components: [
+                            {
+                                "id": 2,
+                                "x": 1,
+                                "y": 0,
+                                "w": 6,
+                                "h": 15,
+                                "available": false,
+                                "comp": "news"
+                            },
+                            {
+                                "id": 4,
+                                "x": 7,
+                                "y": 0,
+                                "w": 2,
+                                "h": 9,
+                                "available": false,
+                                "comp": "calendar"
+                            }
+                        ]
                     }
-                ]
+                },
+				
 			}
 		}
     }

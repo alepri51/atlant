@@ -71,7 +71,8 @@ export default new Vuex.Store({
             }
         ],
         notFound: false,
-        path_query: {}
+        path_query: {},
+        route: {}
     },
     mutations: {
         RESET_ENTITIES(state) {
@@ -141,7 +142,7 @@ export default new Vuex.Store({
                     response.error = error; //DO NOT REMOVE
 
                     //оставшиеся данные
-                    response.rest = { ...rest };
+                    response.rest = rest && Object.keys(rest).length ? { ...rest } : void 0;
                     response.entities = entities;
 
                     entities && this.commit('SET_ENTITIES', { entities, method: response.config.method });
@@ -166,10 +167,10 @@ export default new Vuex.Store({
         LOADING(state, value) {
             state.loading = value;
         },
-        REGISTER_VIEW(state, name) {
+        REGISTER_VIEW(state, { name, view }) {
             Vue.component(
                 name,
-                async () => import(`./views/${name}`).catch(() => {
+                async () => import(`./views/${view}`).catch(() => {
                     return import(`./views/not-found`);
                 })
             );
@@ -193,6 +194,11 @@ export default new Vuex.Store({
         },
         SET_PATH_QUERY(state, query) {
             state.path_query = query;
+        },
+        SET_ROUTE(state, route) {
+            //debugger
+            route.id = route.id && parseInt(route.id);
+            state.route = route;
         },
         LOCATION(state, view) {
             state.view = view;

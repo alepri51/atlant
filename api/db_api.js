@@ -48,6 +48,7 @@ class Model extends SecuredAPI {
         if(transform && typeof result === 'object' && Object.keys(result).length) {
             return this.model(result);
         }
+        else return result;
     }
 }
 

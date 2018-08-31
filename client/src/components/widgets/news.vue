@@ -58,44 +58,42 @@
                     </v-btn>
                 </v-speed-dial>
             </v-layout>   
-            <div>
-                
-
-            </div>    
         </div>
 
         
 
         <v-divider slot="divider" class="mb-4"/>
 
-        <v-flex v-if="filter.length" v-for="item in filter" :key="item._id" style="max-width: 200px">
-            <sui-card :class="{ 'elevation-1': active !== item._id, 'elevation-10': active === item._id }" @mouseover="active = item._id" @mouseout="active = false">
+        <v-flex v-if="filter.length" v-for="item in filter" :key="item._id" style="max-width: 250px">
+            <sui-card :class="{ 'elevation-1': active !== item._id, 'elevation-10': active === item._id }" @click="clicked = item._id" @mouseover="active = item._id" @mouseout="active = false">
                 <!-- <sui-image src="static/images/avatar/large/matthew.png" /> -->
                 <!-- :placeholder="`https://placeimg.com/300/${200 + item._id}/nature`" -->
-                <sui-embed
+                <sui-embed v-if="item.video_url"
+                    :active="item._id === clicked"
                     icon="fas fa-film"
-                    id="90Omh7_I8vI"
+                    :id="item.video_id"
                     :placeholder="item.compressed ? `https://localhost:8000/${item._id}/files/${item.compressed}` : ''"
-                    source="youtube"
-                    :iframe="{allowFullScreen: true }"
+                    :source="item.video_provider"
+                    :iframe="{ allowFullScreen: true, allowfullscreen: true, mozallowfullscreen: true, webkitallowfullscreen: true}"
                 />
+                <v-card-media v-else-if="item.compressed" :height="112" :src="item.compressed ? `https://localhost:8000/${item._id}/files/${item.compressed}` : ''" />
+                <v-card-media v-else :height="112" :src="`https://placeimg.com/150/${100 + item._id}/nature`" />
+
                 <sui-card-content>
-                    <sui-card-header class="primary--text">{{ item.title }}</sui-card-header>
-                    <!-- <sui-card-meta><small>{{ item.created }}</small></sui-card-meta> -->
+                    <sui-card-header :alt="item.title" class="primary--text">{{ item.title }}</sui-card-header>
                     <sui-card-meta><small>{{ new Date(parseInt(item.created)).toLocaleString() }}</small></sui-card-meta>
 
                     <v-divider/>
 
-                    <sui-card-description>
-                        {{ item.text }}
-                    </sui-card-description>
+                    <sui-card-description v-html="item.text"/>
+                        <!-- {{ item.text }} -->
                 </sui-card-content>
                 <sui-card-content extra>
-                    <div v-if="item.tags" style="overflow: hidden; white-space: nowrap; text-overflow: ellipsis; display: inline-block; max-width: 140px">
+                    <div v-if="item.tags && item.tags.length" style="overflow: hidden; white-space: nowrap; text-overflow: ellipsis; display: inline-block; max-width: 120px">
                         <v-icon class="mr-1 secondary--text" :size="12">fas fa-tags</v-icon>
                         <small>{{ item.tags.reduce((str, item, inx, arr) => str = str + item + (inx === arr.length - 1 ? '' : ' | '), '') }}</small>
                     </div>
-                    <v-btn slot="right" dark flat color="secondary" icon small class="ma-0"><v-icon small>fas fa-expand</v-icon></v-btn>
+                    <v-btn slot="right" :to="`readnews:${item._id}`" dark flat color="secondary" icon small class="ma-0"><v-icon small>fas fa-expand</v-icon></v-btn>
                 </sui-card-content>
 
                 <v-speed-dial class="card-dial"
@@ -131,6 +129,7 @@
                             small
                             color="accent"
                             @click="commit('SHOW_MODAL', { news: item })"
+                            class="btn-icon-shadow"
                         >
                             <v-tooltip left>
                                 <v-icon slot="activator" :size="13" style="margin-bottom: 1px">fas fa-pen</v-icon>
@@ -143,9 +142,10 @@
                             small
                             color="error"
                             @click.native="commit('SHOW_MODAL', { news: item, options: { remove: true }})"
+                            class="btn-icon-shadow"
                         >
                             <v-tooltip left>
-                                <v-icon slot="activator" small>fas fa-times</v-icon>
+                                <v-icon  slot="activator" small>fas fa-times</v-icon>
                                 <span>Удалить</span>
                             </v-tooltip>
                         </v-btn>
@@ -210,6 +210,7 @@
                 append: false,
 
                 active: false,
+                clicked: false,
                 value: {},
                 direction: 'bottom',
                 fab: {},

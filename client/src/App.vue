@@ -44,16 +44,15 @@
         name: 'App',
         components: {
             navigation: () => import('./components/navigation'),
-            /* signin: () => import('./components/modals/signin'),
-            signup: () => import('./components/modals/signup'),
-            signout: () => import('./components/modals/signout') */
         },
         computed: {
             cssProps() {
                 return {
                     '--scroll-background': this.$colors.shades.transparent,
                     '--scroll-color': this.$vuetify.theme.scrollColor,
-                    '--embed-icon-color': this.$colors.shades.white
+                    '--embed-icon-color': this.$colors.shades.white,
+                    '--editor-button-color': this.$vuetify.theme.secondary,
+                    '--primary-color': this.$vuetify.theme.primary,
                 }
             }
         },

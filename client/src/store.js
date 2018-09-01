@@ -57,7 +57,7 @@ export default new Vuex.Store({
             {
                 icon: '',
                 name: 'Статьи',
-                to: 'articlelayout'
+                to: 'articleslayout'
             },
             {
                 icon: '',
@@ -72,7 +72,8 @@ export default new Vuex.Store({
         ],
         notFound: false,
         path_query: {},
-        route: {}
+        route: {},
+        registered_modals: {}
     },
     mutations: {
         RESET_ENTITIES(state) {
@@ -111,48 +112,42 @@ export default new Vuex.Store({
             let onResponse = (response => {
 
                 let {token, auth, error, entities, _cached, ...rest} = response.data;
-                ВОЗВРАЩАЕТ УЖЕ ОБНОВЛЕННЫЙ ТОКЕН БЕЗ РАЗРЕШЕНИЯ КОДА ИЗ ПРОСМОТРА НОВОСТИ ВОЗВРАТ ПРОИСХОДИТ
+
                 if(!token) {
+                    this.commit('RESET_CACHE');
+                    this.commit('RESET_ENTITIES');
                     this.dispatch('execute', { cache: false, endpoint: 'signup.silent'});
                 }
                 else {
-                    //auth && [0, 1].includes(auth.signed) && this.commit('RESET_CACHE');
-                    console.log('response', response.config.url, _cached, requests_cache.length);
-                    //УБРАТЬ СТАРЫЕ ДАННЫЕ ПРИ ВХОДЕ
-                    //auth.signed === 1 && state.auth && state.auth.signed === 0 && (entities = {}, this.commit('RESET_ENTITIES'));
 
-                    //token MUST EXISTS!
-                    this.commit('SET_TOKEN', token);
-                    this.commit('SET_AUTH', auth);
-
-
-                    error && !error.system && this.commit('SHOW_SNACKBAR', { text: `ОШИБКА: ${error.message}` });
-
-                    //error && error.code === 403 && !error.system && auth.signed !== 1 && this.commit('SHOW_MODAL', { signin: void 0 });
-                    if(error && error.code === 403 && !error.system && auth.signed !== 1) {
-                        //debugger;
-                        /* for(let req = 0; req < activeRequests.length; req++) {
-                            activeRequests[req] && activeRequests[req]();
-                        }
-                        
-                        activeRequests = []; */
-
-                        console.log('SIGN IN SHOW');
-                        this.commit('SHOW_MODAL', { signin: void 0 });
+                    if(!state.auth || (state.auth && auth.signed !== state.auth.signed)) {
+                        this.commit('RESET_CACHE');
+                        auth.signed === 0 && this.commit('RESET_ENTITIES');
+                    }
+                    else {
                     }
 
-                    response.error = error; //DO NOT REMOVE
+                    if(!_cached) {
+                        this.commit('SET_TOKEN', token);
+                        this.commit('SET_AUTH', auth);
+                        error && !error.system && this.commit('SHOW_SNACKBAR', { text: `ОШИБКА: ${error.message}` });
 
-                    //оставшиеся данные
-                    response.rest = rest && Object.keys(rest).length ? { ...rest } : void 0;
-                    response.entities = entities;
+                        if(error && error.code === 403 && !error.system && auth.signed !== 1) {
+                            console.log('SIGN IN SHOW');
+                            this.commit('SHOW_MODAL', { signin: void 0 });
+                        }
 
-                    entities && this.commit('SET_ENTITIES', { entities, method: response.config.method });
-                    
-                    //SAVE CACHED STATE IF IS
-                    response.data._cached = !!response.config.cache;
-                }
+                        response.error = error; //DO NOT REMOVE
 
+                        response.rest = rest && Object.keys(rest).length ? { ...rest } : void 0;
+                        response.entities = entities;
+
+                        entities && this.commit('SET_ENTITIES', { entities, method: response.config.method });
+
+                    }
+            }
+
+                response.data._cached = !!response.config.cache;
                 return response;
             });
 
@@ -189,10 +184,14 @@ export default new Vuex.Store({
             );
         },
         REGISTER_MODAL(state, name) {
-            Vue.component(
-                name,
-                async () => import(`./components/modals/${name}`)
-            );
+            if(!state.registered_modals[name]) {
+                state.registered_modals[name] = true;
+
+                Vue.component(
+                    name,
+                    async () => import(`./components/modals/${name}`)
+                );
+            }
         },
         SET_PATH_QUERY(state, query) {
             state.path_query = query;

@@ -110,7 +110,7 @@
                             //debugger;
                             if(!response.error) {
                                 this.commit('HIDE_MODAL', { signup: void 0 });
-                                this.$router.replace('newslayout');
+                                //this.$router.replace('newslayout');
                             }
                         }
                     })

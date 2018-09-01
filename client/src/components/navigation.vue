@@ -41,7 +41,7 @@
         </v-btn>
     </v-toolbar-items>
 
-    <v-toolbar-items v-if="auth && auth.signed === 1">
+    <v-toolbar-items v-if="authenticated">
         <v-btn flat @click="commit('SHOW_MODAL', { signout: void 0 })" color="background">
             Выход<v-icon small class="ml-1">fas fa-sign-out-alt</v-icon>
         </v-btn>

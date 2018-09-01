@@ -96,7 +96,7 @@
             </v-card-text>
             <v-card-actions>
                 <v-spacer></v-spacer>
-                <v-btn color="unimportant" flat @click.native="commit('HIDE_MODAL', { news: void 0 })">{{ options.remove ? 'Не удалять' : 'Не сохранять'}}</v-btn>
+                <v-btn color="unimportant" flat @click.native="commit('HIDE_MODAL', { 'news-dialog': void 0 })">{{ options.remove ? 'Не удалять' : 'Не сохранять'}}</v-btn>
                 
                 <v-btn dark :class="options.remove ? 'error' : 'secondary'" flat @click.native="submit">{{ options.remove ? 'Удалить' : 'Cохранить'}}</v-btn>
             </v-card-actions>

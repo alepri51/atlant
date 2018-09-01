@@ -10,12 +10,7 @@ export default {
         }
     },
     methods: {
-        async load() {
-            if(this.auth.signed === 1) {
-                let response = !this.form._id ? await this.execute({ endpoint: `${this.entity}.defaults`, cache: false }) : {};
-                this.defaults = response.rest || this.defaults;
-            }
-        },
+        
         submit() {
             //debugger
             let validated = this.options.remove || this.$refs.form.validate();
@@ -70,14 +65,13 @@ export default {
     },
     created() {
         console.log('CREATED', this.entity);
-        this.load();
+        //this.load();
+        //debugger
+        
     },
     watch: {
-        'auth.signed': function() {
-            this.load();
-        },
         'visible': function(val) {
-            val && this.load();
+            val && (this.defaults = this.entities.default && this.entities.default[this.entity] || {});
         }
     }
 }

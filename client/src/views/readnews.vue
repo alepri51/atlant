@@ -1,5 +1,5 @@
 <template>
-    <dashboard v-if="true"  :layout="layout" :components="components" :data="{}" @REGISTER-COMPONENT="registerComponent"/>
+    <dashboard v-if="true" :title="title" :layout="layout" :components="components" :data="{}" @REGISTER-COMPONENT="registerComponent"/>
     <div v-else>
         ДОСТУП ЗАКРЫТ
     </div>
@@ -10,6 +10,11 @@
     
     export default {
         extends: Layout,
+        computed: {
+            title() {
+                document.title = (this.entities.news && this.entities.news[this.component_id] && 'Новость: ' + this.entities.news[this.component_id].title) || 'Чтение';
+            }
+        },
         data() {
 			return {
                 selected_date: void 0,

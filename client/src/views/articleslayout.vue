@@ -12,12 +12,12 @@
         extends: Layout,
         /* computed: {
             title() {
-                this.route.view === this.component_name && (document.title = 'Новости');
+                this.route.view === this.component_name && (document.title = 'Статьи');
             }
         }, */
         methods: {
             getTitle() {
-                return 'Новости';
+                return 'Статьи';
             }
         },
         data() {
@@ -31,10 +31,19 @@
                         },
                         components: [
                             {
-                                "id": 2,
+                                "id": 1,
                                 "x": 1,
                                 "y": 0,
-                                "w": 8,
+                                "w": 2,
+                                "h": 15,
+                                "available": false,
+                                "comp": "articlescontent"
+                            },
+                            {
+                                "id": 2,
+                                "x": 3,
+                                "y": 0,
+                                "w": 6,
                                 "h": 15,
                                 "available": false,
                                 "comp": "news"
@@ -48,10 +57,19 @@
                         },
                         components: [
                             {
-                                "id": 2,
+                                "id": 1,
                                 "x": 0,
                                 "y": 0,
-                                "w": 10,
+                                "w": 3,
+                                "h": 15,
+                                "available": false,
+                                "comp": "articlescontent"
+                            },
+                            {
+                                "id": 2,
+                                "x": 3,
+                                "y": 0,
+                                "w": 7,
                                 "h": 15,
                                 "available": false,
                                 "comp": "news"
@@ -65,10 +83,19 @@
                         },
                         components: [
                             {
-                                "id": 2,
+                                "id": 1,
                                 "x": 1,
                                 "y": 0,
-                                "w": 6,
+                                "w": 2,
+                                "h": 15,
+                                "available": false,
+                                "comp": "articlescontent"
+                            },
+                            {
+                                "id": 2,
+                                "x": 3,
+                                "y": 0,
+                                "w": 4,
                                 "h": 15,
                                 "available": false,
                                 "comp": "news"

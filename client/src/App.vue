@@ -35,6 +35,8 @@
                 {{ $store.state.snackbar.caption }}
             </v-btn>
         </v-snackbar>
+
+        <news-dialog/>
     </v-app>
 </template>
 
@@ -44,6 +46,7 @@
         name: 'App',
         components: {
             navigation: () => import('./components/navigation'),
+            newsDialog: () => import('./components/modals/news-dialog'),
         },
         computed: {
             cssProps() {

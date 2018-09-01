@@ -17,15 +17,18 @@ class NewsLayout extends Model {
 class SingleNews extends API {
     constructor(...args) {
         super(...args);
+
+        this.error = void 0;//СОМНИТЕЛЬНАЯ ХУЙНЯ
     }
 
     async default() {
         //let news = await db.News._query('MATCH (node:Новость {_id:{id}})', { id: parseInt(this.id) });
-        let news = await db.News._findOne({ _id: parseInt(this.id) }, { compositions: [] });
+        //let news = await db.News._findOne({ _id: parseInt(this.id) }, { compositions: [] });
+        let news = await db.News._findOne({ _id: parseInt(this.id) });
         //news = news.sort((a, b) => b.updated - a.updated);
 
         let result = {
-            singlenews: [news]
+            news: [news]
         };
 
         result = normalize(result);
@@ -53,7 +56,15 @@ class News extends DBAccess {
         //news = news.sort((a, b) => b.updated - a.updated);
 
         let result = {
-            news
+            news,
+            defaults: [
+                {
+                    _id: 'news-dialog',
+                    title: `Заголовок - ${new Date().toLocaleString()}`,
+                    text: 'Текст',
+                    tags: ['Новость']
+                }
+            ]
         };
 
         return result;

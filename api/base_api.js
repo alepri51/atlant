@@ -96,10 +96,32 @@ class API {
     }
 
     verifyJWT(token) {
-        return jwt.decode(token);
+        let payload = jwt.decode(token);
+
+        try {
+            jwt.verify(token, payload.key);
+
+            return payload;
+        }
+        catch(err) {
+            console.log('ERROR:', err);
+            //this.revokeJWT();
+            this.error = err;
+             
+            if(err.name === 'TokenExpiredError') {
+                this.error.class_name = this.class_name;
+                this.error.expired = true;
+                this.error.system = true;
+
+                //payload.auth.signed === 1 ? payload.auth.signed = 2 : payload.auth.signed = 0;
+                payload.auth.signed === 1 && (payload.auth.signed = 2);
+                return payload;
+            }
+        };
     }
 
     async refreshJWT() {
+        //return this.payload;
         let payload = this.payload;
         if(payload) {
             //REFRESH TOKEN
@@ -149,7 +171,7 @@ class SecuredAPI extends API {
 
     }
 
-    verifyJWT(token) {
+    /* verifyJWT(token) {
         let payload = super.verifyJWT(token);
 
         try {
@@ -171,7 +193,24 @@ class SecuredAPI extends API {
                 return payload;
             }
         };
-    }
+    } */
+
+    /* async refreshJWT() {
+        let payload = super.refreshJWT();
+        if(payload) {
+            //REFRESH TOKEN
+            let private_key = KEYS_CACHE[payload.id];
+
+            payload.insecure && (private_key = payload.key);
+
+            if(!private_key) {
+                private_key = await getAccountPrivateKey(payload.id);
+                KEYS_CACHE[payload.id] = private_key;
+            }
+
+            this.token = this.signJWT(payload, private_key, payload.insecure ? {} : void 0);
+        }
+    } */
 
     checkSecurity(name, method) {
         let authError = function(...args) {
@@ -183,7 +222,7 @@ class SecuredAPI extends API {
             //this.generateError({ code: 403, message: 'Отказано в доступе. Возможно Ваша сессия завершилась.', data: { expired: true, class: this.constructor.name }});
         };
 
-        return this.auth.signed !== 1 && authError;
+        return this.auth ? this.auth.signed !== 1 && authError : authError;
     }
 
     security(name, method) {

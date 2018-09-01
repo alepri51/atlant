@@ -16,6 +16,8 @@ let router = new Router({
 });
 
 router.beforeEach(async (to, from, next) => {
+    store.commit('HIDE_MODALS');
+    
     let name = to.path.slice(1);
     to.query && store.commit('SET_PATH_QUERY', to.query);
     //debugger

@@ -40,7 +40,7 @@
                         
                         this.commit('HIDE_MODAL', { [this.entity]: void 0 });
                         
-                        this.$router.replace('landing');
+                        //this.$router.replace('landing');
                     }    
                 });
             }

@@ -11,11 +11,22 @@ export default {
         },
         components() {
             return this.layouts[this.current_layout].components;
+        },
+        title() {
+            this.route.view === this.component_name && (document.title = this.getTitle());
+        },
+    },
+    methods: {
+        getTitle() {
+            return 'atlant.club';
         }
     },
     watch: {
         '$vuetify.breakpoint': function(breakpoint) {
             this.current_layout = breakpoint.name;
+        },
+        'route': function() {
+            //this.title();
         }
     },
     created() {
@@ -27,6 +38,12 @@ export default {
 
             return memo;
         }, {})
+    },
+    activated() {
+        //debugger
+        //this.title && (document.title = this.title);
+        //this.title();
+        //document.title = this.title;
     },
     data() {
         return {

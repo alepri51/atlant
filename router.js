@@ -69,10 +69,11 @@ let proccedRequest = async function(req, res) {
     if(!object.error) {
         !object[action] && (action = 'default');
 
-        let executor = action ? object[action].bind(object) : object.default.bind(object);
+        //let executor = action ? object[action].bind(object) : object.default.bind(object);
+        //let executor = object[action].bind(object);
 
         let params = Object.keys(req.body).length === 0 ? req.query : req.body;
-        result = await executor(params, req, res);
+        result = await object[action].call(object, params, req, res); //executor(params, req, res);
 
         await object.refreshJWT(); //DO NOT REMOVE
     }

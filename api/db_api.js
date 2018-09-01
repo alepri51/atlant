@@ -15,6 +15,8 @@ let normalize = function normalize(data = {}) {
         const schema = normalizer.schema;
 
         const _member = new schema.Entity('member', {}, { idAttribute: '_id' });
+        
+        const _default = new schema.Entity('default', {}, { idAttribute: '_id' });
 
         const _news = new schema.Entity('news', {
             author: _member
@@ -27,7 +29,8 @@ let normalize = function normalize(data = {}) {
         const db = new schema.Entity('database', {
             member: _member,
             news: [_news],
-            singlenews: [_singlenews]
+            singlenews: [_singlenews],
+            defaults: [_default]
         }, { 
             idAttribute: 'api'
         });

@@ -1,5 +1,5 @@
 <template>
-    <widget name="новости" wrap justify-center>
+    <widget :name="`новости (${filter.length})`" wrap justify-center>
         <div slot="header">
             <v-layout class="ma-2">
                 <h2 class="primary--text">
@@ -27,7 +27,7 @@
 
                         dark
                         fab
-                        color="secondary"
+                        color="accent"
                     >
                         <v-icon>fas fa-plus</v-icon>
                         <v-icon>fas fa-times</v-icon>
@@ -36,8 +36,8 @@
                         fab
                         dark
                         small
-                        color="accent"
-                        @click="commit('SHOW_MODAL', { news: void 0 })"
+                        color="secondary"
+                        @click="commit('SHOW_MODAL', { 'news-dialog': void 0 })"
                     >
                         <v-tooltip left>
                             <v-icon slot="activator">far fa-newspaper</v-icon>
@@ -48,8 +48,8 @@
                         fab
                         dark
                         small
-                        color="accent"
-                        @click="commit('SHOW_MODAL', { news: void 0 })"
+                        color="secondary"
+                        @click="commit('SHOW_MODAL', { 'news-dialog': void 0 })"
                     >
                         <v-tooltip left>
                             <v-icon slot="activator">far fa-calendar-alt</v-icon>
@@ -64,8 +64,8 @@
 
         <v-divider slot="divider" class="mb-4"/>
 
-        <v-flex v-if="filter.length" v-for="item in filter" :key="item._id" style="max-width: 250px">
-            <sui-card :class="{ 'elevation-1': active !== item._id, 'elevation-10': active === item._id }" @click="clicked = item._id" @mouseover="active = item._id" @mouseout="active = false">
+        <v-flex v-if="filter.length" v-for="item in filter" :key="item._id" style="max-width: 300px">
+            <sui-card style="width: 300px!important" :class="{ 'elevation-1': active !== item._id, 'elevation-10': active === item._id }" @click="clicked = item._id" @mouseover="active = item._id" @mouseout="active = false">
                 <!-- <sui-image src="static/images/avatar/large/matthew.png" /> -->
                 <!-- :placeholder="`https://placeimg.com/300/${200 + item._id}/nature`" -->
                 <sui-embed v-if="item.video_url"
@@ -76,8 +76,8 @@
                     :source="item.video_provider"
                     :iframe="{ allowFullScreen: true, allowfullscreen: true, mozallowfullscreen: true, webkitallowfullscreen: true}"
                 />
-                <v-card-media v-else-if="item.compressed" :height="112" :src="item.compressed ? `https://localhost:8000/${item._id}/files/${item.compressed}` : ''" />
-                <v-card-media v-else :height="112" :src="`https://placeimg.com/150/${100 + item._id}/nature`" />
+                <v-card-media v-else-if="item.compressed" :height="159.75" :src="item.compressed ? `https://localhost:8000/${item._id}/files/${item.compressed}` : ''" />
+                <v-card-media v-else :height="159.75" :src="`https://placeimg.com/150/${100 + item._id}/nature`" />
 
                 <sui-card-content>
                     <sui-card-header :alt="item.title" class="primary--text">{{ item.title }}</sui-card-header>
@@ -117,7 +117,7 @@
                             dark
                             fab
                             small
-                            color="secondary"
+                            color="accent"
                             :style="!fab[item._id] && 'opacity: 0.5'"
                         >
                             <v-icon>fas fa-chevron-down</v-icon>
@@ -127,8 +127,8 @@
                             icon
                             dark
                             small
-                            color="accent"
-                            @click="commit('SHOW_MODAL', { news: item })"
+                            color="secondary"
+                            @click="commit('SHOW_MODAL', { 'news-dialog': item })"
                             class="btn-icon-shadow"
                         >
                             <v-tooltip left>
@@ -141,7 +141,7 @@
                             dark
                             small
                             color="error"
-                            @click.native="commit('SHOW_MODAL', { news: item, options: { remove: true }})"
+                            @click.native="commit('SHOW_MODAL', { 'news-dialog': item, options: { remove: true }})"
                             class="btn-icon-shadow"
                         >
                             <v-tooltip left>
@@ -163,18 +163,23 @@
             </sui-card>
         </v-flex>
 
-        <news @removed="removed" @appended="appended"/>
+        <!-- <news-dialog @removed="removed" @appended="appended"/> -->
     </widget>        
 </template>
 
 <script>
     import Widget from './class_widget';
+    //import newsDialog from '../modals/news-dialog';
 
     export default {
         props: ['date'],
         extends: Widget,
         components: {
-            news: () => import('../modals/news'),
+            //newsDialog
+            //news: () => import('../modals/news'), DONT DO LIKE THIS, REGISTERED MULTIPLY SAME DIALOGS AND SHOWS THEM TOGETHER, USE REGISTER_MODAL INSTEAD
+        },
+        created() {
+            //this.commit('REGISTER_MODAL', 'news-dialog');
         },
         computed: {
             filter() {
@@ -188,12 +193,6 @@
         methods: {
             tags(item) {
                 return item.tags.reduce((str, item, inx) => str = str + item, '')
-            },
-            appended(_id) {
-                debugger;
-            },
-            removed() {
-
             },
             onHover(id) {
                 this.value[id] = true;

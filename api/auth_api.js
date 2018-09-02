@@ -6,7 +6,7 @@ const generate = require('nanoid/generate');
 const uaParser = require('ua-parser-js');
 
 const { API } = require('./base_api');
-const db = require('../db');
+const db = require('../models');
 let { btc, Club, Member, List, Message } = db;
 
 class SignIn extends API {

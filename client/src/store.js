@@ -303,6 +303,7 @@ export default new Vuex.Store({
             //config.cache = false;
             commit('LOADING', true);
 
+            console.log('EXECUTE:', endpoint, 'CACHE', !!config.cache);
             try {
 
                 config.method === 'get' ? config.params = payload : config.data = payload;

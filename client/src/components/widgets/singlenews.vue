@@ -24,7 +24,7 @@
                 dark
                 fab
                 color="accent"
-                @click="commit('SHOW_MODAL', { 'news-dialog': item })"
+                @click="commit('SHOW_MODAL', { 'news': item })"
             >
                 <v-icon>fas fa-pen</v-icon>
                 <v-icon>fas fa-feather-alt</v-icon>
@@ -39,7 +39,7 @@
                 <sui-embed v-if="item.video_url"
                     icon="fas fa-film"
                     :id="item.video_id"
-                    :placeholder="item.compressed ? `https://localhost:8000/${item._id}/files/${item.compressed}` : ''"
+                    :placeholder="item.compressed ? `https://localhost:8000/${item._id}/files/${item.compressed}` : `https://placeimg.com/500/${400 + item._id}/nature`"
                     :source="item.video_provider"
                     :iframe="{ 
                         allowFullScreen: true, 

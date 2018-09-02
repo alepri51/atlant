@@ -57,7 +57,7 @@ export default {
         },
         authenticated() {
             //debugger;
-            return this.auth ? this.auth.signed !== 0 : false;
+            return this.auth ? this.auth.signed && this.auth.signed !== 0 : false;
         },
         route() {
             return this.state.route;

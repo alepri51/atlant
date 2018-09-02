@@ -7,6 +7,7 @@
                     Содержание:
                 </h2>
                 
+
                 <v-btn
                     v-if="auth.group === 'admins'"
                     class="top-dial" 
@@ -18,8 +19,7 @@
                     color="accent"
                     @click="commit('SHOW_MODAL', { 'news-dialog': item })"
                 >
-                    <v-icon>fas fa-pen</v-icon>
-                    <v-icon>fas fa-feather-alt</v-icon>
+                    <v-icon :size="18">fas fa-pen</v-icon>
                 </v-btn>
             </v-layout>   
             
@@ -31,35 +31,7 @@
 
         <v-card style="flex: 1" flat>
             <v-card-text>
-                <sui-list>
-                    <tree-list :items="items">
-                    <!-- <sui-list-item>
-                        <sui-list-icon name="fas fa-user"/>
-
-                        <sui-list-content>
-                            <sui-list-header>semantic.json</sui-list-header>
-                            <sui-list-description>Contains build settings for gulp</sui-list-description>
-                            <sui-list-list>
-                                <sui-list-item>
-                                    <sui-list-icon name="folder" />
-                                    <sui-list-content>
-                                        <sui-list-header>default</sui-list-header>
-                                        <sui-list-description>Default packaged theme</sui-list-description>
-                                    </sui-list-content>
-                                </sui-list-item>
-                                <sui-list-item>
-                                    <sui-list-icon name="folder" />
-                                    <sui-list-content>
-                                        <sui-list-header>my_theme</sui-list-header>
-                                        <sui-list-description>
-                                            Packaged themes are also available in this folder
-                                        </sui-list-description>
-                                    </sui-list-content>
-                                </sui-list-item>
-                            </sui-list-list>
-                        </sui-list-content>
-                    </sui-list-item> -->
-                </sui-list>
+                <tree-list :items="filter" :selected="selected" @select="selected = arguments[0], $emit('select', selected)"/>
             </v-card-text>
         </v-card>
     </widget>        
@@ -70,31 +42,90 @@
 
     export default {
         extends: Widget,
+        components: {
+            'tree-list': () => import('../tree-list')
+        },
+        computed: {
+            filter() {
+                if(!this.selected) {
+                    this.selected = this.raw_data.length && this.raw_data[0]._id;
+                    this.$emit('select', this.selected);
+                }
+                
+                debugger
+                
+                let content = this.raw_data.map(section => {
+                    !section.items && (section.items = section.children.map(child => this.raw_data.find(section => section._id === child)));
+                    return section
+                });
+                
+                content = content.filter(section => !section.parent);
+                return content;
+            }
+        },
         data() {
             return {
-                items: [
+                entity: 'content',
+                selected: void 0,
+                /* items: [
                     {
                         _id: 1,
-                        title: 'LEVEL 0',
-                        description: '0 - level'
-                        icon: 'fas fa-user',
+                        title: 'semantic.json',
+                        description: 'Contains build settings for gulp',
+                        icon: 'far fa-caret-down',
                         items: [
                             {
                                 _id: 2,
-                                title: 'LEVEL 1',
-                                description: '1 - level'
-                                icon: 'fas fa-user',
+                                title: 'default',
+                                description: 'Default packaged theme',
+                                icon: 'far fa-caret-down',
                             },
                             {
                                 _id: 3,
-                                title: 'LEVEL 1.1',
-                                description: '1.1 - level'
-                                icon: 'fas fa-user',
+                                title: 'my_theme',
+                                description: 'Packaged themes are also available in this folder',
+                                icon: 'far fa-caret-down',
+                            }
+
+                        ]
+                    },
+                    {
+                        _id: 4,
+                        title: 'semantic.json',
+                        description: 'Contains build settings for gulp',
+                        icon: 'far fa-caret-down',
+                        items: [
+                            {
+                                _id: 5,
+                                title: 'default',
+                                description: 'Default packaged theme',
+                                icon: 'far fa-caret-down',
+                                items: [
+                                    {
+                                        _id: 6,
+                                        title: 'default',
+                                        description: 'Default packaged theme',
+                                        icon: 'fab fa-creative-commons-share',
+                                    },
+                                    {
+                                        _id: 7,
+                                        title: 'my_theme',
+                                        description: 'Packaged themes are also available in this folder',
+                                        icon: 'fab fa-creative-commons-share',
+                                    }
+
+                                ]
+                            },
+                            {
+                                _id: 8,
+                                title: 'my_theme',
+                                description: 'Packaged themes are also available in this folder',
+                                icon: 'far fa-caret-down',
                             }
 
                         ]
                     }
-                ]
+                ] */
             }
         }
     }

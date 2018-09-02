@@ -2,46 +2,12 @@
 
 const fs = require('fs-extra');
 const path = require('path');
-const normalizer = require('normalizr');
 const compress_images = require('compress-images');
 
-const db = require('../db');
+const db = require('../models');
+const normalize = db.normalize;
 
 const { SecuredAPI } = require('./base_api');
-
-let normalize = function normalize(data = {}) {
-    if(Object.keys(data).length) {
-        data.api = data.api || 'v1';
-        const schema = normalizer.schema;
-
-        const _member = new schema.Entity('member', {}, { idAttribute: '_id' });
-        
-        const _default = new schema.Entity('default', {}, { idAttribute: '_id' });
-
-        const _news = new schema.Entity('news', {
-            author: _member
-        }, { idAttribute: '_id' });
-
-        const _singlenews = new schema.Entity('singlenews', {
-            author: _member
-        }, { idAttribute: '_id' });
-
-        const db = new schema.Entity('database', {
-            member: _member,
-            news: [_news],
-            singlenews: [_singlenews],
-            defaults: [_default]
-        }, { 
-            idAttribute: 'api'
-        });
-
-        let normalized = normalizer.normalize(data, db);
-        normalized = { ...normalized, entry: 'database' };
-
-        return normalized;
-    }
-    else return data;
-}
 
 class Model extends SecuredAPI {
     constructor(...args) {
@@ -53,28 +19,6 @@ class Model extends SecuredAPI {
 
     normalize(data = {}) {
         return normalize(data);
-        /* if(Object.keys(data).length) {
-            data.api = data.api || 'v1';
-            const schema = normalizer.schema;
-
-            const _member = new schema.Entity('member', {}, { idAttribute: '_id' });
-            const _news = new schema.Entity('news', {
-                author: _member
-            }, { idAttribute: '_id' });
-
-            const db = new schema.Entity('database', {
-                member: _member,
-                news: [_news]
-            }, { 
-                idAttribute: 'api'
-            });
-
-            let normalized = normalizer.normalize(data, db);
-            normalized = { ...normalized, entry: 'database' };
-
-            return normalized;
-        }
-        else return data; */
     }
 
     onExecuted(name, result) {
@@ -139,8 +83,8 @@ class DBAccess extends Model {
         return data;
     }
 
-    afterSave(data, req) {
-
+    afterSave(data, transformed, req) {
+        return transformed;
     }
 
     async save(payload, req, res) {
@@ -149,7 +93,7 @@ class DBAccess extends Model {
             if(req.blob) {
                 if(req.blob.err) {
                     let err = req.blob.err;
-                    this.generateError({ code: err.code, message: err.message, data: this.constructor.name });  
+                    //this.generateError({ code: err.code, message: err.message, data: this.constructor.name });  
                     resolve(err);
                 }
                 else {
@@ -215,6 +159,7 @@ class DBAccess extends Model {
                     
                     //payload = data;
                     let err = await blobSave(data);
+                    this.error = err && { message: err.toString() };
                     //!err && (data = await db[this.constructor.name]._update({ ...payload }));
                     break;
             }
@@ -222,7 +167,7 @@ class DBAccess extends Model {
             let transformed = await this.transformData(data, req);
             //let normalized = this.normalize(transformed || {});
 
-            this.afterSave(data, transformed, req);
+            transformed = this.afterSave(data, transformed, req);
 
             return transformed;
         }

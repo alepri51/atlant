@@ -36,7 +36,8 @@
             </v-btn>
         </v-snackbar>
 
-        <news-dialog/>
+        <news/>
+        <manual/>
     </v-app>
 </template>
 
@@ -46,7 +47,8 @@
         name: 'App',
         components: {
             navigation: () => import('./components/navigation'),
-            newsDialog: () => import('./components/modals/news-dialog'),
+            news: () => import('./components/modals/news'),
+            manual: () => import('./components/modals/manual')
         },
         computed: {
             cssProps() {

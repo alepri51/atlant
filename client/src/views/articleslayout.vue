@@ -1,5 +1,5 @@
 <template>
-    <dashboard v-if="authenticated" :title="title" :layout="layout" :components="components" :data="{}" @REGISTER-COMPONENT="registerComponent" @date-changed="selected_date = arguments[0]" :date="selected_date"/>
+    <dashboard v-if="authenticated" :title="title" :layout="layout" :components="components" :data="{}" @REGISTER-COMPONENT="registerComponent" @select="selected = arguments[0]" :section="selected"/>
     <div v-else>
         ДОСТУП ЗАКРЫТ
     </div>
@@ -22,7 +22,7 @@
         },
         data() {
 			return {
-                selected_date: void 0,
+                selected: void 0,
                 layouts: {
                     'md': {
                         layout: {
@@ -46,7 +46,7 @@
                                 "w": 6,
                                 "h": 15,
                                 "available": false,
-                                "comp": "news"
+                                "comp": "manual"
                             }
                         ]
                     },
@@ -72,7 +72,7 @@
                                 "w": 7,
                                 "h": 15,
                                 "available": false,
-                                "comp": "news"
+                                "comp": "manual"
                             }
                         ]
                     },
@@ -95,19 +95,10 @@
                                 "id": 2,
                                 "x": 3,
                                 "y": 0,
-                                "w": 4,
+                                "w": 6,
                                 "h": 15,
                                 "available": false,
-                                "comp": "news"
-                            },
-                            {
-                                "id": 4,
-                                "x": 7,
-                                "y": 0,
-                                "w": 2,
-                                "h": 9,
-                                "available": false,
-                                "comp": "calendar"
+                                "comp": "manual"
                             }
                         ]
                     }

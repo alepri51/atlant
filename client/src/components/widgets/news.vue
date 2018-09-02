@@ -29,7 +29,9 @@
                         fab
                         color="accent"
                     >
-                        <v-icon>fas fa-plus</v-icon>
+                        <v-icon> fas fa-plus</v-icon>
+                        <!-- <v-icon :size="10" v-show="!append" color="secondary">fas fa-user</v-icon> -->
+
                         <v-icon>fas fa-times</v-icon>
                     </v-btn>
                     <v-btn
@@ -37,7 +39,7 @@
                         dark
                         small
                         color="secondary"
-                        @click="commit('SHOW_MODAL', { 'news-dialog': void 0 })"
+                        @click="commit('SHOW_MODAL', { 'news': void 0 })"
                     >
                         <v-tooltip left>
                             <v-icon slot="activator">far fa-newspaper</v-icon>
@@ -49,7 +51,7 @@
                         dark
                         small
                         color="secondary"
-                        @click="commit('SHOW_MODAL', { 'news-dialog': void 0 })"
+                        @click="commit('SHOW_MODAL', { 'news': void 0 })"
                     >
                         <v-tooltip left>
                             <v-icon slot="activator">far fa-calendar-alt</v-icon>
@@ -72,7 +74,7 @@
                     :active="item._id === clicked"
                     icon="fas fa-film"
                     :id="item.video_id"
-                    :placeholder="item.compressed ? `https://localhost:8000/${item._id}/files/${item.compressed}` : ''"
+                    :placeholder="item.compressed ? `https://localhost:8000/${item._id}/files/${item.compressed}` : `https://placeimg.com/150/${100 + item._id}/nature`"
                     :source="item.video_provider"
                     :iframe="{ allowFullScreen: true, allowfullscreen: true, mozallowfullscreen: true, webkitallowfullscreen: true}"
                 />
@@ -80,7 +82,7 @@
                 <v-card-media v-else :height="159.75" :src="`https://placeimg.com/150/${100 + item._id}/nature`" />
 
                 <sui-card-content>
-                    <sui-card-header :alt="item.title" class="primary--text">{{ item.title }}</sui-card-header>
+                    <sui-card-header :alt="item.title" :class="item._id === active ? 'accent--text' : 'primary--text'">{{ item.title }}</sui-card-header>
                     <sui-card-meta><small>{{ new Date(parseInt(item.created)).toLocaleString() }}</small></sui-card-meta>
 
                     <v-divider/>
@@ -128,7 +130,7 @@
                             dark
                             small
                             color="secondary"
-                            @click="commit('SHOW_MODAL', { 'news-dialog': item })"
+                            @click="commit('SHOW_MODAL', { 'news': item })"
                             class="btn-icon-shadow"
                         >
                             <v-tooltip left>
@@ -141,7 +143,7 @@
                             dark
                             small
                             color="error"
-                            @click.native="commit('SHOW_MODAL', { 'news-dialog': item, options: { remove: true }})"
+                            @click.native="commit('SHOW_MODAL', { 'news': item, options: { remove: true }})"
                             class="btn-icon-shadow"
                         >
                             <v-tooltip left>

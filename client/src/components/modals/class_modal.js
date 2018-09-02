@@ -9,14 +9,20 @@ export default {
             defaults: {}
         }
     },
+    computed: {
+    },
     methods: {
-        
+        beforeSave(data) {
+            return data;
+        },        
         submit() {
             //debugger
             let validated = this.options.remove || this.$refs.form.validate();
 
             let headers = {};
             let data = void 0;
+
+            this.form = this.beforeSave(this.form);
 
             if(this.form.blob instanceof FormData) {
                 headers = {
@@ -29,6 +35,7 @@ export default {
                     return memo;
                 }, this.form.blob);
             }
+
 
             validated ? 
                 this.execute({ 
@@ -53,12 +60,23 @@ export default {
     computed: {
         visible: { 
             get() {
+                //debugger
                 let { data: modal_data, options = {} } = this.state.modals[this.entity] || { data: void 0, options: void 0 };
                 this.options = options;
 
-                typeof modal_data === 'object' && (Object.keys(modal_data).length ? this.form = JSON.parse(JSON.stringify(modal_data)) : this.form = JSON.parse(JSON.stringify(this.defaults || {})));
-                
+                let defaults = JSON.parse(JSON.stringify(this.defaults || {}));
+
+                //modal_data = modal_data || {};
+                modal_data = modal_data && {...defaults, ...modal_data};
+                this.form = JSON.parse(JSON.stringify(modal_data || defaults));
+
+                //return !!Object.keys(modal_data).length;
                 return !!modal_data;
+
+                //typeof modal_data === 'object' && (Object.keys(modal_data).length ? this.form = JSON.parse(JSON.stringify(modal_data)) : this.form = JSON.parse(JSON.stringify(this.defaults || {})));
+                
+                //return !!modal_data;
+                //return false
             },
             set: () => {}
         },

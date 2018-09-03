@@ -113,10 +113,19 @@ export default new Vuex.Store({
 
                 let {token, auth, error, entities, _cached, ...rest} = response.data;
 
+                error && (!error.system ? this.commit('SHOW_SNACKBAR', { text: `ОШИБКА: ${error.message}` }) : console.error(`ОШИБКА: ${error.message}`));
+
+                if(error && error.code === 403 && !error.system && auth.signed !== 1) {
+                    console.log('SIGN IN SHOW');
+                    this.commit('SHOW_MODAL', { signin: void 0 });
+                }
+
+                response.error = error; //DO NOT REMOVE
+                
                 if(!token) {
                     this.commit('RESET_CACHE');
                     this.commit('RESET_ENTITIES');
-                    this.dispatch('execute', { cache: false, endpoint: 'signup.silent'});
+                    !error && this.dispatch('execute', { cache: false, endpoint: 'signup.silent'});
                 }
                 else {
 
@@ -130,14 +139,14 @@ export default new Vuex.Store({
                     if(!_cached) {
                         this.commit('SET_TOKEN', token);
                         this.commit('SET_AUTH', auth);
-                        error && !error.system && this.commit('SHOW_SNACKBAR', { text: `ОШИБКА: ${error.message}` });
+                        /* error && !error.system && this.commit('SHOW_SNACKBAR', { text: `ОШИБКА: ${error.message}` });
 
                         if(error && error.code === 403 && !error.system && auth.signed !== 1) {
                             console.log('SIGN IN SHOW');
                             this.commit('SHOW_MODAL', { signin: void 0 });
                         }
 
-                        response.error = error; //DO NOT REMOVE
+                        response.error = error; //DO NOT REMOVE */
 
                         response.rest = rest && Object.keys(rest).length ? { ...rest } : void 0;
                         response.entities = entities;
@@ -145,6 +154,8 @@ export default new Vuex.Store({
                         entities && this.commit('SET_ENTITIES', { entities, method: response.config.method });
 
                     }
+
+                    
             }
 
                 response.data._cached = !!response.config.cache;

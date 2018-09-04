@@ -28,6 +28,7 @@
 
     export default {
         extends: Widget,
+        props: ['selected'],
         data: () => 
         {
             return {
@@ -40,10 +41,10 @@
                 return `${this.component_name}${ this.component_id ? ':' + this.component_id : '' }`;
             },
             filter() {
-                //debugger
-                let content = this.raw_data.find(item => item._id === this.auth.member);
+                debugger
+                let content = this.raw_data.find(item => item._id === this.selected);
                 
-                return content && content.list.members.map(member => this.entities.member[member]);
+                return content && content.list.members && content.list.members.map(member => this.entities.member[member]);
             }
         },
         methods: {

@@ -1,5 +1,5 @@
 <template>
-    <dashboard v-if="authenticated" :title="title" :layout="layout" :components="components" :data="{}" @REGISTER-COMPONENT="registerComponent" @select="selected = arguments[0]" :section="selected"/>
+    <dashboard v-if="authenticated" :title="title" :layout="layout" :components="components" :data="{}" @REGISTER-COMPONENT="registerComponent" @select="onSelect" :selected="selected"/>
     <div v-else>
         ДОСТУП ЗАКРЫТ
     </div>
@@ -18,6 +18,10 @@
         methods: {
             getTitle() {
                 return 'Статьи';
+            },
+            onSelect(selected) {
+                debugger
+                this.selected = selected;
             }
         },
         data() {

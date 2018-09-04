@@ -73,7 +73,7 @@
                 return `email: ${member.email}; реферальный код: ${member.ref}`;
             },
             onSelect(selected) {
-                
+                debugger;
                 this.selected = selected;
                 this.$emit('select', selected);
             },

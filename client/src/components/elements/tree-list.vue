@@ -104,7 +104,7 @@
 
                     typeof this.closed[child._id] === 'undefined' && (!child.items ? this.$set(this.closed, child._id, true) : this.$set(this.closed, child._id, false));
                     
-                    child._id === 155 && console.log(child.name, child._id, this.empty[child._id], this.entity[item]);
+                    //child._id === 155 && console.log(child.name, child._id, this.empty[child._id], this.entity[item]);
 
                     return child;
                 });

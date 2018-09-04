@@ -16,6 +16,8 @@
     "semantic-ui-vue": "^0.3.3",
     "socket.io": "^2.1.1",
     "socket.io-client": "^2.1.1",
+    "tiptap": "^0.9.1",
+    "tiptap-extensions": "^0.7.1",
     "vue": "^2.5.17",
     "vue-router": "^3.0.1",
     "vue2-editor": "^2.6.6",

@@ -62,7 +62,7 @@ export default new Vuex.Store({
             {
                 icon: '',
                 name: 'Структура',
-                to: 'structure'
+                to: 'structurelayout'
             },
             {
                 icon: '',
@@ -100,11 +100,15 @@ export default new Vuex.Store({
             let onRequest = (config => {
                 console.log('request', config.url, requests_cache.length);
                 state.token && (config.headers.common.authorization = state.token);
-
+                //debugger
                 /* config.cancelToken = new CancelToken(function executor(cancel) {
                     // An executor function receives a cancel function as a parameter
                     activeRequests.push(cancel);
                 }); */
+
+                /* if(config.method === 'get' && state.auth && state.auth.signed !== 1) {
+                    throw new Error('intercepted:' + config.url);
+                } */
 
                 return config;
             });
@@ -115,11 +119,15 @@ export default new Vuex.Store({
 
                 error && (!error.system ? this.commit('SHOW_SNACKBAR', { text: `ОШИБКА: ${error.message}` }) : console.error(`ОШИБКА: ${error.message}`));
 
-                if(error && error.code === 403 && !error.system && auth.signed !== 1) {
+                error && this.commit('RESET_CACHE');
+
+                if(error && error.code === 403 && !error.system && auth && auth.signed !== 1) {
+                    //this.commit('RESET_CACHE');
                     console.log('SIGN IN SHOW');
                     this.commit('SHOW_MODAL', { signin: void 0 });
                 }
 
+                
                 response.error = error; //DO NOT REMOVE
                 
                 if(!token) {
@@ -128,10 +136,10 @@ export default new Vuex.Store({
                     !error && this.dispatch('execute', { cache: false, endpoint: 'signup.silent'});
                 }
                 else {
-
+                    
                     if(!state.auth || (state.auth && auth.signed !== state.auth.signed)) {
-                        this.commit('RESET_CACHE');
                         auth.signed === 0 && this.commit('RESET_ENTITIES');
+                        auth.signed === 0 && this.commit('RESET_CACHE');
                     }
                     else {
                     }
@@ -156,14 +164,14 @@ export default new Vuex.Store({
                     }
 
                     
-            }
+                }
 
                 response.data._cached = !!response.config.cache;
                 return response;
             });
 
             let onError = (error => {
-                this.commit('SHOW_SNACKBAR', { text: `ОШИБКА: ${error.message}` });
+                error.message.indexOf('intercepted') !== -1 ? console.error(`ОШИБКА: ${error.message}`) : this.commit('SHOW_SNACKBAR', { text: `ОШИБКА: ${error.message}` });
             });
 
             api.interceptors.request.use(onRequest, onError);

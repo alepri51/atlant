@@ -166,7 +166,14 @@ let normalize = function normalize(data = {}) {
         data.api = data.api || 'v1';
         const schema = normalizer.schema;
 
+        const _wallet = new schema.Entity('wallet', {}, { idAttribute: '_id' });
+
         const _member = new schema.Entity('member', {}, { idAttribute: '_id' });
+        _member.define({
+            referer: _member,
+            referals: [_member],
+            wallet: _wallet
+        });
         
         const _default = new schema.Entity('default', {}, { idAttribute: '_name' });
         
@@ -202,6 +209,7 @@ let normalize = function normalize(data = {}) {
         });
 
         let normalized = normalizer.normalize(data, db);
+        delete normalized.entities.wallet;
         normalized = { ...normalized, entry: 'database' };
 
         return normalized;

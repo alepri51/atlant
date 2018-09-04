@@ -17,7 +17,7 @@
                     dark
                     fab
                     color="accent"
-                    @click="commit('SHOW_MODAL', { 'news-dialog': item })"
+                    @click="commit('SHOW_MODAL', { 'xxx': void 0 })"
                 >
                     <v-icon :size="18">fas fa-pen</v-icon>
                 </v-btn>
@@ -31,7 +31,7 @@
 
         <v-card style="flex: 1" flat>
             <v-card-text>
-                <tree-list :items="filter" :selected="selected" @select="selected = arguments[0], $emit('select', selected)"/>
+                <tree-list :items="filter" items-name="referals" :entity="entities.member" @select="onSelect" @expand="onExpand"/>
             </v-card-text>
         </v-card>
     </widget>        
@@ -46,26 +46,40 @@
             'tree-list': () => import('../tree-list')
         },
         computed: {
+            endpoint() {
+                //debugger
+                return `${this.component_name}${ this.component_id ? ':' + this.component_id : '' }`;
+            },
             filter() {
-                if(!this.selected) {
-                    this.selected = this.raw_data.length && this.raw_data[0]._id;
-                    this.$emit('select', this.selected);
-                }
+                /* if(!this.selected) {
+                    this.selected = this.raw_data.length && this.raw_data.find(item => item._id === this.auth.member)._id;
+                    //this.$emit('select', this.selected);
+                } */
                 
                 //debugger
                 
-                let content = this.raw_data.map(section => {
-                    !section.items && (section.items = (section.children && section.children.map(child => this.raw_data.find(section => section._id === child))) || [] );
-                    return section
-                });
+                /* let content = this.raw_data.map(member => {
+                    //!member.items && member.referals && (member.items = member.referals.map(child => this.raw_data.find(member => member._id === child)));
+                    !member.title && (member.title = member.name + '(' + member.ref + ')');
+                    return member
+                }); */
                 
-                content = content.filter(section => !section.parent);
+                let content = this.raw_data.filter(item => item._id === this.auth.member);// content.filter(member => member._id === this.auth.member);
                 return content;
+            }
+        },
+        methods: {
+            onSelect(selected) {
+                this.$emit('select', selected);
+            },
+            onExpand(selected) {
+                this.execute({ endpoint: `structure:${selected}.expand` });
+                this.$emit('expand', selected);
             }
         },
         data() {
             return {
-                entity: 'content',
+                entity: 'member',
                 selected: void 0,
             }
         }

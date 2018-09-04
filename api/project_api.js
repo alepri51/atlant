@@ -5,12 +5,43 @@ const { Model, DBAccess } = require('./db_api');
 const { API, SecuredAPI } = require('./base_api');
 const db = require('../models');
 
+class Structure extends DBAccess {
+    constructor(...args) {
+        super(...args);
+
+        this.transforms.push('expand');
+    }
+
+    async default() {
+        return await this.expand();
+        /* let member = await db.Member._findOne({ _id: this.auth.member });
+
+        let result = {
+            member
+        };
+
+        //result = normalize(result);
+
+        return result; */
+    }
+
+    async expand() {
+        let member = await db.Member._findOne({ _id: parseInt(this.id) || this.auth.member });
+
+        let result = {
+            member
+        };
+
+        //result = normalize(result);
+
+        return result;
+    }
+}
 
 class Content extends DBAccess {
     constructor(...args) {
         super(...args);
 
-        this.error = void 0;//СОМНИТЕЛЬНАЯ ХУЙНЯ
     }
 
     async default() {
@@ -19,6 +50,7 @@ class Content extends DBAccess {
         let roots = sections.filter(section => !section.parent);
         let content = sections.map((section, inx, arr) => {
             section.children = arr.filter(item => item.parent && item.parent._id === section._id);
+            section.children = section.children || [];
             return section;
         });
 
@@ -30,6 +62,7 @@ class Content extends DBAccess {
 
         return result;
     }
+    
 }
 
 class SingleManual extends SecuredAPI {
@@ -216,4 +249,4 @@ class News extends DBAccess {
     }
 }
 
-module.exports = { NewsLayout, News, SingleNews, Content, Manual, SingleManual };
+module.exports = { NewsLayout, News, SingleNews, Content, Manual, SingleManual, Structure };

@@ -43,6 +43,95 @@
                             @keyup.enter="submit"
                             validate-on-blur
                         />
+                        <!-- <editor :extensions="extensions">
+                            <div class="menubar is-hidden" :class="{ 'is-focused': focused }" slot="menubar" slot-scope="{ nodes, marks, focused }">
+                                <div v-if="nodes && marks">
+
+                                    <button
+                                        class="menubar__button"
+                                        :class="{ 'is-active': marks.bold.active() }"
+                                        @click="marks.bold.command"
+                                    >
+                                        <v-icon>fas fa-bold</v-icon>
+                                    </button>
+
+                                    <button
+                                        class="menubar__button"
+                                        :class="{ 'is-active': marks.italic.active() }"
+                                        @click="marks.italic.command"
+                                    >
+                                        <v-icon name="italic" />
+                                    </button>
+
+                                    <button
+                                        class="menubar__button"
+                                        @click="marks.code.command"
+                                        :class="{ 'is-active': marks.code.active() }
+                                    ">
+                                        <v-icon name="code" />
+                                    </button>
+
+                                    <button
+                                        class="menubar__button"
+                                        :class="{ 'is-active': nodes.paragraph.active() }"
+                                        @click="nodes.paragraph.command"
+                                    >
+                                        <v-icon name="paragraph" />
+                                    </button>
+
+                                    <button
+                                        class="menubar__button"
+                                        :class="{ 'is-active': nodes.heading.active({ level: 1 }) }"
+                                        @click="nodes.heading.command({ level: 1 })"
+                                    >
+                                        H1
+                                    </button>
+
+                                    <button
+                                        class="menubar__button"
+                                        :class="{ 'is-active': nodes.heading.active({ level: 2 }) }"
+                                        @click="nodes.heading.command({ level: 2 })"
+                                    >
+                                        H2
+                                    </button>
+
+                                    <button
+                                        class="menubar__button"
+                                        :class="{ 'is-active': nodes.heading.active({ level: 3 }) }"
+                                        @click="nodes.heading.command({ level: 3 })"
+                                    >
+                                        H3
+                                    </button>
+
+                                    <button
+                                        class="menubar__button"
+                                        :class="{ 'is-active': nodes.bullet_list.active() }"
+                                        @click="nodes.bullet_list.command"
+                                    >
+                                        <v-icon name="ul" />
+                                    </button>
+
+                                    <button
+                                        class="menubar__button"
+                                        :class="{ 'is-active': nodes.ordered_list.active() }"
+                                        @click="nodes.ordered_list.command"
+                                    >
+                                        <v-icon name="ol" />
+                                    </button>
+
+                                    <button
+                                        class="menubar__button"
+                                        :class="{ 'is-active': nodes.code_block.active() }"
+                                        @click="nodes.code_block.command"
+                                    >
+                                        <v-icon name="code" />
+                                    </button>
+
+                                </div>
+                            </div>
+
+                            <div class="editor__content" slot="content" slot-scope="props" v-html="form.text"></div>
+                        </editor> -->
                         <vue-editor v-model="form.text" 
                             :disabled="options.remove"
                             useMarkdownShortcuts
@@ -112,12 +201,32 @@
     import urlParser from "js-video-url-parser";
     import { VueEditor } from "vue2-editor";
 
+    import { Editor } from 'tiptap';
+    import {
+        BlockquoteNode,
+        BulletListNode,
+        CodeBlockNode,
+        HardBreakNode,
+        HeadingNode,
+        ImageNode,
+        ListItemNode,
+        OrderedListNode,
+        TodoItemNode,
+        TodoListNode,
+        BoldMark,
+        CodeMark,
+        ItalicMark,
+        LinkMark,
+        HistoryExtension,
+    } from 'tiptap-extensions'
+
     export default {
         extends: Modal,
         inheritAttrs: false,
         components: {
             vFileUpload,
-            VueEditor
+            VueEditor,
+            Editor
         },
         data() {
             return {
@@ -132,7 +241,24 @@
                     /* [{ 'indent': '-1'}, { 'indent': '+1' }], */
                     ['link', 'image'],
                     ['clean']   
-                ]
+                ],
+                extensions: [
+                    new BlockquoteNode(),
+                    new BulletListNode(),
+                    new CodeBlockNode(),
+                    new HardBreakNode(),
+                    new HeadingNode({ maxLevel: 3 }),
+                    new ImageNode(),
+                    new ListItemNode(),
+                    new OrderedListNode(),
+                    new TodoItemNode(),
+                    new TodoListNode(),
+                    new BoldMark(),
+                    new CodeMark(),
+                    new ItalicMark(),
+                    new LinkMark(),
+                    new HistoryExtension(),
+                ],
             }
         },
         computed: {
@@ -173,4 +299,19 @@
     #quill-container {
         max-height: 300px;
     }
+
+    .editor__content {
+        border-bottom: 2px solid transparent;
+        height: 20vh;
+        overflow: auto;
+    }
+
+    .editor__content:focus {
+        border-bottom: 2px solid var(--primary-color);
+    }
+
+    .ProseMirror:focus {
+        border-bottom: 2px solid var(--primary-color);
+    }
+
 </style>

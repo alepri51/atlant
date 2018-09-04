@@ -31,7 +31,8 @@
 
         <v-card style="flex: 1" flat>
             <v-card-text>
-                <tree-list :items="filter" :selected="selected" @select="selected = arguments[0], $emit('select', selected)"/>
+                <!-- <tree-list :items="filter" :selected="selected" @select="selected = arguments[0], $emit('select', selected)"/> -->
+                <tree-list opened-icon="far fa-folder-open" closed-icon="far fa-folder" empty-icon="far fa-copy" :items="filter" items-name="children" :entity="entities.content" :selected="selected" @select="selected = arguments[0], $emit('select', selected)"/>
             </v-card-text>
         </v-card>
     </widget>        
@@ -43,7 +44,7 @@
     export default {
         extends: Widget,
         components: {
-            'tree-list': () => import('../tree-list')
+            'tree-list': () => import('../elements/tree-list')
         },
         computed: {
             filter() {
@@ -54,12 +55,12 @@
                 
                 //debugger
                 
-                let content = this.raw_data.map(section => {
+                /* let content = this.raw_data.map(section => {
                     !section.items && (section.items = (section.children && section.children.map(child => this.raw_data.find(section => section._id === child))) || [] );
                     return section
-                });
+                }); */
                 
-                content = content.filter(section => !section.parent);
+                let content = this.raw_data.filter(section => !section.parent);
                 return content;
             }
         },

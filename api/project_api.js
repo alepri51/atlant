@@ -47,10 +47,11 @@ class Content extends DBAccess {
     async default() {
         let sections = await db.Section._findAll();
 
-        let roots = sections.filter(section => !section.parent);
+        //let roots = sections.filter(section => !section.parent);
         let content = sections.map((section, inx, arr) => {
-            section.children = arr.filter(item => item.parent && item.parent._id === section._id);
-            section.children = section.children || [];
+            let children = arr.filter(item => item.parent && item.parent._id === section._id);
+            children.length && (section.children = children);
+            //section.children = section.children || [];
             return section;
         });
 

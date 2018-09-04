@@ -65,6 +65,8 @@
 </script>
 
 <style scoped>
+    
+
     .v-content {
         height: 100vh; /* SET THIS FUCKING HEIGHT !!! */
     }

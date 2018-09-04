@@ -1,10 +1,10 @@
 <template>
-    <widget :name="`новости (${filter.length})`" column style="align-items: stretch">
+    <widget :name="`иерархия`" column>
         <div slot="header">
             <v-layout class="ma-2">
                 <h2 class="primary--text">
                     <v-icon color="primary" medium class="mr-2 shadow">fas fa-exclamation-circle</v-icon>
-                    Содержание:
+                    Ваши партнеры:
                 </h2>
                 
 
@@ -31,7 +31,7 @@
 
         <v-card style="flex: 1" flat>
             <v-card-text>
-                <tree-list :items="filter" items-name="referals" :entity="entities.member" @select="onSelect" @expand="onExpand"/>
+                <tree-list :description="memberDescription" dynamic empty-icon="far fa-user-circle" :items="filter" items-name="referals" :entity="entities.member" :selected="selected" @select="onSelect" @expand="onExpand"/>
             </v-card-text>
         </v-card>
     </widget>        
@@ -43,7 +43,7 @@
     export default {
         extends: Widget,
         components: {
-            'tree-list': () => import('../tree-list')
+            'tree-list': () => import('../elements/tree-list')
         },
         computed: {
             endpoint() {
@@ -69,18 +69,28 @@
             }
         },
         methods: {
+            memberDescription(member) {
+                return `email: ${member.email}; реферальный код: ${member.ref}`;
+            },
             onSelect(selected) {
+                
+                this.selected = selected;
                 this.$emit('select', selected);
             },
-            onExpand(selected) {
-                this.execute({ endpoint: `structure:${selected}.expand` });
+            async onExpand(selected) {
+                //debugger;
+                this.execute({ endpoint: `structure:${selected}.expand`, repeatOnError: true });
+                //error && this.execute({ endpoint: `structure:${selected}.expand` });
                 this.$emit('expand', selected);
             }
+        },
+        created() {
+            this.selected = this.auth.member;
         },
         data() {
             return {
                 entity: 'member',
-                selected: void 0,
+                selected: void 0
             }
         }
     }

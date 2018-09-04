@@ -108,7 +108,7 @@
 
 <script>
     import Modal from './class_modal';
-    import vFileUpload from '../v-file-upload';
+    import vFileUpload from '../elements/v-file-upload';
     import urlParser from "js-video-url-parser";
     import { VueEditor } from "vue2-editor";
 

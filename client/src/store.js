@@ -26,6 +26,7 @@ Vue.use(Vuex);
 const CancelToken = axios.CancelToken;
 let requests_cache = new Cache();
 let api = void 0;
+let repeatQueue = [];
 
 export default new Vuex.Store({
     strict: true,
@@ -100,6 +101,9 @@ export default new Vuex.Store({
             let onRequest = (config => {
                 console.log('request', config.url, requests_cache.length);
                 state.token && (config.headers.common.authorization = state.token);
+
+                config.repeatOnError && repeatQueue.push(config.repeatOnError);
+
                 //debugger
                 /* config.cancelToken = new CancelToken(function executor(cancel) {
                     // An executor function receives a cancel function as a parameter
@@ -127,7 +131,16 @@ export default new Vuex.Store({
                     this.commit('SHOW_MODAL', { signin: void 0 });
                 }
 
-                
+                if(!error && repeatQueue.length) {
+                    //debugger
+                    
+                    repeatQueue.forEach(config => {
+                        delete config.repeatOnError;
+                        api(config)
+                    });
+                    repeatQueue = [];
+                }
+
                 response.error = error; //DO NOT REMOVE
                 
                 if(!token) {
@@ -305,7 +318,7 @@ export default new Vuex.Store({
         },
     },
     actions: {
-        async execute({ commit, state }, { cache = true, method, endpoint, payload, headers, callback }) {
+        async execute({ commit, state }, { cache = true, method, endpoint, payload, headers, callback, repeatOnError }) {
             //console.log('REQUEST:', endpoint);
 
             let response;
@@ -319,6 +332,8 @@ export default new Vuex.Store({
             };
 
             config.cache = config.method === 'get' ? cache ? requests_cache : false : false;
+            repeatOnError && (config.repeatOnError = config);
+
             //config.cache = false;
             commit('LOADING', true);
 

@@ -24,7 +24,8 @@
 			return {
                 selected: void 0,
                 layouts: {
-                    'md': {
+                    
+                    'xs,sm,md,lg,xl': {
                         layout: {
                             cols: 10,
                             rows: 15
@@ -33,32 +34,6 @@
                             {
                                 "id": 1,
                                 "x": 1,
-                                "y": 0,
-                                "w": 2,
-                                "h": 15,
-                                "available": false,
-                                "comp": "structure"
-                            },
-                            {
-                                "id": 2,
-                                "x": 3,
-                                "y": 0,
-                                "w": 6,
-                                "h": 15,
-                                "available": false,
-                                "comp": "no"
-                            }
-                        ]
-                    },
-                    'sm,xs': {
-                        layout: {
-                            cols: 10,
-                            rows: 15
-                        },
-                        components: [
-                            {
-                                "id": 1,
-                                "x": 0,
                                 "y": 0,
                                 "w": 3,
                                 "h": 15,
@@ -67,36 +42,28 @@
                             },
                             {
                                 "id": 2,
-                                "x": 3,
+                                "x": 4,
                                 "y": 0,
-                                "w": 7,
-                                "h": 15,
+                                "w": 2,
+                                "h": 6,
                                 "available": false,
-                                "comp": "no"
-                            }
-                        ]
-                    },
-                    'lg,xl': {
-                        layout: {
-                            cols: 10,
-                            rows: 15
-                        },
-                        components: [
-                            {
-                                "id": 1,
-                                "x": 1,
-                                "y": 0,
-                                "w": 5,
-                                "h": 15,
-                                "available": false,
-                                "comp": "structure"
+                                "comp": "qrcode"
                             },
                             {
-                                "id": 2,
+                                "id": 4,
                                 "x": 6,
                                 "y": 0,
-                                "w": 6,
-                                "h": 15,
+                                "w": 3,
+                                "h": 6,
+                                "available": false,
+                                "comp": "reflist"
+                            },
+                            {
+                                "id": 3,
+                                "x": 4,
+                                "y": 6,
+                                "w": 5,
+                                "h": 9,
                                 "available": false,
                                 "comp": "no"
                             }

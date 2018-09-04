@@ -172,6 +172,9 @@ let normalize = function normalize(data = {}) {
         _member.define({
             referer: _member,
             referals: [_member],
+            list: {
+                members: [_member]
+            },
             wallet: _wallet
         });
         

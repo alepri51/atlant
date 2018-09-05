@@ -39,7 +39,7 @@
                 <sui-embed v-if="item.video_url"
                     icon="fas fa-film"
                     :id="item.video_id"
-                    :placeholder="item.compressed ? `https://localhost:8000/${item._id}/files/${item.compressed}` : `https://placeimg.com/500/${400 + item._id}/nature`"
+                    :placeholder="item.compressed ? `${BASE_URL}/${item._id}/files/${item.compressed}` : `https://placeimg.com/500/${400 + item._id}/nature`"
                     :source="item.video_provider"
                     :iframe="{ 
                         allowFullScreen: true, 
@@ -49,7 +49,7 @@
                     }"
                     
                 />
-                <v-card-media v-else-if="item.compressed" :height="'30vh'" :src="item.compressed ? `https://localhost:8000/${item._id}/files/${item.compressed}` : ''" />
+                <v-card-media v-else-if="item.compressed" :height="'30vh'" :src="item.compressed ? `${BASE_URL}/${item._id}/files/${item.compressed}` : ''" />
                 <v-card-media v-else :height="'30vh'" :src="`https://placeimg.com/500/${500 + item._id}/nature`" />
             </sui-card>
             <v-card-text v-html="item.text" style="flex: 1;"/>

@@ -2,7 +2,7 @@ import Vue from 'vue';
 import Vuex from 'vuex';
 import io from 'socket.io-client';
 
-const BASE_URL = 'https://localhost:8000';
+const BASE_URL = 'https://localhost:8001';
 
 //debugger;
 const socket = io(BASE_URL);
@@ -31,6 +31,7 @@ let repeatQueue = [];
 export default new Vuex.Store({
     strict: true,
     state: {
+        BASE_URL,
         loading: false,
         view: '',
         modals: {},

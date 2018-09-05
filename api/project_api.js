@@ -25,8 +25,24 @@ class Structure extends DBAccess {
         return result; */
     }
 
+    /* async member() {
+        let member = await db.Member._findOne({ _id: parseInt(this.id) || this.auth.member });
+        let list = await db.List._findOne({ _id: member.list._id });
+        member.list.members = list.members.sort((a, b) => a._rel.номер - b._rel.номер);
+
+        let result = {
+            member
+        };
+
+        //result = normalize(result);
+
+        return result;
+    } */
+
     async expand() {
         let member = await db.Member._findOne({ _id: parseInt(this.id) || this.auth.member });
+        let list = await db.List._findOne({ _id: member.list._id });
+        member.list.members = list.members.sort((a, b) => a._rel.номер - b._rel.номер);
 
         let result = {
             member

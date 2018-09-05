@@ -61,6 +61,9 @@ export default {
         },
         route() {
             return this.state.route;
+        },
+        BASE_URL() {
+            return this.state.BASE_URL;
         }
     }
 }

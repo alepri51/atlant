@@ -8,7 +8,7 @@
                 </h2>
                 
 
-                <v-btn
+                <!-- <v-btn
                     v-if="auth.group === 'admins'"
                     class="top-dial" 
 
@@ -20,7 +20,7 @@
                     @click="commit('SHOW_MODAL', { 'xxx': void 0 })"
                 >
                     <v-icon :size="18">fas fa-pen</v-icon>
-                </v-btn>
+                </v-btn> -->
             </v-layout>   
             
         </div>
@@ -31,7 +31,7 @@
 
         <v-card style="flex: 1" flat>
             <v-card-text>
-                <tree-list :description="memberDescription" dynamic empty-icon="far fa-user-circle" :items="filter" items-name="referals" :entity="entities.member" :selected="selected" @select="onSelect" @expand="onExpand"/>
+                <tree-list :description="memberDescription" :name="memberName" dynamic empty-icon="far fa-user-circle" :items="filter" items-name="referals" :entity="entities.member" :selected="selected" @select="onSelect" @expand="onExpand"/>
             </v-card-text>
         </v-card>
     </widget>        
@@ -42,6 +42,7 @@
 
     export default {
         extends: Widget,
+        props: ['selected'],
         components: {
             'tree-list': () => import('../elements/tree-list')
         },
@@ -69,28 +70,30 @@
             }
         },
         methods: {
+            memberName(member) {
+                return `${member._id === this.auth.member ? member.name + ' (это Вы)' : member.name }`;
+            },
             memberDescription(member) {
                 return `email: ${member.email}; реферальный код: ${member.ref}`;
             },
             onSelect(selected) {
-                debugger;
-                this.selected = selected;
+                this.execute({ endpoint: `structure:${selected}.expand`, repeatOnError: true });
+                //this.selected = selected;
                 this.$emit('select', selected);
             },
-            async onExpand(selected) {
+            onExpand(selected) {
                 //debugger;
                 this.execute({ endpoint: `structure:${selected}.expand`, repeatOnError: true });
-                //error && this.execute({ endpoint: `structure:${selected}.expand` });
                 this.$emit('expand', selected);
             }
         },
         created() {
-            this.selected = this.auth.member;
+            this.$emit('select', this.auth.member);
         },
         data() {
             return {
                 entity: 'member',
-                selected: void 0
+                //selected: void 0
             }
         }
     }

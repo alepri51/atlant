@@ -4,14 +4,22 @@
             <v-layout class="ma-2">
                 <h3 class="primary--text">
                     <v-icon color="primary" class="mr-2 shadow">fas fa-qrcode</v-icon>
-                    QR-код:
+                    {{ `QR-код ${filter.name}:` }}
                 </h3>
             </v-layout>
         </div>
 
         <v-divider slot="divider"/>
 
-        <qr :text="`https://atlant.club/?ref=${filter.ref}`" :size="100" class="QR"></qr>
+        <v-layout column align-center>
+            <qr :text="`https://atlant.club/?ref=${filter.ref}`" :size="100" class="QR"></qr>
+
+            <br>
+
+            <h4>
+                <a :href="`https://atlant.club/?ref=${filter.ref}`" target="_blank">go to atlant.club: {{filter.ref}}</a>
+            </h4>
+        </v-layout>
     </widget>
 </template>
 
@@ -21,6 +29,7 @@
 
     export default {
         extends: Widget,
+        props: ['selected'],
         components: {
             qr: VueQRCodeComponent
         },
@@ -37,7 +46,7 @@
             },
             filter() {
                 //debugger
-                return this.entities.member ? this.entities.member[this.auth.member] : {};
+                return this.entities.member ? this.entities.member[this.selected] : {};
             }
         },
         methods: {
@@ -48,8 +57,6 @@
 </script>
 
 <style scoped>
-    .QR {
-        color: var(--primary-color);
-    }
+    
 </style>
 

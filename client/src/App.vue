@@ -52,12 +52,15 @@
         },
         computed: {
             cssProps() {
+                //debugger
                 return {
                     '--scroll-background': this.$colors.shades.transparent,
                     '--scroll-color': this.$vuetify.theme.scrollColor,
                     '--embed-icon-color': this.$colors.shades.white,
                     '--editor-button-color': this.$vuetify.theme.secondary,
                     '--primary-color': this.$vuetify.theme.primary,
+                    '--secondary-color': this.$vuetify.theme.secondary,
+                    '--accent-color': this.$vuetify.theme.accent
                 }
             }
         },

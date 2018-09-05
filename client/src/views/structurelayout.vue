@@ -20,7 +20,7 @@
                 return 'Статьи';
             },
             onSelect(selected) {
-                debugger
+                //debugger
                 this.selected = selected;
             }
         },
@@ -69,7 +69,7 @@
                                 "w": 5,
                                 "h": 9,
                                 "available": false,
-                                "comp": "no"
+                                "comp": "referals"
                             }
                         ]
                     }

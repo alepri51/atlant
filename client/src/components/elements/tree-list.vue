@@ -22,13 +22,13 @@
 
                     @mouseover="onIn(item)" @mouseout="onOut(item)"
                 >
-                    {{ item.title || item.name }}
+                    {{ item.title }}
                 </h3>
                 <sui-list-description>{{ item.description }}</sui-list-description>
                     <!-- <tree-list :items="item.items"/> -->
 
                 <sui-list-list v-if="item[itemsName] && item[itemsName].length" v-show="!closed[item._id]" class="pa-0 pt-1">
-                    <tree-list :description="description" :dynamic="dynamic" :opened-icon="openedIcon" :closed-icon="closedIcon" :empty-icon="emptyIcon" :items="item[itemsName]" :items-name="itemsName" :entity="entity" :selected="selected" v-on="$listeners"/>
+                    <tree-list :description="description" :name="name" :dynamic="dynamic" :opened-icon="openedIcon" :closed-icon="closedIcon" :empty-icon="emptyIcon" :items="item[itemsName]" :items-name="itemsName" :entity="entity" :selected="selected" v-on="$listeners"/>
                 </sui-list-list>
                 <!-- <div v-else>no items {{ item }}</div> -->
             </sui-list-content>
@@ -75,6 +75,9 @@
             },
             description: {
                 type: Function
+            },
+            name: {
+                type: Function
             }
         },
         data() {
@@ -100,6 +103,8 @@
                     let child = item instanceof Object ? item : this.entity[item];
                     child = JSON.parse(JSON.stringify(child));
                     child.items = child[this.itemsName];
+
+                    this.name && (child.title = this.name(child));
                     this.description && (child.description = this.description(child));
 
                     typeof this.closed[child._id] === 'undefined' && (!child.items ? this.$set(this.closed, child._id, true) : this.$set(this.closed, child._id, false));

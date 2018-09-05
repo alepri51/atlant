@@ -74,11 +74,11 @@
                     :active="item._id === clicked"
                     icon="fas fa-film"
                     :id="item.video_id"
-                    :placeholder="item.compressed ? `https://localhost:8000/${item._id}/files/${item.compressed}` : `https://placeimg.com/150/${100 + item._id}/nature`"
+                    :placeholder="item.compressed ? `${BASE_URL}/${item._id}/files/${item.compressed}` : `https://placeimg.com/150/${100 + item._id}/nature`"
                     :source="item.video_provider"
                     :iframe="{ allowFullScreen: true, allowfullscreen: true, mozallowfullscreen: true, webkitallowfullscreen: true}"
                 />
-                <v-card-media v-else-if="item.compressed" :height="159.75" :src="item.compressed ? `https://localhost:8000/${item._id}/files/${item.compressed}` : ''" />
+                <v-card-media v-else-if="item.compressed" :height="159.75" :src="item.compressed ? `${BASE_URL}/${item._id}/files/${item.compressed}` : ''" />
                 <v-card-media v-else :height="159.75" :src="`https://placeimg.com/150/${100 + item._id}/nature`" />
 
                 <sui-card-content>

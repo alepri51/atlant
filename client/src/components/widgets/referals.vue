@@ -1,5 +1,5 @@
 <template>
-    <widget name="scroll" wrap justify-center>
+    <widget :name="`партнеры (${filter.length})`" wrap justify-center>
         <div slot="header">
             <v-layout class="ma-2">
                 <h2 class="primary--text">
@@ -48,6 +48,7 @@
                 </sui-card-content>
             </sui-card>
         </v-flex>
+        
     </widget>
 </template>
 

@@ -6,15 +6,26 @@ export default {
     components: {
         widget: () => import('./widget')
     },
+    data() {
+        return {
+            active: false
+        }
+    },
     activated() {
         console.log('activated', this.entity);
+        this.active = true;
         this.load();
+    },
+    deactivated() {
+        console.log('deactivated', this.entity);
+        this.active = false;
+        //this.load();
     },
     methods: {
         load() {
             //debugger;
 
-            this.execute({ endpoint: this.endpoint, method: 'get' });
+            this.active && this.execute({ endpoint: this.endpoint, method: 'get' });
         }
     },
     computed: {
@@ -30,9 +41,27 @@ export default {
     },
     watch: {
         'auth.signed': function(val, old) {
-            console.log('SIGN CHANGED from:', old, 'TO:', val);
+            console.log(`SIGN CHANGED on ${this.entity} from:`, old, 'TO:', val, 'EVENT');
             //val < old && this.load();
             val === 1 && this.load();
+
+            if(val === 1 && this.auth.member) {
+                console.log('REGISTER EVENT:', `${this.auth.member}:update:${this.entity}`);
+
+                this.$socket.off(this.events.update);
+
+                let update = this.$socket.on(`${this.auth.member}:update:${this.entity}`, (data) => {
+                    console.log('SOCKET UPDATE DATA:', data);
+                    
+                    this.commit('SET_ENTITIES', { method: 'GET', ...data });
+                });
+
+                this.events.update = update.id;
+            }
+        },
+        'auth.member': function(val, old) {
+            console.log(`${this.entity} MEMBER CHANGED from:`, old, 'TO:', val);
+            !val && this.$socket.off(this.events.update);
         }
     }
 }

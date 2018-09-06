@@ -29,7 +29,7 @@
         methods: {
             onScroll() {
                 //this.offsetTop = e.target.scrollTop
-                console.log('SCROLLING');
+                //console.log('SCROLLING');
             }
         }
     }

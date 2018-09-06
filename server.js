@@ -42,7 +42,7 @@ app.use(compression({
 
 app.use('/api', cors());
 
-app.use('/api', require('./router')(require('socket.io')(httpsServer)));
+app.use('/api', require('./router')(require('socket.io')(httpsServer))); //MULTI PROCESS ISSUE
 
 app.use('/api', cors());
 

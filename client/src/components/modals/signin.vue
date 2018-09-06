@@ -70,6 +70,7 @@
                         payload: this.$data, 
                         callback: (response) => {
                             if(!response.error) {
+                                //debugger;
                                 //this.commit('RESET_CACHE');
                                 this.commit('HIDE_MODAL', { signin: void 0 });
                                 

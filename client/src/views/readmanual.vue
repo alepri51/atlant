@@ -12,7 +12,7 @@
         extends: Layout,
         computed: {
             title() {
-                document.title = (this.entities.news && this.entities.news[this.component_id] && 'Новость: ' + this.entities.news[this.component_id].title) || 'Чтение';
+                document.title = (this.entities.manual && this.entities.manual[this.component_id] && 'Статья: ' + this.entities.manual[this.component_id].title) || 'Чтение';
             }
         },
         data() {

@@ -122,6 +122,7 @@ export default new Vuex.Store({
 
                 let {token, auth, error, entities, _cached, ...rest} = response.data;
 
+                response.error = error; //DO NOT REMOVE
                 error && (!error.system ? this.commit('SHOW_SNACKBAR', { text: `ОШИБКА: ${error.message}` }) : console.error(`ОШИБКА: ${error.message}`));
 
                 error && this.commit('RESET_CACHE');
@@ -142,7 +143,6 @@ export default new Vuex.Store({
                     repeatQueue = [];
                 }
 
-                response.error = error; //DO NOT REMOVE
                 
                 if(!token) {
                     this.commit('RESET_CACHE');
@@ -268,11 +268,13 @@ export default new Vuex.Store({
         },
         SET_AUTH(state, auth) {
             state.auth = auth;
-            this.commit('HIDE_SNACKBAR');
+            auth.signed && this.commit('HIDE_SNACKBAR');
         },
         SHOW_SNACKBAR(state, options) {
+            //debugger;
+            state.snackbar = { ...state.snackbar, ...options };
             state.snackbar.visible = true;
-            Object.assign(state.snackbar, options);
+            //Object.assign(state.snackbar, options);
             //console.log(state.snackbar);
         },
         HIDE_SNACKBAR(state) {

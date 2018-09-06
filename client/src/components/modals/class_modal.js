@@ -82,7 +82,7 @@ export default {
         },
     },
     created() {
-        console.log('CREATED', this.entity);
+        //console.log('CREATED', this.entity);
         //this.load();
         //debugger
         

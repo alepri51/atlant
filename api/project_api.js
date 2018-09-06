@@ -94,7 +94,7 @@ class SingleManual extends SecuredAPI {
         //let news = await db.News._findOne({ _id: parseInt(this.id) }, { compositions: [] });
         //let manual = await db.Manual._findOne({ _id: parseInt(this.id) });
         //news = news.sort((a, b) => b.updated - a.updated);
-        let manual = await db.Manual._query('MATCH (node: `Статья` {_id:{id}})-[*]->(r: `Раздел`) WITH node, collect(r._id) AS parents', { id: parseInt(this.id) }, { otherVars: ['parents']});
+        let manual = await db.Manual._query('MATCH (node: `Статья` {_id:{id}})-[:`раздел`*]->(r: `Раздел`) WITH node, collect(r._id) AS parents', { id: parseInt(this.id) }, { otherVars: ['parents']});
 
         let result = {
             manual

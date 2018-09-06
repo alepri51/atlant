@@ -69,7 +69,7 @@ export default new Vuex.Store({
             {
                 icon: '',
                 name: 'Финансы',
-                to: 'payment'
+                to: 'paymentlayout'
             }
         ],
         notFound: false,

@@ -90,6 +90,10 @@ a.v-tabs__item:hover {
     font-weight: 400!important;
 }
 
+.fab {
+    font-family: "Font Awesome 5 Brands"!important;
+}
+
 a:hover {
     color: var(--accent-color);
 }

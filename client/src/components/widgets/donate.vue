@@ -1,5 +1,5 @@
 <template>
-    <widget name="взнос" justify-center align-center>
+    <widget name="операции" justify-center align-center>
         <div slot="header">
             <v-layout class="ma-2">
                 <h2 class="accent--text">
@@ -11,10 +11,10 @@
 
         <v-divider slot="divider"/>
 
-        <v-layout column align-center>
+        <!-- <v-layout class="" column justify-center align-center> -->
             <!-- <qr :text="`https://atlant.club/?ref=${filter.ref}`" :size="100" class="QR"></qr> -->
 
-            <div class="ui statistics">
+            <div class="ui statistics ma-2">
                 <div class="statistic  ">
                     <div class="value ">
                         <i class="shadow fas fa-dollar-sign icon green--text text--darken-2"></i> 75
@@ -35,7 +35,7 @@
                 </div>
             </div>
             
-        </v-layout>
+        <!-- </v-layout> -->
     </widget>
 </template>
 
@@ -63,6 +63,8 @@
 </script>
 
 <style scoped>
-    
+    .ui.statistics:after {
+        display: none!important;
+    }
 </style>
 

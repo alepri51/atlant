@@ -178,7 +178,7 @@
         computed: {
             filter() {
                 //debugger
-                //console.log(this.section);
+                ////console.log(this.section);
                 let raw_data = this.raw_data.filter(item => item.parents.includes(this.section));
 
                 return raw_data.sort((a, b) => a.created - b.created);

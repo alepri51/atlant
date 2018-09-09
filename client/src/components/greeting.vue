@@ -67,7 +67,7 @@
         },
         methods: {
             search() {
-                console.log(this.search_string);
+                //console.log(this.search_string);
                 this.search_string = this.search_string || 'Москва';
                 this.commit('SHOW_SNACKBAR', {text: this.search_string});
                 this.search_string = '';

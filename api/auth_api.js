@@ -32,7 +32,7 @@ class SignIn extends API {
                     group: member.group,
                     signed: 1
                 },
-                key: member.wallet.publicKey
+                //key: member.wallet.publicKey
             };
 
             this.token = this.signJWT(payload, member.wallet.privateKey);
@@ -97,7 +97,7 @@ class SignUp extends API {
     }
 
     async submit(params, req) {
-        let { name, email, password, referer, wallet_address } = params;
+        let { name, email, password, referer, address } = params;
 
         let member = await Member._findOne({ email });
 
@@ -126,7 +126,7 @@ class SignUp extends API {
                             publicKey,
                             privateKey,
                             club_address: await btc.getNewAddress(),
-                            wallet_address
+                            address
                     }
                 });
 

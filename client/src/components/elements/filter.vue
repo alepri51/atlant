@@ -155,7 +155,7 @@
 
                 this.$emit('select', this.selection);
 
-                console.log('MULTI', this.multi)
+                //console.log('MULTI', this.multi)
             },
             clear() {
                 this.selection = {};

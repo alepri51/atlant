@@ -1,9 +1,9 @@
 'use strict';
 
-const { normalize } = require('../models');
+const { normalize } = require('./models/normalize');
 const { Model, DBAccess } = require('./db_api');
 const { API, SecuredAPI } = require('./base_api');
-const db = require('../models');
+const db = require('./models');
 
 const Order = require('./order');
 

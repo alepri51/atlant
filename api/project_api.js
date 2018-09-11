@@ -5,7 +5,11 @@ const { Model, DBAccess } = require('./db_api');
 const { API, SecuredAPI } = require('./base_api');
 const db = require('../models');
 
+<<<<<<< HEAD
 class Structure extends DBAccess {
+=======
+class Payment extends DBAccess {
+>>>>>>> parent of faa77d6... commit
     constructor(...args) {
         super(...args);
 
@@ -13,6 +17,7 @@ class Structure extends DBAccess {
     }
 
     async default() {
+<<<<<<< HEAD
         return await this.expand();
         /* let member = await db.Member._findOne({ _id: this.auth.member });
 
@@ -29,6 +34,9 @@ class Structure extends DBAccess {
         let member = await db.Member._findOne({ _id: parseInt(this.id) || this.auth.member });
         let list = await db.List._findOne({ _id: member.list._id });
         member.list.members = list.members.sort((a, b) => a._rel.номер - b._rel.номер);
+=======
+        let orders = await db.Order._findAll();
+>>>>>>> parent of faa77d6... commit
 
         let result = {
             member
@@ -266,4 +274,8 @@ class News extends DBAccess {
     }
 }
 
+<<<<<<< HEAD
 module.exports = { NewsLayout, News, SingleNews, Content, Manual, SingleManual, Structure };
+=======
+module.exports = { NewsLayout, News, SingleNews, Content, Manual, SingleManual, Structure, Payment };
+>>>>>>> parent of faa77d6... commit

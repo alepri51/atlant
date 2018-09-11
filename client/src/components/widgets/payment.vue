@@ -38,6 +38,7 @@
                     </tr>
                 </thead>
                 <tbody>
+<<<<<<< HEAD
                     <tr class="elevation-1">
                         <td><i class="shadow fas fa-donate icon primary--text"/>Клубный взнос</td>
                         <td>10.10.2018 13:45</td>
@@ -85,6 +86,16 @@
                         <td>10.10.2018 13:45</td>
                         <td>выполнен успешно</td>
                         <td style="text-align: right"><i class="shadow fas fa-dollar-sign icon green--text text--darken-2"></i>10</td>
+=======
+                    <tr v-for="(item, inx) in filter" :key="inx" style="cursor: pointer" :class="{ 'elevation-1': hovered === item._id}" @mouseover="hovered = item._id" @mouseout="hovered = void 0">
+                        <td class="">
+                            <v-icon small class="shadow icon" :color="item.items.length === 1 ? item.items[0].product.color : 'primary'" :class="item.items.length === 1 ? item.items[0].product.icon : 'fas fa-file-invoice-dollar'"/>
+                            {{ item.items.length === 1 ? item.items[0].product.name : `Платеж № ${item.number}` }}
+                        </td>
+                        <td>{{ new Date(item.date).toLocaleString() }}</td>
+                        <td>{{ item.state}}</td>
+                        <td style="text-align: right"><i class="shadow fas fa-dollar-sign icon green--text text--darken-2"></i>{{ item.sum }}</td>
+>>>>>>> parent of faa77d6... commit
                     </tr>
                     
                 </tbody>

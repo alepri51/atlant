@@ -5,7 +5,7 @@ const { Model, DBAccess } = require('./db_api');
 const { API, SecuredAPI } = require('./base_api');
 const db = require('../models');
 
-class Structure extends DBAccess {
+class Payment extends DBAccess {
     constructor(...args) {
         super(...args);
 
@@ -13,22 +13,7 @@ class Structure extends DBAccess {
     }
 
     async default() {
-        return await this.expand();
-        /* let member = await db.Member._findOne({ _id: this.auth.member });
-
-        let result = {
-            member
-        };
-
-        //result = normalize(result);
-
-        return result; */
-    }
-
-    /* async member() {
-        let member = await db.Member._findOne({ _id: parseInt(this.id) || this.auth.member });
-        let list = await db.List._findOne({ _id: member.list._id });
-        member.list.members = list.members.sort((a, b) => a._rel.номер - b._rel.номер);
+        let orders = await db.Order._findAll();
 
         let result = {
             member
@@ -37,7 +22,7 @@ class Structure extends DBAccess {
         //result = normalize(result);
 
         return result;
-    } */
+    } 
 
     async expand() {
         let member = await db.Member._findOne({ _id: parseInt(this.id) || this.auth.member });
@@ -266,4 +251,4 @@ class News extends DBAccess {
     }
 }
 
-module.exports = { NewsLayout, News, SingleNews, Content, Manual, SingleManual, Structure };
+module.exports = { NewsLayout, News, SingleNews, Content, Manual, SingleManual, Structure, Payment };

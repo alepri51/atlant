@@ -16,7 +16,7 @@
             </v-card-text>
             <v-card-actions>
                 <v-spacer></v-spacer>
-                <v-btn color="unimportant" flat @click.native="commit('HIDE_MODAL', { [entity]: void 0 })">Отменить</v-btn>
+                <v-btn color="unimportant" flat @click.native="cancel">Отменить</v-btn>
                 <v-btn dark color="secondary" @click.native="submit">ХОРОШО, ОЖИДАЙТЕ</v-btn>
             </v-card-actions>
 
@@ -36,6 +36,20 @@
             }
         },
         methods: {
+            cancel() {
+                debugger
+                this.execute({ 
+                    method: 'post', 
+                    endpoint: 'donate.cancel',
+                    payload: this.form,
+                    callback: () => {
+                        
+                        this.commit('HIDE_MODAL', { [this.entity]: void 0 });
+                        
+                        //this.$router.replace('landing');
+                    }    
+                });
+            }
             /* submit() {
                 this.execute({ 
                     method: 'post', 

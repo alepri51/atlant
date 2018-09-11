@@ -22,6 +22,18 @@ class Donate extends SecuredAPI {
         super(...args);
 
         this.error = void 0;
+
+        /* this.emitter.on('interval', () => { // OFF EVENT AFTER CLASS METHOD CALL
+            console.log('interval from emitter');
+        }); */
+    }
+
+    checkDonate(self) {
+
+    }
+
+    async cancel(payload, req, res) {
+        console.log(payload);
     }
 
     async save(payload, req, res) {
@@ -38,7 +50,7 @@ class Donate extends SecuredAPI {
         result = normalize(result);
         this.io.emit(`${this.auth.member}:update:paymentlayout`, result);
 
-        setTimeout(() => {
+        /* setTimeout(() => {
             order.state = 'completed';
 
             let orders = Object.values(fake_orders);
@@ -50,7 +62,7 @@ class Donate extends SecuredAPI {
             result = normalize(result);
             this.io.emit(`${this.auth.member}:update:paymentlayout`, result);
 
-        }, 4000);
+        }, 4000); */
 
         return result;
     }
@@ -72,7 +84,7 @@ class Donate extends SecuredAPI {
 
             let donate = await db.Product._findOne({ name: 'взнос' });
             
-            let params = donate.price.destinations.reduce((memo, destination, inx) => {
+            let params = donate.price.destinations.reduce((memo, destination, inx) => { //change inx to destination line!!! 0- line is club address ever
                 memo.charges = memo.charges || {};
                 memo.destinations = memo.destinations || [];
 
@@ -117,7 +129,18 @@ class Donate extends SecuredAPI {
                 donate: rest_order
             };
 
-            //result = normalize(result);
+            let cnt = 20;
+            this.emitter.push({
+                calls: Infinity,
+                executor: async (self) => {
+                   
+                    cnt--;
+                    self.calls = cnt;
+                    console.log(Date.now(), rest_order._id);
+
+                    return await db.btc.convertToBtc(donate.price.amount);                
+                }
+            });
 
             return result;
         }

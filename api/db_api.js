@@ -194,4 +194,4 @@ class DBAccess extends Model {
     }
 }
 
-module.exports = { Model, DBAccess, normalize }
+module.exports = { Model, DBAccess }

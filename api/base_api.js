@@ -18,9 +18,11 @@ class APIError extends Error {
 }
 
 class API {
-    constructor({ token, id, io, req, res, payload }) {
+    constructor({ token, id, io, req, res, payload, emitter }) {
 
         this.io = io;
+        this.emitter = emitter;
+
         this.token = token;
         this.id = id;
 
@@ -223,7 +225,6 @@ class SecuredAPI extends API {
 }
 
 module.exports = {
-    APIError,
     API,
     SecuredAPI,
     Unknown

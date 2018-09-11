@@ -279,7 +279,8 @@ function hash(value) {
             await Destination._save({ 
                 to: 'club.wallet.address',
                 percent: 30,
-                sum: 25
+                sum: 25,
+                //line: 0 //SET ALL LINES OR AS RELATION PROPERTY OR AS OBJECT {line} property
             });
 
             destinations = await Destination._findAll();

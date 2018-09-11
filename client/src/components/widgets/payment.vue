@@ -93,7 +93,6 @@
                         <td>{{ new Date(item.date).toLocaleString() }}</td>
                         <td>{{ item.state}}</td>
                         <td style="text-align: right"><i class="shadow fas fa-dollar-sign icon green--text text--darken-2"></i>{{ item.sum }}</td>
-
                     </tr>
                     
                 </tbody>

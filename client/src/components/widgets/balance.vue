@@ -1,5 +1,5 @@
 <template>
-    <widget :name="`баланс`" justify-center align-center>
+    <widget :name="`баланс`" column>
         <div slot="header">
             <v-layout class="ma-2">
                 <h2 class="primary--text">
@@ -15,9 +15,9 @@
 
         
 
-        <v-divider slot="divider"/>
+        <v-divider slot="divider" class="mb-4"/>
 
-        <!-- <v-layout class="" column justify-center align-center> -->
+        <v-layout class="ma-2" column justify-center align-center>
             <div class="ui statistics ma-2">
                 <div class="statistic  ">
                     <div class="value">
@@ -44,7 +44,7 @@
                     </div>
                 </div>
             </div>
-        <!-- </v-layout>    -->
+        </v-layout>   
 
     </widget>        
 </template>
@@ -71,7 +71,9 @@
 </script>
 
 <style scoped>
-    .ui.statistics:after {
-        display: none!important;
+
+    .top-dial {
+        margin-top: 24px;
     }
+
 </style>

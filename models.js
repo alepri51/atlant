@@ -180,7 +180,6 @@ let normalize = function normalize(data = {}) {
         
         const _default = new schema.Entity('default', {}, { idAttribute: '_name' });
         
-        const _order = new schema.Entity('payment', {}, { idAttribute: '_id' });
 
         const _news = new schema.Entity('news', {
             author: _member
@@ -208,7 +207,6 @@ let normalize = function normalize(data = {}) {
             defaults: [_default],
             content: [_content],
             manual: [_manual],
-            orders: [_order]
         }, { 
             idAttribute: 'api'
         });

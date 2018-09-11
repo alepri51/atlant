@@ -266,4 +266,3 @@ class News extends DBAccess {
     }
 }
 
-module.exports = { NewsLayout, News, SingleNews, Content, Manual, SingleManual, Structure };

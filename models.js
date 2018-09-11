@@ -41,7 +41,7 @@ let member = {
 
 let wallet = {
     club_address: String,
-    address: String,
+    wallet_address: String,
     privateKey: String,
     publicKey: String
 };
@@ -229,21 +229,6 @@ async function getAccountPrivateKey(id) {
     return member && member.wallet.privateKey;
 }
 
-async function getAccountKeys(id) {
-    let member = await Member._findOne({ _id: id });
-    return member && {
-        privateKey: member.wallet.privateKey,
-        publicKey: member.wallet.publicKey,
-    }
-}
-
-const bcrypt = require('bcryptjs');
-
-function hash(value) {
-    let salt = bcrypt.genSaltSync(10);
-    return bcrypt.hashSync(value, salt);
-}
-
 //////////////////////////MODELS//////////////////////////////////////
 
 (async () => { //DB INIT IF NEEDED
@@ -317,30 +302,26 @@ function hash(value) {
             while(rc !== 0) {
 
                 await Destination._save({ 
-                    to: 'referer.list.members.' + rc + '.wallet.address',
-                    percent: 7,
-                    sum: 5
+                    to: 'referer.list.members.' + rc + '.address',
+                    percent: 7
                 });
     
                 rc--;
             }
     
             await Destination._save({ 
-                to: 'referer.list.members.0.wallet.address',
-                percent: 20,
-                sum: 15
+                to: 'referer.list.members.0.address',
+                percent: 20
             });
 
             await Destination._save({ 
-                to: 'referer.wallet.address',
-                percent: 15,
-                sum: 10
+                to: 'referer.list.members.6.address',
+                percent: 15
             });
 
             await Destination._save({ 
-                to: 'club.wallet.address',
-                percent: 30,
-                sum: 25
+                to: 'club.address',
+                percent: 30
             });
 
             destinations = await Destination._findAll();
@@ -381,7 +362,7 @@ function hash(value) {
                 hash: '',
                 wallet: {
                         club_address,
-                        address: club_address
+                        wallet_address: generate('1234567890abcdef', 32)
                     }
             });
         }
@@ -405,10 +386,10 @@ function hash(value) {
                     hash: hash(rc + 'r@email.com:123'),
                     ref: generate('1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZ', 6),
                     wallet: {
-                        publicKey,
-                        privateKey,
-                        club_address,
-                        address: generate('1234567890abcdef', 32)
+                            publicKey,
+                            privateKey,
+                            club_address,
+                            wallet_address: generate('1234567890abcdef', 32)
                     },
                     group: 'admins'
                 });
@@ -439,10 +420,8 @@ function hash(value) {
 
 module.exports = {
     getAccountPrivateKey,
-    getAccountKeys,
     normalize,
     btc,
-    generate,
     Wallet,
     Member,
     RootMember,

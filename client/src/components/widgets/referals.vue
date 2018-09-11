@@ -75,7 +75,7 @@
         },
         methods: {
             onSelect(selected) {
-                this.execute({ endpoint: `structure:${selected}.expand`, repeatOnError: 403 });
+                this.execute({ endpoint: `structure:${selected}.expand`, repeatOnError: true });
                 this.$emit('select', selected);
             }
         }

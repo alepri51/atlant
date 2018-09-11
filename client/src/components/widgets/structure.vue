@@ -77,13 +77,13 @@
                 return `email: ${member.email}; реферальный код: ${member.ref}`;
             },
             onSelect(selected) {
-                this.execute({ endpoint: `structure:${selected}.expand`, repeatOnError: 403 });
+                this.execute({ endpoint: `structure:${selected}.expand`, repeatOnError: true });
                 //this.selected = selected;
                 this.$emit('select', selected);
             },
             onExpand(selected) {
                 //debugger;
-                this.execute({ endpoint: `structure:${selected}.expand`, repeatOnError: 403 });
+                this.execute({ endpoint: `structure:${selected}.expand`, repeatOnError: true });
                 this.$emit('expand', selected);
             }
         },

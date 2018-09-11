@@ -21,7 +21,7 @@
 <script>
     import Widget from './class_widget';
     //debugger;
-    ////console.log(SuiVue);
+    //console.log(SuiVue);
     
     export default {
         extends: Widget,
@@ -29,7 +29,7 @@
         methods: {
             onScroll() {
                 //this.offsetTop = e.target.scrollTop
-                ////console.log('SCROLLING');
+                //console.log('SCROLLING');
             }
         }
     }

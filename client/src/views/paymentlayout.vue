@@ -10,9 +10,14 @@
     
     export default {
         extends: Layout,
+        /* computed: {
+            title() {
+                this.route.view === this.component_name && (document.title = 'Статьи');
+            }
+        }, */
         methods: {
             getTitle() {
-                return 'Платежи';
+                return 'Статьи';
             },
             onSelect(selected) {
                 //debugger
@@ -34,16 +39,16 @@
                                 "id": 2,
                                 "x": 2,
                                 "y": 0,
-                                "w": 2,
+                                "w": 3,
                                 "h": 6,
                                 "available": false,
                                 "comp": "donate"
                             },
                             {
                                 "id": 4,
-                                "x": 4,
+                                "x": 5,
                                 "y": 0,
-                                "w": 4,
+                                "w": 3,
                                 "h": 6,
                                 "available": false,
                                 "comp": "balance"

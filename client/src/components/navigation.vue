@@ -27,7 +27,7 @@
 
     <v-spacer/>
 
-    <v-toolbar-items v-if="!authenticated">
+    <v-toolbar-items v-if="!state.loading && !authenticated">
         <v-btn flat @click="commit('SHOW_MODAL', { signup: void 0 })" color="background">
             <v-icon small class="mr-1">far fa-user-circle</v-icon>РЕГИСТРАЦИЯ
         </v-btn>
@@ -47,7 +47,7 @@
         </v-btn>
     </v-toolbar-items>
 
-    <v-toolbar-items v-if="auth && auth.signed !== 1">
+    <v-toolbar-items v-if="!state.loading && auth && auth.signed !== 1">
         <v-btn flat @click="commit('SHOW_MODAL', { signin: void 0 })" color="background">
             <v-icon small class="mr-1">fas fa-sign-in-alt</v-icon>Войти
         </v-btn>

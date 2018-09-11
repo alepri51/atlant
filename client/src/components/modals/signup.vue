@@ -31,12 +31,12 @@
                                             class="ma-1"
                             ></v-text-field>
                             <v-flex xs12>
-                                <v-text-field v-model="address"
+                                <v-text-field v-model="wallet_address"
                                                 label="Wallet"
                                                 required
                                                 color="primary"
                                                 :rules="[
-                                                    () => !!address || 'This field is required',
+                                                    () => !!wallet_address || 'This field is required',
                                                 ]"
                                                 @keyup.enter="submit"
                                 ></v-text-field>
@@ -90,7 +90,7 @@
                 name: '',
                 email: '',
                 password: '',
-                address: ''
+                wallet_address: ''
             }
         },
         created() {

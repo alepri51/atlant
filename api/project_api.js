@@ -251,4 +251,8 @@ class News extends DBAccess {
     }
 }
 
+<<<<<<< HEAD
 module.exports = { NewsLayout, News, SingleNews, Content, Manual, SingleManual, Structure, Payment };
+=======
+module.exports = { NewsLayout, News, SingleNews, Content, Manual, SingleManual, Structure, Payment };
+>>>>>>> parent of faa77d6... commit

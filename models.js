@@ -41,7 +41,7 @@ let member = {
 
 let wallet = {
     club_address: String,
-    wallet_address: String,
+    address: String,
     privateKey: String,
     publicKey: String
 };
@@ -180,6 +180,7 @@ let normalize = function normalize(data = {}) {
         
         const _default = new schema.Entity('default', {}, { idAttribute: '_name' });
         
+        const _order = new schema.Entity('payment', {}, { idAttribute: '_id' });
 
         const _news = new schema.Entity('news', {
             author: _member
@@ -207,6 +208,7 @@ let normalize = function normalize(data = {}) {
             defaults: [_default],
             content: [_content],
             manual: [_manual],
+            orders: [_order]
         }, { 
             idAttribute: 'api'
         });
@@ -225,6 +227,21 @@ let normalize = function normalize(data = {}) {
 async function getAccountPrivateKey(id) {
     let member = await Member._findOne({ _id: id });
     return member && member.wallet.privateKey;
+}
+
+async function getAccountKeys(id) {
+    let member = await Member._findOne({ _id: id });
+    return member && {
+        privateKey: member.wallet.privateKey,
+        publicKey: member.wallet.publicKey,
+    }
+}
+
+const bcrypt = require('bcryptjs');
+
+function hash(value) {
+    let salt = bcrypt.genSaltSync(10);
+    return bcrypt.hashSync(value, salt);
 }
 
 //////////////////////////MODELS//////////////////////////////////////
@@ -300,26 +317,30 @@ async function getAccountPrivateKey(id) {
             while(rc !== 0) {
 
                 await Destination._save({ 
-                    to: 'referer.list.members.' + rc + '.address',
-                    percent: 7
+                    to: 'referer.list.members.' + rc + '.wallet.address',
+                    percent: 7,
+                    sum: 5
                 });
     
                 rc--;
             }
     
             await Destination._save({ 
-                to: 'referer.list.members.0.address',
-                percent: 20
+                to: 'referer.list.members.0.wallet.address',
+                percent: 20,
+                sum: 15
             });
 
             await Destination._save({ 
-                to: 'referer.list.members.6.address',
-                percent: 15
+                to: 'referer.wallet.address',
+                percent: 15,
+                sum: 10
             });
 
             await Destination._save({ 
-                to: 'club.address',
-                percent: 30
+                to: 'club.wallet.address',
+                percent: 30,
+                sum: 25
             });
 
             destinations = await Destination._findAll();
@@ -360,7 +381,7 @@ async function getAccountPrivateKey(id) {
                 hash: '',
                 wallet: {
                         club_address,
-                        wallet_address: generate('1234567890abcdef', 32)
+                        address: club_address
                     }
             });
         }
@@ -384,10 +405,10 @@ async function getAccountPrivateKey(id) {
                     hash: hash(rc + 'r@email.com:123'),
                     ref: generate('1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZ', 6),
                     wallet: {
-                            publicKey,
-                            privateKey,
-                            club_address,
-                            wallet_address: generate('1234567890abcdef', 32)
+                        publicKey,
+                        privateKey,
+                        club_address,
+                        address: generate('1234567890abcdef', 32)
                     },
                     group: 'admins'
                 });
@@ -418,8 +439,10 @@ async function getAccountPrivateKey(id) {
 
 module.exports = {
     getAccountPrivateKey,
+    getAccountKeys,
     normalize,
     btc,
+    generate,
     Wallet,
     Member,
     RootMember,

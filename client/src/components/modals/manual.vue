@@ -159,7 +159,7 @@
                     this.form.video_provider = void 0;
                     this.form.video_id = void 0;
                 }
-                //console.log(this.form.video);
+                ////console.log(this.form.video);
                 /* { 
                     mediaType: 'video',
                     id: 'HRb7B9fPhfA',

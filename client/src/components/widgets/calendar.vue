@@ -52,7 +52,7 @@
         created() {
             let cd = new Date();
             cd.setTime( cd.getTime() - cd.getTimezoneOffset() * 60 * 1000 );
-            //console.log('CURRENT DATE:', cd.toISOString().slice(0, 10));
+            ////console.log('CURRENT DATE:', cd.toISOString().slice(0, 10));
         },
         methods: {
             allowedDates: val => true//['2018-07-10', '2018-07-11', '2018-07-21'].indexOf(val) !== -1

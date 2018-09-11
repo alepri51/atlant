@@ -38,6 +38,7 @@
 
         <news/>
         <manual/>
+        <donate/>
     </v-app>
 </template>
 
@@ -48,7 +49,8 @@
         components: {
             navigation: () => import('./components/navigation'),
             news: () => import('./components/modals/news'),
-            manual: () => import('./components/modals/manual')
+            manual: () => import('./components/modals/manual'),
+            donate: () => import('./components/modals/donate'),
         },
         computed: {
             cssProps() {

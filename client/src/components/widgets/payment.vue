@@ -25,7 +25,7 @@
         <v-divider slot="divider" class="mb-2"/>
 
         <v-layout class="ma-2">
-            <table class="ui definition table">
+            <table class="ui definition table" style="max-width: 100%">
                 <thead>
                     <tr>
                 
@@ -34,65 +34,18 @@
                         </th>
                         <th>Дата</th>
                         <th>Состояние</th>
-                        <th>Сумма</th>
+                        <th style="text-align: right">Сумма</th>
                     </tr>
                 </thead>
                 <tbody>
-                    <tr class="elevation-1">
-                        <td><i class="shadow fas fa-donate icon primary--text"/>Клубный взнос</td>
-                        <td>10.10.2018 13:45</td>
-                        <td>выполнен успешно</td>
-                        <td style="text-align: right"><i class="shadow fas fa-dollar-sign icon green--text text--darken-2"></i>75</td>
-                    </tr>
-                    <tr>
-                        <td><i class="shadow fas fa-image icon primary--text"/>Лэндинг</td>
-                        <td>10.10.2018 13:45</td>
-                        <td>выполнен успешно</td>
-                        <td style="text-align: right"><i class="shadow fas fa-dollar-sign icon green--text text--darken-2"></i>10</td>
-                    </tr>
-                    <tr>
-                        <td><i class="shadow fas fa-sign-in-alt icon primary--text"/>Поступление от партнера</td>
-                        <td>10.10.2018 13:45</td>
-                        <td>выполнен успешно</td>
-                        <td style="text-align: right"><i class="shadow fas fa-dollar-sign icon green--text text--darken-2"></i>10</td>
-                    </tr>
-                    <tr>
-                        <td><i class="shadow fas fa-sign-out-alt icon primary--text"/> Перевод партнеру</td>
-                        <td>10.10.2018 13:45</td>
-                        <td>выполнен успешно</td>
-                        <td style="text-align: right"><i class="shadow fas fa-dollar-sign icon green--text text--darken-2"></i>10</td>
-                    </tr>
-                    <tr>
-                        <td><i class="shadow fas fa-donate icon primary--text"/>Клубный взнос</td>
-                        <td>10.10.2018 13:45</td>
-                        <td>выполнен успешно</td>
-                        <td style="text-align: right"><i class="shadow fas fa-dollar-sign icon green--text text--darken-2"></i>75</td>
-                    </tr>
-                    <tr>
-                        <td><i class="shadow fas fa-image icon primary--text"/>Лэндинг</td>
-                        <td>10.10.2018 13:45</td>
-                        <td>выполнен успешно</td>
-                        <td style="text-align: right"><i class="shadow fas fa-dollar-sign icon green--text text--darken-2"></i>10</td>
-                    </tr>
-                    <tr>
-                        <td><i class="shadow fas fa-sign-in-alt icon primary--text"/>Поступление от партнера</td>
-                        <td>10.10.2018 13:45</td>
-                        <td>выполнен успешно</td>
-                        <td style="text-align: right"><i class="shadow fas fa-dollar-sign icon green--text text--darken-2"></i>10</td>
-                    </tr>
-                    <tr>
-                        <td><i class="shadow fas fa-sign-out-alt icon primary--text"/> Перевод партнеру</td>
-                        <td>10.10.2018 13:45</td>
-                        <td>выполнен успешно</td>
-                        <td style="text-align: right"><i class="shadow fas fa-dollar-sign icon green--text text--darken-2"></i>10</td>
                     <tr v-for="(item, inx) in filter" :key="inx" style="cursor: pointer" :class="{ 'elevation-1': hovered === item._id}" @mouseover="hovered = item._id" @mouseout="hovered = void 0">
                         <td class="">
-                            <v-icon small class="shadow icon" :color="item.items.length === 1 ? item.items[0].product.color : 'primary'" :class="item.items.length === 1 ? item.items[0].product.icon : 'fas fa-file-invoice-dollar'"/>
-                            {{ item.items.length === 1 ? item.items[0].product.name : `Платеж № ${item.number}` }}
+                            <v-icon small class="shadow icon" :color="item.product.color || 'primary'" :class="item.product.icon || 'fas fa-file-invoice-dollar'"/>
+                            {{ item.product.name || `Платеж № ${item.id}` }}
                         </td>
                         <td>{{ new Date(item.date).toLocaleString() }}</td>
-                        <td>{{ item.state}}</td>
-                        <td style="text-align: right"><i class="shadow fas fa-dollar-sign icon green--text text--darken-2"></i>{{ item.sum }}</td>
+                        <td>{{ item.state }}</td>
+                        <td style="text-align: right"><i class="shadow fas fa-dollar-sign icon green--text text--darken-2"></i>{{ item.cost }}</td>
                     </tr>
                     
                 </tbody>
@@ -112,8 +65,13 @@
         },
         computed: {
             filter() {
+                //debugger
                 return this.raw_data;
-            }
+            },
+            endpoint() {
+                
+                return `${this.entity}${ this.component_id ? ':' + this.component_id : '' }/?page=${this.page}`;
+            },
         },
         methods: {
         },
@@ -121,12 +79,18 @@
         },
         data() {
             return {
+                hovered: void 0,
                 page: 1,
                 sort: [
                     { text: 'по умолчанию' },
                     { text: 'по дате' },
                     { text: 'по сумме' }
                 ]
+            }
+        },
+        watch: {
+            'page': function() {
+                this.load();
             }
         }
     }

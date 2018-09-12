@@ -86,7 +86,8 @@ let price = {
 let destination = {
     to: String,
     sum: Number,
-    percent: Number
+    percent: Number,
+    line: Number
 };
 
 let Product = neoModel(neo, 'Продукт', product);
@@ -258,7 +259,8 @@ function hash(value) {
                 await Destination._save({ 
                     to: 'referer.list.members.' + rc + '.wallet.address',
                     percent: 7,
-                    sum: 5
+                    sum: 5,
+                    line: rc + 1
                 });
     
                 rc--;
@@ -267,19 +269,22 @@ function hash(value) {
             await Destination._save({ 
                 to: 'referer.list.members.0.wallet.address',
                 percent: 20,
-                sum: 15
+                sum: 15,
+                line: 7
             });
 
             await Destination._save({ 
                 to: 'referer.wallet.address',
                 percent: 15,
-                sum: 10
+                sum: 10,
+                line: 1
             });
 
             await Destination._save({ 
                 to: 'club.wallet.address',
                 percent: 30,
                 sum: 25,
+                line: 0
                 //line: 0 //SET ALL LINES OR AS RELATION PROPERTY OR AS OBJECT {line} property
             });
 
@@ -348,7 +353,7 @@ function hash(value) {
                         publicKey,
                         privateKey,
                         club_address,
-                        address: generate('1234567890abcdef', 32)
+                        address: 'fake_address:' + generate('1234567890abcdef', 32)
                     },
                     group: 'admins'
                 });

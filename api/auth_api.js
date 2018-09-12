@@ -82,10 +82,10 @@ class SignOut extends API {
     }
 
     async submit() {
-        this.payload.auth = {
+        this.payload && (this.payload.auth = {
             id: this.payload.auth.id,
             signed: 0
-        };
+        });
     }
 }
 

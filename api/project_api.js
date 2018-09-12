@@ -5,6 +5,8 @@ const { Model, DBAccess } = require('./db_api');
 const { API, SecuredAPI } = require('./base_api');
 const db = require('./models');
 
+const axios = require('axios');
+
 const Order = require('./order');
 
 function s2p(obj, path){
@@ -84,11 +86,11 @@ class Donate extends SecuredAPI {
 
             let donate = await db.Product._findOne({ name: 'взнос' });
             
-            let params = donate.price.destinations.reduce((memo, destination, inx) => { //change inx to destination line!!! 0- line is club address ever
+            let params = donate.price.destinations.reduce((memo, destination) => { //change inx to destination line!!! 0- line is club address ever
                 memo.charges = memo.charges || {};
                 memo.destinations = memo.destinations || [];
 
-                memo.charges[inx] = destination.sum;
+                memo.charges[destination.line] = destination.sum;
                 
                 let address = destination.to;
 
@@ -99,14 +101,28 @@ class Donate extends SecuredAPI {
                 }
 
                 memo.destinations.push({
-                    line: inx,
+                    line: destination.line,
                     address
                 });
+
+                memo.cost = memo.cost + destination.sum || destination.sum;
 
                 return memo;
             }, {});
 
-            params.cost = donate.price.amount;
+            params.address = member.wallet.club_address;
+            params.memberAddress = member.wallet.address;
+            params.type = 'tDonate';
+
+            let order = await axios({
+                method: 'POST',
+                url: 'http://atlantwork.com/btcapi/newOrder',
+                data: { ...params }
+            });
+
+            console.log(order);
+
+            /* params.cost = donate.price.amount;
             let convert = await db.btc.convertToBtc(donate.price.amount);
             params.rate = convert.rate.last;
             params.address = member.wallet.club_address;
@@ -140,7 +156,7 @@ class Donate extends SecuredAPI {
 
                     return await db.btc.convertToBtc(donate.price.amount);                
                 }
-            });
+            }); */
 
             return result;
         }

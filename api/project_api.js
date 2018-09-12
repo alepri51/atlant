@@ -36,6 +36,23 @@ class Donate extends SecuredAPI {
 
     async cancel(payload, req, res) {
         console.log(payload);
+
+        let response = await axios({
+            method: 'DELETE',
+            url: `http://atlantwork.com/btcapi/orders/${payload.id}`
+        })
+        .catch((err) => {
+            this.error = {
+                code: err.code || 400,
+                message: err.message
+                
+            };
+        });
+
+        if(this.error) return;
+
+        console.log(response.data);
+        //return response.data;
     }
 
     async save(payload, req, res) {
@@ -86,22 +103,36 @@ class Donate extends SecuredAPI {
 
             let donate = await db.Product._findOne({ name: 'взнос' });
             
-            let params = donate.price.destinations.reduce((memo, destination) => { //change inx to destination line!!! 0- line is club address ever
+            let params = donate.price.destinations.reduce(async (memo, destination) => { //change inx to destination line!!! 0- line is club address ever
+                memo = await memo;
+
                 memo.charges = memo.charges || {};
                 memo.destinations = memo.destinations || [];
 
                 memo.charges[destination.line] = destination.sum;
                 
-                let address = destination.to;
+                let root = destination.to.split('.')[0];
+                let mid = destination.to.split('.')[1];
+                let address = void 0;
 
-                if(address.indexOf('.') !== -1) {
-                    let member = destination.to.split('.')[0];
-                    destination.to = destination.to.split('.').slice(1);
-                    address = s2p(roots[member], destination.to.join('.'));
+                if(root !== 'member') {
+                    if(roots[root]) {
+                        destination.to = destination.to.split('.').slice(1);
+                        mid = s2p(roots[root], destination.to.join('.'));
+                        mid = mid || roots[root];
+                        address = mid.wallet.address;
+                        mid = mid._id;
+                    } else throw new Error('Unknown product destination!');
+                }
+                else {
+                    mid = await db.Member._findOne({ _id: mid }); //NOT TESTED YET
+                    address = mid.wallet.address;
+                    mid = mid._id;
                 }
 
                 memo.destinations.push({
                     line: destination.line,
+                    mid,
                     address
                 });
 
@@ -110,53 +141,57 @@ class Donate extends SecuredAPI {
                 return memo;
             }, {});
 
+            params = await params;
+
             params.address = member.wallet.club_address;
             params.memberAddress = member.wallet.address;
-            params.type = 'tDonate';
+            params.memberId = member._id;
+            params.type = donate._id;
+            params.product = donate.name;
 
-            let order = await axios({
+            let response = await axios({
                 method: 'POST',
                 url: 'http://atlantwork.com/btcapi/newOrder',
                 data: { ...params }
+            })
+            .catch((err) => {
+                this.error = {
+                    code: err.code || 400,
+                    message: err.message
+                };
             });
+
+            /* let response = await axios({
+                method: 'GET',
+                url: `http://atlantwork.com/btcapi/orders/${20}`,
+                data: { ...params }
+            })
+            .catch((err) => {
+                this.error = {
+                    code: err.code || 400,
+                    message: err.message
+                    
+                };
+            }); */
+
+            if(this.error) return;
+
+            let order = response.data.order || response.data;
 
             console.log(order);
 
-            /* params.cost = donate.price.amount;
-            let convert = await db.btc.convertToBtc(donate.price.amount);
-            params.rate = convert.rate.last;
-            params.address = member.wallet.club_address;
+            let { id, amount, cost, rate, address } = order;
 
-            let order = new Order({ ...params });
-            order = order.get();
+            let result = { donate: { id, amount, cost, rate, address } };
 
-            order._id = db.generate('1234567890abcdef', 32);
-            order.state = 'unconfirmed';
+            this.emitter.cycle({ event: 'check-order', interval: 1000, immediate: false });
 
-            let { price, ...rest_donate } = donate;
-            order.product = rest_donate;
-            order.date = Date.now();
-
-            let { destinations, ...rest_order } = order;
-
-            fake_orders[order._id] = rest_order;
-
-            let result = {
-                donate: rest_order
-            };
-
-            let cnt = 20;
-            this.emitter.push({
-                calls: Infinity,
-                executor: async (self) => {
-                   
-                    cnt--;
-                    self.calls = cnt;
-                    console.log(Date.now(), rest_order._id);
-
-                    return await db.btc.convertToBtc(donate.price.amount);                
-                }
-            }); */
+            let cnt = 5;
+            this.emitter.on('check-order', (socket) => {
+                cnt--;
+                !cnt && this.emitter.stop('check-order');
+                console.log('check-order', cnt);
+            });
 
             return result;
         }
@@ -187,6 +222,18 @@ class Payment extends DBAccess {
 
     async default(params) {
         console.log(params);
+
+        /* let response = await axios({
+            method: 'GET',
+            url: 'http://atlantwork.com/btcapi/orders',
+            data: { ...params }
+        })
+        .catch((err) => {
+            this.error = {
+                code: err.code || 400,
+                message: err.message
+            };
+        }); */
 
         let page = params.page - 1 || 0;
         

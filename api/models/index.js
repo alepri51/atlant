@@ -257,7 +257,7 @@ function hash(value) {
             while(rc !== 0) {
 
                 await Destination._save({ 
-                    to: 'referer.list.members.' + rc + '.wallet.address',
+                    to: 'referer.list.members.' + rc,
                     percent: 7,
                     sum: 5,
                     line: rc + 1
@@ -267,21 +267,21 @@ function hash(value) {
             }
     
             await Destination._save({ 
-                to: 'referer.list.members.0.wallet.address',
+                to: 'referer.list.members.0',
                 percent: 20,
                 sum: 15,
                 line: 7
             });
 
             await Destination._save({ 
-                to: 'referer.wallet.address',
+                to: 'referer',
                 percent: 15,
                 sum: 10,
                 line: 1
             });
 
             await Destination._save({ 
-                to: 'club.wallet.address',
+                to: 'club', // can be also member.{id} //lookup members with {id}
                 percent: 30,
                 sum: 25,
                 line: 0

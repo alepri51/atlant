@@ -7,6 +7,7 @@ const router = express.Router();
 router.use(express.json());
 router.use(express.urlencoded({extended: false}));
 
+const Emitter = require('./api/emitter');
 const types = require('./api');
 
 let io = void 0;
@@ -156,109 +157,10 @@ process.on('unhandledRejection', err => {
     console.log('unhandledRejection => ', err);
 });
 
-const EventEmitter = require('events');
-
-class Emitter extends EventEmitter {
-    constructor({ io, payload, interval }) {
-        super();
-        //internal server singlton  to create at start up
-        this.io = io;
-        this.payload = payload;
-
-        this.timer = void 0;
-
-        this.cycle(interval);
-
-        this.functions = [
-            {
-                calls: Infinity,
-                executor: this.onInterval
-            }
-        ];
-
-        /* this.functions = [
-            {
-                calls: Infinity,
-                executor: this.onInterval
-            }, 
-            this.test,
-            {
-                calls: 1,
-                executor: this.test1
-            }
-        ]; */
-    }
-
-    push(action) {
-        this.functions.push(action);
-    }
-
-    cycle(interval = 1000) {
-        !this.timer && (this.timer = setTimeout(async () => {
-            clearTimeout(this.timer);
-            
-            let actions = this.functions.reduce((memo, action) => {
-                if(typeof action === 'object') {
-                    let calls = action.calls;
-                    action.calls > 0 && memo.push(action.executor.call(this, action));
-                    action.calls === calls && action.calls--;
-                };
-
-                if(typeof action === 'function') {
-                    memo.push(action.call(this));
-                };
-
-                return memo;
-            }, []);
-
-            this.functions = this.functions.filter(action => typeof action === 'function' || (typeof action === 'object' && action.calls));
-
-            await Promise.all(actions);
-
-            this.timer = void 0
-            this.cycle(interval);
-        }, interval));
-    }
-
-    onInterval(self) {
-    
-        return new Promise((resolve, reject) => {
-            //self && (self.calls = 0); // 0- to stop; 1- to call once mo time
-            this.emit('interval');
-
-            //console.log('interval');
-
-            return resolve(); 
-        });
-
-        //return Promise.resolve();
-    }
-
-    /* async test() {
-        return new Promise((resolve, reject) => {
-            setTimeout(() => {
-
-                console.log('TEST executed');
-                return resolve();    
-            }, 100);
-        });
-    }
-
-    async test1() {
-        return new Promise((resolve, reject) => {
-            setTimeout(() => {
-
-                console.log('TEST1 executed');
-                return resolve();    
-            }, 100);
-        });
-    } */
-}
-
 module.exports = function(io) {
     socketInitialize(io);
 
-    emitter = new Emitter({ io, interval: 1000 });
+    emitter = new Emitter({ io });
 
     return router;
 }

@@ -32,7 +32,7 @@
         extends: Modal,
         data: () => {
             return {
-                //entity: 'payment'
+                
             }
         },
         methods: {
@@ -42,26 +42,16 @@
                     method: 'post', 
                     endpoint: 'donate.cancel',
                     payload: this.form,
-                    callback: () => {
+                    //repeatOnError: 403,
+                    callback: (response) => {
                         
-                        this.commit('HIDE_MODAL', { [this.entity]: void 0 });
+                        if(!response.error) 
+                            this.commit('HIDE_MODAL', { [this.entity]: void 0 });
                         
                         //this.$router.replace('landing');
                     }    
                 });
             }
-            /* submit() {
-                this.execute({ 
-                    method: 'post', 
-                    endpoint: 'donate.submit',
-                    callback: () => {
-                        
-                        this.commit('HIDE_MODAL', { [this.entity]: void 0 });
-                        
-                        //this.$router.replace('landing');
-                    }    
-                });
-            } */
         }
     }    
 </script>

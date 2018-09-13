@@ -9,7 +9,7 @@ const { normalize } = require('./models/normalize');
 
 const { SecuredAPI, API } = require('./base_api');
 
-class Model extends API {
+class Model extends SecuredAPI {
     constructor(...args) {
         super(...args);
 

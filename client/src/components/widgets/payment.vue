@@ -38,13 +38,13 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr v-for="(item, inx) in filter" :key="inx" style="cursor: pointer" :class="{ 'elevation-1': hovered === item._id}" @mouseover="hovered = item._id" @mouseout="hovered = void 0">
+                    <tr v-for="(item, inx) in filter" :key="inx" style="cursor: pointer" :class="{ 'elevation-1': hovered === item.id}" @mouseover="hovered = item.id" @mouseout="hovered = void 0">
                         <td class="">
-                            <v-icon small class="shadow icon" :color="item.product.color || 'primary'" :class="item.product.icon || 'fas fa-file-invoice-dollar'"/>
-                            {{ item.product.name || `Платеж № ${item.id}` }}
+                            <v-icon small class="shadow icon" :color="item.color || 'primary'" :class="item.icon || 'fas fa-file-invoice-dollar'"/>
+                            {{ item.type || `Платеж № ${item.id}` }}
                         </td>
-                        <td>{{ new Date(item.date).toLocaleString() }}</td>
-                        <td>{{ item.state }}</td>
+                        <td>{{ new Date(item.createdAt).toLocaleString() }}</td>
+                        <td>{{ item.status }}</td>
                         <td style="text-align: right"><i class="shadow fas fa-dollar-sign icon green--text text--darken-2"></i>{{ item.cost }}</td>
                     </tr>
                     

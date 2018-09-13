@@ -200,6 +200,8 @@ class SecuredAPI extends API {
 
             //this.generateError({ code: 403, message: 'Отказано в доступе. Возможно Ваша сессия завершилась.', data: { expired: true, class: this.constructor.name }});
         };
+        
+        console.log(this.class_name);
 
         return this.auth ? this.auth.signed !== 1 && authError : authError;
     }

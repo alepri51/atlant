@@ -57,31 +57,36 @@ class Donate extends SecuredAPI {
 
     async save(payload, req, res) {
         console.log(payload);
-        let order = fake_orders[payload._id];
-        order.state = 'waiting';
 
-        let orders = Object.values(fake_orders);
+        let response = await axios({
+            method: 'GET',
+            url: `http://atlantwork.com/btcapi/orders/?id=${payload.id}`
+        })
+        .catch((err) => {
+            this.error = {
+                code: err.code || 400,
+                message: err.message
+                
+            };
+        });
+
+        let order = response.data.order;
 
         let result = {
-            orders
+            orders: [order]
         };
 
         result = normalize(result);
         this.io.emit(`${this.auth.member}:update:paymentlayout`, result);
 
-        /* setTimeout(() => {
-            order.state = 'completed';
+        this.emitter.cycle({ event: 'check-order', interval: 1000, immediate: false });
 
-            let orders = Object.values(fake_orders);
-    
-            let result = {
-                orders
-            };
-
-            result = normalize(result);
-            this.io.emit(`${this.auth.member}:update:paymentlayout`, result);
-
-        }, 4000); */
+        let cnt = 5;
+        this.emitter.on('check-order', (socket) => {
+            cnt--;
+            !cnt && this.emitter.stop('check-order');
+            console.log('check-order', cnt);
+        });
 
         return result;
     }
@@ -146,8 +151,8 @@ class Donate extends SecuredAPI {
             params.address = member.wallet.club_address;
             params.memberAddress = member.wallet.address;
             params.memberId = member._id;
-            params.type = donate._id;
-            params.product = donate.name;
+            params.type = donate.name;
+            params.typeId = donate._id;
 
             let response = await axios({
                 method: 'POST',
@@ -158,13 +163,13 @@ class Donate extends SecuredAPI {
                 this.error = {
                     code: err.code || 400,
                     message: err.message
+                    //message: (err.config && err.config.data) || err.message
                 };
             });
 
             /* let response = await axios({
                 method: 'GET',
-                url: `http://atlantwork.com/btcapi/orders/${20}`,
-                data: { ...params }
+                url: `http://atlantwork.com/btcapi/orders/?id=${32}`,
             })
             .catch((err) => {
                 this.error = {
@@ -184,14 +189,7 @@ class Donate extends SecuredAPI {
 
             let result = { donate: { id, amount, cost, rate, address } };
 
-            this.emitter.cycle({ event: 'check-order', interval: 1000, immediate: false });
-
-            let cnt = 5;
-            this.emitter.on('check-order', (socket) => {
-                cnt--;
-                !cnt && this.emitter.stop('check-order');
-                console.log('check-order', cnt);
-            });
+            
 
             return result;
         }
@@ -223,21 +221,20 @@ class Payment extends DBAccess {
     async default(params) {
         console.log(params);
 
-        /* let response = await axios({
+        let response = await axios({
             method: 'GET',
-            url: 'http://atlantwork.com/btcapi/orders',
-            data: { ...params }
+            url: `http://atlantwork.com/btcapi/orders/?memberId=${this.auth.member}&limit=${params.size || 5}&offset=${(params.page - 1 || 0) * (params.size || 5)}`
         })
         .catch((err) => {
             this.error = {
                 code: err.code || 400,
                 message: err.message
+                
             };
-        }); */
+        });
 
-        let page = params.page - 1 || 0;
-        
-        let orders = Object.values(fake_orders).slice(page * 8, (page + 1) * 8);
+        this.error = void 0;
+        let orders = !this.error ? response.data.orders : [];
 
         let result = {
             orders

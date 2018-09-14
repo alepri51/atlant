@@ -73,7 +73,7 @@ body ::-webkit-scrollbar-track {
 }
 
 *:not(i) {
-    font-family: 'Montserrat' !important;
+    font-family: 'Roboto Condensed'!important;
 }
 
 a.v-tabs__item:hover {

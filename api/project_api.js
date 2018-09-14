@@ -59,8 +59,37 @@ class Donate extends SecuredAPI {
         }); */
     }
 
-    checkDonate(self) {
+    checkOrder({ id }) {
+        this.emitter.cycle({ event: 'check-order', interval: 1000, immediate: false });
 
+        let cnt = 5;
+        this.emitter.on('check-order', async (socket, cb) => {
+            cnt--;
+            !cnt && this.emitter.stop('check-order');
+            console.log('check-order', cnt);
+
+            let response = await axios({
+                method: 'PUT',
+                url: `http://atlantwork.com/btcapi/orders/${id}`,
+                data: {
+                    "status": "done",
+                    "txid": "56d135250c9f1661ad891214e6abd26cdb802ce50fea6e920384c457a57a57d8",
+                    "txidOut": "1cd6eb9bddac2091bd1ee1465d9d98a9ff41fc3d9b0835688fa23197d786e8f9",
+                    "confirmations": 12
+                }
+            })
+            .catch((err) => {
+                this.error = {
+                    code: err.code || 400,
+                    message: err.message
+                    
+                };
+            });
+
+            //socket.emit(`${this.auth.member}:update:paymentlayout`, response.data);
+
+            cb();
+        });
     }
 
     async cancel(payload, req, res) {
@@ -112,16 +141,8 @@ class Donate extends SecuredAPI {
 
         result = normalize(result);
 
-        //this.io.emit(`${this.auth.member}:update:paymentlayout`, result);
 
-        this.emitter.cycle({ event: 'check-order', interval: 1000, immediate: false });
-
-        let cnt = 5;
-        this.emitter.on('check-order', (socket) => {
-            cnt--;
-            !cnt && this.emitter.stop('check-order');
-            console.log('check-order', cnt);
-        });
+        this.checkOrder({ id: params.id });
 
         return result;
     }

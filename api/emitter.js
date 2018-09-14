@@ -21,15 +21,16 @@ class Emitter extends EventEmitter {
         !this.timer[event] && this.timer[event] !== 'STOP' && (this.timer[event] = setTimeout(async () => {
             clearTimeout(this.timer[event]);
             
-            this.emit(event, this.io);
-
-            this.counter[event] -= 1;
+            this.emit(event, this.io, (params) => {
+                this.counter[event] -= 1;
             
-            !this.counter[event] && (this.timer[event] = 'STOP');
+                !this.counter[event] && (this.timer[event] = 'STOP');
+    
+                this.timer[event] !== 'STOP' && (this.timer[event] = void 0);
+    
+                this.cycle({ event, interval, immediate: false });
+            });
 
-            this.timer[event] !== 'STOP' && (this.timer[event] = void 0);
-
-            this.cycle({ event, interval, immediate: false });
         }, first_interval));
     }
 

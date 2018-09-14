@@ -11,7 +11,7 @@
 
                 <v-pagination
                     v-model="page"
-                    :length="14"
+                    :length="length"
                     prev-icon="fas fa-caret-left primary--text"
                     next-icon="fas fa-caret-right primary--text"
                     :total-visible="6"
@@ -64,12 +64,17 @@
             'dropdown-filter': filter
         },
         computed: {
+            cache() {
+                return this.length !== this.page;
+            },
+            length() {
+                let count = this.raw_data.find(item => !item.id);
+                return count ? count.count : 0;
+            },
             filter() {
-                //debugger
-                return this.raw_data;
+                return this.raw_data.filter(item => item.id);
             },
             endpoint() {
-                
                 return `${this.entity}${ this.component_id ? ':' + this.component_id : '' }/?page=${this.page}`;
             },
         },
@@ -89,7 +94,8 @@
             }
         },
         watch: {
-            'page': function() {
+            'page': function(val) {
+                this.$emit('page-changed', val);
                 this.load();
             }
         }

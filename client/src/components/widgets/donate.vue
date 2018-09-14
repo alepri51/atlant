@@ -44,6 +44,7 @@
     import VueQRCodeComponent from 'vue-qrcode-component';
 
     export default {
+        props: ['paymentPage'],
         extends: Widget,
         components: {
             qr: VueQRCodeComponent
@@ -67,6 +68,7 @@
                         if(!response.error) {
                             //console.log(response.data.donate);
 
+                            response.data.donate.paymentPage = this.paymentPage;
                             this.commit('SHOW_MODAL', { donate: response.data.donate });
                             
                             //this.$router.replace('landing');

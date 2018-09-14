@@ -1,4 +1,5 @@
 import Base from '../class_base';
+import {Cache} from 'axios-extensions';
 //import widget from './widgets/widget';
 
 export default {
@@ -25,10 +26,13 @@ export default {
         load() {
             //debugger;
             //console.log('LOADING:', this.entity);
-            this.active && this.execute({ endpoint: this.endpoint, method: 'get' });
+            this.active && this.execute({ endpoint: this.endpoint, method: 'get', cache: this.cache }); 
         }
     },
     computed: {
+        cache() {
+            return true;
+        },
         endpoint() {
             return `${this.entity}${ this.component_id ? ':' + this.component_id : '' }`;
         },

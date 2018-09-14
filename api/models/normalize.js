@@ -7,6 +7,8 @@ let normalize = function normalize(data = {}) {
         data.api = data.api || 'v1';
         const schema = normalizer.schema;
 
+        const _count = new schema.Entity('count', {}, { idAttribute: 'count' });
+
         const _wallet = new schema.Entity('wallet', {}, { idAttribute: '_id' });
 
         const _member = new schema.Entity('member', {}, { idAttribute: '_id' });
@@ -49,7 +51,8 @@ let normalize = function normalize(data = {}) {
             defaults: [_default],
             content: [_content],
             manual: [_manual],
-            orders: [_order]
+            orders: [_order],
+            count: _count
         }, { 
             idAttribute: 'api'
         });

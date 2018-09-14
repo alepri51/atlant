@@ -1,5 +1,15 @@
 <template>
-    <dashboard v-if="authenticated" :title="title" :layout="layout" :components="components" :data="{}" @REGISTER-COMPONENT="registerComponent" @select="onSelect" :selected="selected"/>
+    <dashboard v-if="authenticated" 
+        :title="title" 
+        :layout="layout" 
+        :components="components" 
+        :data="{}" 
+        @REGISTER-COMPONENT="registerComponent" 
+        @page-changed="payment_page = arguments[0]" 
+        @select="onSelect" 
+        :selected="selected"
+        :payment-page="payment_page"
+    />
     <div v-else>
         ДОСТУП ЗАКРЫТ
     </div>
@@ -22,6 +32,7 @@
         data() {
 			return {
                 selected: void 0,
+                payment_page: 1,
                 layouts: {
                     
                     'xs,sm,md,lg,xl': {

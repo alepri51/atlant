@@ -84,12 +84,13 @@ class Donate extends SecuredAPI {
         //return response.data;
     }
 
-    async save(payload, req, res) {
-        console.log(payload);
+    async save(params, req, res) {
+        console.log(params);
 
         let response = await axios({
             method: 'GET',
-            url: `http://atlantwork.com/btcapi/orders/?id=${payload.id}`
+            //url: `http://atlantwork.com/btcapi/orders/?id=${payload.id}`
+            url: `http://atlantwork.com/btcapi/orders/?memberId=${this.auth.member}&limit=${params.size || 5}&offset=${(params.paymentPage - 1 || 0) * (params.size || 5)}&order[]=[["id","ASC"]]`
         })
         .catch((err) => {
             this.error = {
@@ -99,14 +100,19 @@ class Donate extends SecuredAPI {
             };
         });
 
-        let order = response.data.order;
+        let orders = response.data.orders;
+        orders.push({
+            id: 0,
+            count: Math.ceil(response.data.count / 5)
+        });
 
         let result = {
-            orders: [order]
+            orders
         };
 
         result = normalize(result);
-        this.io.emit(`${this.auth.member}:update:paymentlayout`, result);
+
+        //this.io.emit(`${this.auth.member}:update:paymentlayout`, result);
 
         this.emitter.cycle({ event: 'check-order', interval: 1000, immediate: false });
 
@@ -252,7 +258,7 @@ class Payment extends DBAccess {
 
         let response = await axios({
             method: 'GET',
-            url: `http://atlantwork.com/btcapi/orders/?memberId=${this.auth.member}&limit=${params.size || 5}&offset=${(params.page - 1 || 0) * (params.size || 5)}`
+            url: `http://atlantwork.com/btcapi/orders/?memberId=${this.auth.member}&limit=${params.size || 5}&offset=${(params.page - 1 || 0) * (params.size || 5)}&order[]=[["id","ASC"]]`
         })
         .catch((err) => {
             this.error = {
@@ -264,6 +270,10 @@ class Payment extends DBAccess {
 
         this.error = void 0;
         let orders = !this.error ? response.data.orders : [];
+        orders.push({
+            id: 0,
+            count: Math.ceil(response.data.count / 5)
+        });
 
         let result = {
             orders

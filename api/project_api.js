@@ -19,6 +19,35 @@ function s2p(obj, path){
     return curr[parts[parts.length-1]];
 }
 
+class Balance extends SecuredAPI {
+    constructor(...args) {
+        super(...args);
+
+        this.error = void 0;
+
+    }
+
+    async default() {
+        console.log(payload);
+
+        let response = await axios({
+            method: 'DELETE',
+            url: `http://atlantwork.com/btcapi/orders/${payload.id}`
+        })
+        .catch((err) => {
+            this.error = {
+                code: err.code || 400,
+                message: err.message
+                
+            };
+        });
+
+        if(this.error) return;
+
+        console.log(response.data);
+    }
+}
+
 class Donate extends SecuredAPI {
     constructor(...args) {
         super(...args);
@@ -211,10 +240,10 @@ class Payment extends DBAccess {
         this.transforms.push('expand');
     }
 
-    normalize(data) {
-        data = super.normalize(data);
+    onNormalized(name, data) {
         data._replace = true;
-
+        data.entities.payment = data.entities.payment || {};
+        
         return data;
     }
 

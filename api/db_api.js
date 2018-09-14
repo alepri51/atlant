@@ -31,7 +31,7 @@ class Model extends SecuredAPI {
         if(transform && typeof result === 'object' && Object.keys(result).length) {
             let data = this.normalize(result);
             
-            this.onNormalized(name, data);
+            data = this.onNormalized(name, data) || data;
             
             return data;
         }

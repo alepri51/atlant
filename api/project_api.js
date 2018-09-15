@@ -32,7 +32,7 @@ class Balance extends SecuredAPI {
 
         let response = await axios({
             method: 'DELETE',
-            url: `http://atlantwork.com/btcapi/orders/${payload.id}`
+            url: `http://atlantwork.com/btcapi/t/${payload.id}`
         })
         .catch((err) => {
             this.error = {
@@ -60,33 +60,50 @@ class Donate extends SecuredAPI {
     }
 
     checkOrder({ id }) {
-        this.emitter.cycle({ event: 'check-order', interval: 1000, immediate: false });
+        this.emitter.cycle({ event: 'check-order', interval: 3000, immediate: false });
 
         let cnt = 5;
+        let statuses = ['done', 'sending', 'pending'];
+
         this.emitter.on('check-order', async (socket, cb) => {
             cnt--;
-            !cnt && this.emitter.stop('check-order');
-            console.log('check-order', cnt);
+            
+            if(statuses.length) {
 
-            let response = await axios({
-                method: 'PUT',
-                url: `http://atlantwork.com/btcapi/orders/${id}`,
-                data: {
-                    "status": "done",
-                    "txid": "56d135250c9f1661ad891214e6abd26cdb802ce50fea6e920384c457a57a57d8",
-                    "txidOut": "1cd6eb9bddac2091bd1ee1465d9d98a9ff41fc3d9b0835688fa23197d786e8f9",
-                    "confirmations": 12
-                }
-            })
-            .catch((err) => {
-                this.error = {
-                    code: err.code || 400,
-                    message: err.message
+                let status = statuses.pop();
+
+                console.log('check-order', statuses.length);
+
+                let response = await axios({
+                    method: 'PUT',
+                    url: `http://atlantwork.com/btcapi/orders/${id}`,
+                    data: {
+                        status,
+                        "txid": "56d135250c9f1661ad891214e6abd26cdb802ce50fea6e920384c457a57a57d8",
+                        "txidOut": "1cd6eb9bddac2091bd1ee1465d9d98a9ff41fc3d9b0835688fa23197d786e8f9",
+                        "confirmations": 12
+                    }
+                })
+                .catch((err) => {
+                    this.error = {
+                        code: err.code || 400,
+                        message: err.message
+                        
+                    };
+                });
+
+                if(!this.error) {
+                    let result = {
+                        orders: [response.data.order]
+                    };
+            
+                    result = normalize(result);
                     
-                };
-            });
+                    socket.emit(`${this.auth.member}:update:payment`, result);
+                }
+            }
+            else this.emitter.stop('check-order');
 
-            //socket.emit(`${this.auth.member}:update:paymentlayout`, response.data);
 
             cb();
         });
@@ -544,4 +561,4 @@ class News extends DBAccess {
     }
 }
 
-module.exports = { NewsLayout, News, SingleNews, Content, Manual, SingleManual, Structure, Payment, Donate };
+module.exports = { NewsLayout, News, SingleNews, Content, Manual, SingleManual, Structure, Payment, Donate, Balance };

@@ -27,6 +27,25 @@ export default {
             //debugger;
             //console.log('LOADING:', this.entity);
             this.active && this.execute({ endpoint: this.endpoint, method: 'get', cache: this.cache }); 
+
+            if(this.auth.signed === 1 && this.auth.member) {
+                console.log('REGISTER EVENT:', `${this.auth.member}:update:${this.entity}`);
+
+                this.$socket.off(this.events.update);
+
+                let update = this.$socket.on(`${this.auth.member}:update:${this.entity}`, (data) => {
+                    //debugger
+                    this.onEvent(data);
+
+                });
+
+                this.events.update = update.id;
+            }
+        },
+        onEvent(data) {
+            console.log('SOCKET UPDATE DATA:', data);
+                    
+            this.commit('SET_ENTITIES', { method: 'GET', ...data });
         }
     },
     computed: {
@@ -50,6 +69,7 @@ export default {
 
             //this.commit('RESET_CACHE');
             val === 1 && this.load();
+            /* val === 1 && this.load();
 
             if(val === 1 && this.auth.member) {
                 console.log('REGISTER EVENT:', `${this.auth.member}:update:${this.entity}`);
@@ -57,14 +77,13 @@ export default {
                 this.$socket.off(this.events.update);
 
                 let update = this.$socket.on(`${this.auth.member}:update:${this.entity}`, (data) => {
-                    debugger
-                    console.log('SOCKET UPDATE DATA:', data);
-                    
-                    this.commit('SET_ENTITIES', { method: 'GET', ...data });
+                    //debugger
+                    this.onEvent(data);
+
                 });
 
                 this.events.update = update.id;
-            }
+            } */
         },
         'auth.member': function(val, old) {
             //console.log(`${this.entity} MEMBER CHANGED from:`, old, 'TO:', val);

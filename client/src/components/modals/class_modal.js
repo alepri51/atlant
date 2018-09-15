@@ -16,7 +16,7 @@ export default {
             return data;
         },        
         submit() {
-            //debugger
+            debugger
             let validated = this.options.remove || (this.$refs.form && this.$refs.form.validate()) || !this.$refs.form;
 
             let headers = {};
@@ -51,6 +51,7 @@ export default {
 
                             this.$refs.form && this.commit('MUTATE_ENTITY', { entities: response.entities, entity: this.entity, id: this.form._id, deleted: this.options.remove });
                             //this.commit('MUTATE_ENTITY', { entities: response.entities, entity: this.entity, id: this.form._id, deleted: this.options.remove });
+                            this.form = {};
                         }
                     }
                 })
@@ -69,7 +70,7 @@ export default {
 
                 //modal_data = modal_data || {};
                 modal_data = modal_data && {...defaults, ...modal_data};
-                this.form = JSON.parse(JSON.stringify(modal_data || defaults));
+                this.form = Object.keys(this.form).length ? this.form : JSON.parse(JSON.stringify(modal_data || defaults));
 
                 //return !!Object.keys(modal_data).length;
                 return !!modal_data;

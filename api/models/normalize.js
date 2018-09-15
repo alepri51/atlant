@@ -3,7 +3,9 @@
 const normalizer = require('normalizr');
 
 let normalize = function normalize(data = {}) {
+
     if(Object.keys(data).length) {
+        
         data.api = data.api || 'v1';
         const schema = normalizer.schema;
 
@@ -58,7 +60,9 @@ let normalize = function normalize(data = {}) {
         });
 
         let normalized = normalizer.normalize(data, db);
-        delete normalized.entities.wallet;
+
+        delete normalized.entities.wallet; 
+        
         normalized = { ...normalized, entry: 'database' };
 
         return normalized;

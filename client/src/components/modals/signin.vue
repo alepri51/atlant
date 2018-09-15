@@ -52,7 +52,7 @@
         data: (vm) => {
             return {
                 //entity: 'signin',
-                email: 'R9BW0M',//'7r@email.com',//'NUFJCN',
+                email: '7r@email.com',//'7r@email.com',//'NUFJCN',
                 password: '123'
 
                 /* email: 'club@atlant.club',

@@ -105,7 +105,7 @@ let proccedRequest = async function(req, res) {
     return { token, auth, error, ...result };
 };
 
-router.all(patterns, processToken, /* multipartDetector, */ async (req, res, next) => {
+router.all(patterns, processToken, multipartDetector, async (req, res, next) => {
     try {
         
         console.log('BEGIN REQUEST:', req.path);

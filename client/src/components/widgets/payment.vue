@@ -79,6 +79,11 @@
             },
         },
         methods: {
+            onEvent(data) {
+                console.log('SOCKET UPDATE PAYMENT DATA:', data);
+                        
+                !this.cache && this.commit('SET_ENTITIES', { method: 'GET', ...data });
+            }
         },
         created() {
         },

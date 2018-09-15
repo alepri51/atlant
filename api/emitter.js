@@ -27,11 +27,14 @@ class Emitter extends EventEmitter {
                 !this.counter[event] && (this.timer[event] = 'STOP');
     
                 this.timer[event] !== 'STOP' && (this.timer[event] = void 0);
+                this.timer[event] === 'STOP' && this.removeAllListeners(event);
     
                 this.cycle({ event, interval, immediate: false });
             });
 
         }, first_interval));
+
+        this.timer[event] === 'STOP' && (this.timer[event] = void 0);
     }
 
     stop(event) {

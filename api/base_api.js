@@ -89,7 +89,7 @@ class API {
         return await crypto.createPassword(salt, precision || 32);
     }
 
-    signJWT(payload, private_key, options = {algorithm: 'RS256', expiresIn: '50s'}) {
+    signJWT(payload, private_key, options = {algorithm: 'RS256', expiresIn: '3600s'}) {
         //console.log('IAT:', payload.iat);
         delete payload.iat;
         delete payload.exp;

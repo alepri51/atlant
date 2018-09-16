@@ -3,7 +3,8 @@
 
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
 
-const https = require('https');
+//const https = require('https');
+const https = require('http');
 const path = require('path');
 const compression = require('compression');
 const helmet = require('helmet');
@@ -17,15 +18,16 @@ const cors = require('cors');
 
 const fs = require('fs');
 
-const key  = fs.readFileSync('ssl/key.pem', 'utf8');
+/* const key  = fs.readFileSync('ssl/key.pem', 'utf8');
 const cert = fs.readFileSync('ssl/cert.pem', 'utf8');
-const credentials = {key, cert};
+const credentials = {key, cert}; */
 
 const httpsListenPort = process.env.PORT || 8001;
 
 const app = express();
 
-let httpsServer = https.createServer(credentials, app);
+//let httpsServer = https.createServer(credentials, app);
+let httpsServer = https.createServer(app);
 
 httpsServer.listen(httpsListenPort);
     

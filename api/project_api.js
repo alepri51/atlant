@@ -28,25 +28,20 @@ class Balance extends SecuredAPI {
     }
 
     async default() {
-        console.log(payload);
+        let income = fake_tnx.filter(tnx => tnx.toMember === this.auth.member && tnx.order.status === 'done');
 
-        let response = await axios({
-            method: 'DELETE',
-            url: `http://atlantwork.com/btcapi/t/${payload.id}`
-        })
-        .catch((err) => {
-            this.error = {
-                code: err.code || 400,
-                message: err.message
-                
-            };
+        let total = income.reduce((sum, tnx) => sum + tnx.amount, 0);
+
+        return normalize({
+            balance: {
+                id: this.auth.member,
+                total
+            }
         });
-
-        if(this.error) return;
-
-        console.log(response.data);
     }
 }
+
+let fake_tnx = [];
 
 class Donate extends SecuredAPI {
     constructor(...args) {
@@ -60,49 +55,40 @@ class Donate extends SecuredAPI {
     }
 
     checkOrder({ id }) {
-        this.emitter.cycle({ event: 'check-order', interval: 3000, immediate: false });
 
-        let cnt = 5;
-        let statuses = ['done', 'sending', 'pending'];
+        this.emitter.cycle({ event: 'check-order', interval: 500, immediate: false });
 
         this.emitter.on('check-order', async (socket, cb) => {
-            cnt--;
             
-            if(statuses.length) {
+            let response = await axios({
+                method: 'GET',
+                url: `http://atlantwork.com/btcapi/orders/${id}`,
+            })
+            .catch((err) => {
+                this.error = {
+                    code: err.code || 400,
+                    message: err.message
+                    
+                };
+            });
 
-                let status = statuses.pop();
+            if(!this.error) {
+                response.data.order.status === 'done' && this.emitter.stop('check-order');
+                console.log('check-order', response.data.order.status);
 
-                console.log('check-order', statuses.length);
-
-                let response = await axios({
-                    method: 'PUT',
-                    url: `http://atlantwork.com/btcapi/orders/${id}`,
-                    data: {
-                        status,
-                        "txid": "56d135250c9f1661ad891214e6abd26cdb802ce50fea6e920384c457a57a57d8",
-                        "txidOut": "1cd6eb9bddac2091bd1ee1465d9d98a9ff41fc3d9b0835688fa23197d786e8f9",
-                        "confirmations": 12
-                    }
-                })
-                .catch((err) => {
-                    this.error = {
-                        code: err.code || 400,
-                        message: err.message
-                        
-                    };
+                response.data.order.status === 'done' && response.data.order.destinations.forEach(item => {
+                    socket.emit(`${item.mid}:update:balance`);
                 });
 
-                if(!this.error) {
-                    let result = {
-                        orders: [response.data.order]
-                    };
-            
-                    result = normalize(result);
-                    
-                    socket.emit(`${this.auth.member}:update:payment`, result);
-                }
+                let result = {
+                    orders: [response.data.order]
+                };
+        
+                result = normalize(result);
+                result.id = id;
+                
+                socket.emit(`${this.auth.member}:update:payment`, result);
             }
-            else this.emitter.stop('check-order');
 
 
             cb();
@@ -136,7 +122,7 @@ class Donate extends SecuredAPI {
         let response = await axios({
             method: 'GET',
             //url: `http://atlantwork.com/btcapi/orders/?id=${payload.id}`
-            url: `http://atlantwork.com/btcapi/orders/?memberId=${this.auth.member}&limit=${params.size || 5}&offset=${(params.paymentPage - 1 || 0) * (params.size || 5)}&order[]=[["id","ASC"]]`
+            url: `http://atlantwork.com/btcapi/orders/?memberId=${this.auth.member}&limit=${params.size || 5}&offset=${(params.paymentPage - 1 || 0) * (params.size || 5)}`
         })
         .catch((err) => {
             this.error = {
@@ -157,19 +143,83 @@ class Donate extends SecuredAPI {
         };
 
         result = normalize(result);
-
+        result._replace = true;
 
         this.checkOrder({ id: params.id });
+        this.fakeChangeOrder({ id: params.id });
 
         return result;
     }
+
+    async fakeChangeOrder({ id }) {
+        this.emitter.cycle({ event: 'change-order', interval: 1000, immediate: false });
+
+        let statuses = ['done', 'sending', 'pending'];
+
+        this.emitter.on('change-order', async (socket, cb) => {
+            if(statuses.length) {
+
+                let status = statuses.pop();
+
+                let response = await axios({
+                    method: 'PUT',
+                    url: `http://atlantwork.com/btcapi/orders/${id}`,
+                    data: {
+                        status
+                    }
+                })
+                .catch((err) => {
+                    this.error = {
+                        code: err.code || 400,
+                        message: err.message
+                        
+                    };
+                });
+
+                if(status === 'done') {
+                    response.data.order.destinations.forEach(item => {
+                        fake_tnx.push({
+                            blocktime: Date.now(),
+                            amount: item.amount,
+                            vout: 0,
+                            fromMember: this.auth.member,
+                            toMember: item.mid,
+                            order: response.data.order
+                        })
+                    });
+                }
+
+            }
+            else this.emitter.stop('change-order');
+
+            cb();
+        });
+    }
+
 
     async prepare() {
         let member = await db.Member._findOne({ _id: this.auth.member });
 
         if(member.referer) {
+            /* let response = await axios({ ПРОВЕРИТЬ ПЕРИОД ОПЛАТЫ
+                method: 'GET',
+                url: `http://atlantwork.com/btcapi/orders/?memberId=${this.auth.member}`
+            })
+            .catch((err) => {
+                this.error = {
+                    code: err.code || 400,
+                    message: err.message
+                    
+                };
+            });
+
+            if(!this.error) {
+
+            } */
+
             let referer = await db.Member._findOne({ _id: member.referer._id });
             referer.list = await db.List._findOne({ _id: referer.list._id });
+            referer.list.members = referer.list.members.sort((a, b) => a._rel.номер - b._rel.номер);
 
             let club = await db.Club._findAll();
             club = club.pop();
@@ -275,8 +325,6 @@ class Donate extends SecuredAPI {
     }
 }
 
-let fake_orders = {};
-
 class Payment extends DBAccess {
     constructor(...args) {
         super(...args);
@@ -296,7 +344,7 @@ class Payment extends DBAccess {
 
         let response = await axios({
             method: 'GET',
-            url: `http://atlantwork.com/btcapi/orders/?memberId=${this.auth.member}&limit=${params.size || 5}&offset=${(params.page - 1 || 0) * (params.size || 5)}&order[]=[["id","ASC"]]`
+            url: `http://atlantwork.com/btcapi/orders/?memberId=${this.auth.member}&limit=${params.size || 5}&offset=${(params.page - 1 || 0) * (params.size || 5)}`
         })
         .catch((err) => {
             this.error = {

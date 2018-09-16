@@ -25,7 +25,9 @@ let normalize = function normalize(data = {}) {
         
         const _default = new schema.Entity('default', {}, { idAttribute: '_name' });
         
-        const _order = new schema.Entity('payment', {}, { idAttribute: 'id' });
+        const _order = new schema.Entity('payment', {});
+
+        const _balance = new schema.Entity('balance', {});
 
         const _news = new schema.Entity('news', {
             author: _member
@@ -54,7 +56,8 @@ let normalize = function normalize(data = {}) {
             content: [_content],
             manual: [_manual],
             orders: [_order],
-            count: _count
+            //count: _count,
+            balance: _balance
         }, { 
             idAttribute: 'api'
         });

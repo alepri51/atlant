@@ -52,6 +52,8 @@ export default {
                             this.$refs.form && this.commit('MUTATE_ENTITY', { entities: response.entities, entity: this.entity, id: this.form._id, deleted: this.options.remove });
                             //this.commit('MUTATE_ENTITY', { entities: response.entities, entity: this.entity, id: this.form._id, deleted: this.options.remove });
                             this.form = {};
+                            
+                            this.onSubmit && this.onSubmit();
                         }
                     }
                 })

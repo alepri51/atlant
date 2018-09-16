@@ -65,14 +65,15 @@
         },
         computed: {
             cache() {
-                return this.length !== this.page;
+                //return this.length !== this.page;
+                return true;
             },
             length() {
                 let count = this.raw_data.find(item => !item.id);
                 return count ? count.count : 0;
             },
             filter() {
-                return this.raw_data.filter(item => item.id);
+                return this.raw_data.filter(item => item.id).sort((a, b) => b.id - a.id);
             },
             endpoint() {
                 return `${this.entity}${ this.component_id ? ':' + this.component_id : '' }/?page=${this.page}`;
@@ -82,7 +83,10 @@
             onEvent(data) {
                 console.log('SOCKET UPDATE PAYMENT DATA:', data);
                         
-                !this.cache && this.commit('SET_ENTITIES', { method: 'GET', ...data });
+                //!this.cache && this.commit('SET_ENTITIES', { method: 'GET', ...data });
+            
+                this.entities.payment[data.id] && this.commit('SET_ENTITIES', { method: 'GET', ...data });
+                this.commit('RESET_CACHE_BY_GROUP', 'payment');
             }
         },
         created() {

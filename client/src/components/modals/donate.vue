@@ -36,6 +36,10 @@
             }
         },
         methods: {
+            onSubmit() {
+                //debugger
+                this.commit('RESET_CACHE_BY_GROUP', 'payment');
+            },
             cancel() {
                 debugger
                 this.execute({ 

@@ -21,13 +21,13 @@
             <div class="ui statistics ma-2">
                 <div class="statistic  ">
                     <div class="value">
-                        <i class="shadow fas fa-dollar-sign icon green--text text--darken-2"></i> 655
+                        <i class="shadow fab fa-btc icon green--text text--darken-2"></i> {{ filter.total }}
                     </div>
                     <div class="label">
                         Всего
                     </div>
                 </div>
-                <div class="statistic  ">
+                <!-- <div class="statistic  ">
                     <div class="value red--text text--darken-2">
                         <i class="shadow fas fa-dollar-sign icon green--text text--darken-2"></i> -5
                     </div>
@@ -42,7 +42,7 @@
                     <div class="label">
                         За месяц
                     </div>
-                </div>
+                </div> -->
             </div>
         <!-- </v-layout>    -->
 
@@ -56,15 +56,26 @@
         extends: Widget,
         computed: {
             filter() {
-                return this.raw_data;
+                return this.raw_data[0] || {};
+            },
+            cache() {
+                return !this.needToUpdate;
             }
         },
         methods: {
+            onEvent(data) {
+                debugger
+                console.log('SOCKET UPDATE balance DATA:', data);
+                this.needToUpdate = true;
+                this.load();                        
+            }
+
         },
         created() {
         },
         data() {
             return {
+                needToUpdate: false
             }
         }
     }

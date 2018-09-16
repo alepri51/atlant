@@ -253,24 +253,59 @@ function hash(value) {
         
         let destinations = await Destination._findAll();
         if(!!!prices.length) {
-            let rc = 5;
-            while(rc !== 0) {
+            /* let rc = 1;
+            while(rc < 7) {
 
                 await Destination._save({ 
-                    to: 'referer.list.members.' + rc,
+                    to: 'referer.list.members.' + (rc - 1),
                     percent: 7,
                     sum: 5,
-                    line: rc + 1
+                    line: rc
                 });
     
-                rc--;
-            }
+                rc++;
+            } */
     
             await Destination._save({ 
                 to: 'referer.list.members.0',
                 percent: 20,
                 sum: 15,
                 line: 7
+            });
+
+            await Destination._save({ 
+                to: 'referer.list.members.1',
+                percent: 20,
+                sum: 15,
+                line: 6
+            });
+
+            await Destination._save({ 
+                to: 'referer.list.members.2',
+                percent: 20,
+                sum: 15,
+                line: 5
+            });
+
+            await Destination._save({ 
+                to: 'referer.list.members.3',
+                percent: 20,
+                sum: 15,
+                line: 4
+            });
+
+            await Destination._save({ 
+                to: 'referer.list.members.4',
+                percent: 20,
+                sum: 15,
+                line: 3
+            });
+
+            await Destination._save({ 
+                to: 'referer.list.members.5',
+                percent: 20,
+                sum: 15,
+                line: 2
             });
 
             await Destination._save({ 

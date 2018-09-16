@@ -1,8 +1,10 @@
 import Vue from 'vue';
 import Vuex from 'vuex';
 import io from 'socket.io-client';
+import URI from './components/elements/uris';
 
-const BASE_URL = 'https://localhost:8001';
+const BASE_URL = 'https://atlant.club';
+//const BASE_URL = 'https://localhost:8001';
 
 //debugger;
 const socket = io(BASE_URL);
@@ -24,9 +26,19 @@ import { cacheAdapterEnhancer, throttleAdapterEnhancer, Cache } from 'axios-exte
 Vue.use(Vuex);
 
 const CancelToken = axios.CancelToken;
-let requests_cache = new Cache();
+//let requests_cache = new Cache();
+let requests_cache = {};
+
 let api = void 0;
 let repeatQueue = [];
+
+const parseURL = (url) => {
+    let [used, unused] = url.split('/');
+    let [component, rest = ''] = used.split(':');
+    let [id, action] = rest.split('.');
+    let view = `${component}${ id ? '_' + id : ''}`;
+    return view;
+}
 
 export default new Vuex.Store({
     strict: true,
@@ -84,13 +96,18 @@ export default new Vuex.Store({
         RESET_CACHE(state) {
             //console.log('RESET', state.auth ? state.auth.signed : 'NULL');
             ////console.log('RESET', state.auth.signed);
-            requests_cache.reset();
+            Object.values(requests_cache).forEach(val => val.reset());
+            //requests_cache.reset();
+        },
+        RESET_CACHE_BY_GROUP(state, name) {
+
+            requests_cache[name] && requests_cache[name].reset();
         },
         INIT(state, view) {
             if(api) return;
 
             api = axios.create({ 
-                baseURL: `${BASE_URL}/api`,
+                baseURL: `${BASE_URL}/api/`,
                 headers: { 'Cache-Control': 'no-cache' },
 	            adapter: throttleAdapterEnhancer(cacheAdapterEnhancer(axios.defaults.adapter), { threshold: 100 })
             });
@@ -110,8 +127,10 @@ export default new Vuex.Store({
             let onResponse = (async response => {
 
                 //response.data._cached && !requests_cache.has(response.config.url) && //console.log('INVALID CACHE');
+                let view = parseURL(response.config.url.replace(response.config.baseURL, ''));
+                let cache = requests_cache[view];
 
-                if(response.data._cached && !requests_cache.has(response.config.url)) {
+                if(response.data._cached && !cache.has(response.config.url)) {
                     response.data._cached = false;
                     //response.config.cache = false;
                     response = await api(response.config);
@@ -346,7 +365,14 @@ export default new Vuex.Store({
                 headers
             };
 
-            config.cache = config.method === 'get' ? cache ? requests_cache : false : false;
+            //debugger
+
+            let view = parseURL(endpoint);
+            
+            let cache_name = view;
+            let use_cahce = requests_cache[cache_name] = requests_cache[cache_name] || new Cache();
+
+            config.cache = config.method === 'get' ? cache ? use_cahce : false : false;
 
             //config.cache = false;
             commit('LOADING', true);
@@ -354,6 +380,7 @@ export default new Vuex.Store({
             //console.log('EXECUTE:', endpoint, 'CACHE', !!config.cache);
 
             try {
+                
 
                 config.method === 'get' ? config.params = payload : config.data = payload;
                 repeatOnError && (config.repeatOnError = { ...config, callback, code: repeatOnError });

@@ -33,13 +33,14 @@ export default {
 
                 this.$socket.off(this.events.update);
 
-                let update = this.$socket.on(`${this.auth.member}:update:${this.entity}`, (data) => {
+                let event = `${this.auth.member}:update:${this.entity}`;
+                let update = this.$socket.on(event, (data) => {
                     //debugger
                     this.onEvent(data);
 
                 });
 
-                this.events.update = update.id;
+                this.events.update = event;
             }
         },
         onEvent(data) {

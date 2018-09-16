@@ -21,7 +21,8 @@ const bolt_port = 7687;
 //http://206.81.24.70:7474
 const neo = require('seraph')({
     bolt: true,
-    server: `bolt://206.81.24.70:${bolt_port}`,
+    server: `bolt://10.135.47.222:${bolt_port}`,
+    //server: `bolt://206.81.24.70:${bolt_port}`,
     user: 'neo4j',
     pass: '123',
     id: '_id'

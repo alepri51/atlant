@@ -1,8 +1,8 @@
 <template>
-    <div>
-        <greeting/>
-        <painpoint/>
-    </div>
+    <iframe src="http://s461722.lpmotortest.com/" style="width: 100%; height: 100%; margin: -2px;"></iframe>
+    <!-- <div>
+        ЗАМЕНИ МЕНЯ
+    </div> -->
 </template>
 
 <script>

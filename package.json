@@ -9,6 +9,10 @@
   },
   "author": "ap",
   "license": "ISC",
+  "engines": {
+    "node": "^10.*",
+    "npm": "^6.2.*"
+  },
   "dependencies": {
     "axios": "^0.18.0",
     "bcryptjs": "^2.4.3",

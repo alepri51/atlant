@@ -27,7 +27,7 @@ const neo = require('seraph')({
     id: '_id'
 });
 
-const neoModel = require('seraph-model');
+const neoModel = require('./seraph-model');
 
 //////////////////////////MODELS//////////////////////////////////////
 
